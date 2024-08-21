@@ -1,16 +1,52 @@
 {
     "name": "org.kb10uy.zatools",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "org.kb10uy.zatools.runtime",
+        "nadena.dev.ndmf",
+        "nadena.dev.ndmf.runtime",
+        "nadena.dev.ndmf.vrchat",
+        "nadena.dev.modular-avatar.core",
+        "AnimatorAsCode.V1",
+        "AnimatorAsCode.V1.VRChat"
+    ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "VRCSDKBase.dll",
+        "VRCSDK3A.dll",
+        "VRC.Dynamics.dll",
+        "VRC.SDK3.Dynamics.PhysBone.dll",
+        "VRC.SDK3.Dynamics.Contact.dll",
+        "VRC.SDK3.Dynamics.Constraint.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "nadena.dev.ndmf",
+            "expression": "1.4.0",
+            "define": "KZT_NDMF"
+        },
+        {
+            "name": "nadena.dev.modular-avatar",
+            "expression": "1.9.0",
+            "define": "KZT_MODULAR_AVATAR"
+        },
+        {
+            "name": "dev.hai-vr.animator-as-code.v1",
+            "expression": "1.1.0",
+            "define": "KZT_ANIMATOR_AS_CODE"
+        },
+        {
+            "name": "dev.hai-vr.animator-as-code.v1.vrchat",
+            "expression": "1.1.0",
+            "define": "KZT_ANIMATOR_AS_CODE_VRC"
+        }
+    ],
     "noEngineReferences": false
 }
