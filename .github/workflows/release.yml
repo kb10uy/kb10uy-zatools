@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 env:
-  packageName: "org.kb10uy.eye-pointer-installer"
+  packageName: "org.kb10uy.zatools"
 
 jobs:
   build:
