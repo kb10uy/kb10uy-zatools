@@ -15,7 +15,7 @@ namespace KusakaFactory.Zatools
         {
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
-                .Run(new Modules.SkirtInfluenceApplier());
+                .Run(new Modules.BoneArrayRotationInfluenceApplier());
         }
     }
 }
