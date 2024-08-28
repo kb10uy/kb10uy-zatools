@@ -4,6 +4,12 @@
         <uie:PropertyField name="FieldParentOffsetDistance" binding-path="ParentOffsetDistance" label="Offset Distance" focusable="true" tooltip="親ボーンを生成する位置の Y 軸方向の距離" style="margin-right: 0; margin-top: 0; margin-bottom: 0; margin-left: 0;" />
         <ui:Label tabindex="-1" text="Sources" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelChainRoots" style="font-size: 12.5px; margin-left: 4px; -unity-font-style: bold; margin-top: 8px;" />
         <ui:ListView name="FieldChainRoots" reorderable="true" show-add-remove-footer="true" binding-path="ChainRoots" show-border="true" header-title="Sources" virtualization-method="DynamicHeight" tooltip="ボーン鎖のリスト" reorder-mode="Animated" show-bound-collection-size="false" show-foldout-header="false" style="margin-right: 0; margin-top: 2px; margin-bottom: 0; margin-left: 4px;" />
-        <ui:Button text="Replace with direct children" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonReplaceWithChildren" tooltip="Sources をこの GameObject の直接の子のリストに設定する" style="margin-top: 8px; margin-right: 2px;" />
+        <ui:Foldout text="Sources Manipulation" value="false">
+            <ui:Button text="Replace with direct children" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonReplaceWithChildren" tooltip="Sources をこの GameObject の直接の子のリストに設定する" style="margin-top: 8px; margin-right: 2px;" />
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row; flex-shrink: 1;">
+                <ui:Slider high-value="1" name="SliderUpdateAllInfluences" show-input-field="true" style="flex-grow: 2; margin-right: 2px;" />
+                <ui:Button text="Update All Influence" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonUpdateAllInfluences" style="flex-grow: 1; padding-right: 12px; margin-right: 2px;" />
+            </ui:VisualElement>
+        </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>

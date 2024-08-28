@@ -22,13 +22,17 @@ namespace KusakaFactory.Zatools.Inspector
             var sourcesList = inspector.Q<ListView>("FieldChainRoots");
             sourcesList.makeItem = visualTreeItem.CloneTree;
 
+            var allInfluencesSlider = inspector.Q<Slider>("SliderUpdateAllInfluences");
             var replaceButton = inspector.Q<Button>("ButtonReplaceWithChildren");
-            replaceButton.clickable.clicked += ReplaceWithChildren;
+            var updateInfluencesButton = inspector.Q<Button>("ButtonUpdateAllInfluences");
+            allInfluencesSlider.value = 1.0f;
+            replaceButton.clickable.clicked += () => ReplaceWithChildren(allInfluencesSlider.value);
+            updateInfluencesButton.clickable.clicked += () => UpdateAllInfluences(allInfluencesSlider.value);
 
             return inspector;
         }
 
-        private void ReplaceWithChildren()
+        private void ReplaceWithChildren(float influenceValue)
         {
             var attachedObjectTransform = (target as BoneArrayRotationInfluence).transform;
             var directChildTransforms = Enumerable.Range(0, attachedObjectTransform.childCount)
@@ -51,7 +55,19 @@ namespace KusakaFactory.Zatools.Inspector
 
                 var newItem = chainRoots.GetArrayElementAtIndex(i);
                 newItem.FindPropertyRelative(nameof(RotationInfluence.Root)).objectReferenceValue = directChildTransforms[i].Transform;
-                newItem.FindPropertyRelative(nameof(RotationInfluence.Influence)).floatValue = 1.0f;
+                newItem.FindPropertyRelative(nameof(RotationInfluence.Influence)).floatValue = influenceValue;
+            }
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void UpdateAllInfluences(float influenceValue)
+        {
+            serializedObject.Update();
+            var chainRoots = serializedObject.FindProperty(nameof(BoneArrayRotationInfluence.ChainRoots));
+            for (var i = 0; i < chainRoots.arraySize; ++i)
+            {
+                var currentItem = chainRoots.GetArrayElementAtIndex(i);
+                currentItem.FindPropertyRelative(nameof(RotationInfluence.Influence)).floatValue = influenceValue;
             }
             serializedObject.ApplyModifiedProperties();
         }
