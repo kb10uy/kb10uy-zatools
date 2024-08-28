@@ -1,5 +1,7 @@
 #if KZT_NDMF
 
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using KusakaFactory.Zatools.Runtime;
@@ -29,20 +31,28 @@ namespace KusakaFactory.Zatools.Inspector
         private void ReplaceWithChildren()
         {
             var attachedObjectTransform = (target as BoneArrayRotationInfluence).transform;
-            serializedObject.Update();
+            var directChildTransforms = Enumerable.Range(0, attachedObjectTransform.childCount)
+                .Select((i) =>
+                {
+                    var transform = attachedObjectTransform.GetChild(i);
+                    var rawAtan2 = Mathf.Atan2(transform.localPosition.z, transform.localPosition.x);
+                    var angleFromZ = Mathf.Repeat(rawAtan2 + Mathf.PI * 1.5f, Mathf.PI * 2.0f);
+                    return (Transform: transform, Angle: angleFromZ);
+                })
+                .OrderBy((p) => p.Angle)
+                .ToList();
 
+            serializedObject.Update();
             var chainRoots = serializedObject.FindProperty(nameof(BoneArrayRotationInfluence.ChainRoots));
             chainRoots.ClearArray();
-            for (var i = 0; i < attachedObjectTransform.childCount; ++i)
+            for (var i = 0; i < directChildTransforms.Count; ++i)
             {
-                var root = attachedObjectTransform.GetChild(i);
                 chainRoots.InsertArrayElementAtIndex(i);
 
                 var newItem = chainRoots.GetArrayElementAtIndex(i);
-                newItem.FindPropertyRelative(nameof(RotationInfluence.Root)).objectReferenceValue = root;
+                newItem.FindPropertyRelative(nameof(RotationInfluence.Root)).objectReferenceValue = directChildTransforms[i].Transform;
                 newItem.FindPropertyRelative(nameof(RotationInfluence.Influence)).floatValue = 1.0f;
             }
-
             serializedObject.ApplyModifiedProperties();
         }
     }
