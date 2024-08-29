@@ -47,7 +47,7 @@ namespace KusakaFactory.Zatools.Modules
 
                 // RotationOffset の計算
                 var middleQuaternion = Quaternion.Slerp(prev.rotation, next.rotation, 0.5f);
-                var rotationDiff = Quaternion.FromToRotation(middleQuaternion * Vector3.up, parentTransform.rotation * Vector3.up);
+                var rotationDiff = Quaternion.Inverse(middleQuaternion) * parentTransform.rotation;
 
                 // RotationConstraint の設定
                 var rotationConstraint = fakeParent.AddComponent<VRCRotationConstraint>();
