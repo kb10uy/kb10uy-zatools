@@ -1,15 +1,19 @@
 #if KZT_NDMF
 
+using System;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Runtime;
+using nadena.dev.ndmf.localization;
 
 namespace KusakaFactory.Zatools.Modules
 {
     internal sealed class BoneArrayRotationInfluenceApplier : Pass<BoneArrayRotationInfluenceApplier>
     {
+        private readonly Lazy<Localizer> _localizer = new Lazy<Localizer>(() => ZatoolNdmfLocalizer.GetLocalizer());
+
         public override string QualifiedName => nameof(BoneArrayRotationInfluenceApplier);
         public override string DisplayName => "Apply skirt PhysBone influence";
 
@@ -25,6 +29,7 @@ namespace KusakaFactory.Zatools.Modules
             var virtualStart = influenceSettings.CloseLoop ? chainsCount : 0;
             var virtualEnd = influenceSettings.CloseLoop ? virtualStart + chainsCount + 1 : virtualStart + chainsCount;
 
+            bool nonCanonicalDetected = false;
             for (int i = virtualStart; i < virtualStart + chainsCount; ++i)
             {
                 var center = influenceSettings.ChainRoots[i % chainsCount];
@@ -38,6 +43,15 @@ namespace KusakaFactory.Zatools.Modules
                 parentTransform.localPosition -= Vector3.up * influenceSettings.ParentOffsetDistance;
                 parentTransform.SetParent(center.Root.parent, true);
                 center.Root.transform.SetParent(parentTransform, true);
+
+                // Armature scale が 1 から離れてると Offset Distance が広くなりすぎたりするらしいので警告する
+                // cf. https://github.com/kb10uy/kb10uy-zatools/issues/1
+                var actualOffset = (center.Root.transform.position - parentTransform.position).magnitude;
+                if (!nonCanonicalDetected && actualOffset / influenceSettings.ParentOffsetDistance >= 1.05f)
+                {
+                    ErrorReport.ReportError(_localizer.Value, ErrorSeverity.Information, "bari.non-canonical-scale", influenceSettings.gameObject.name);
+                    nonCanonicalDetected = true;
+                }
 
                 // 影響元ボーン
                 var hasPrev = i - 1 >= 0;
@@ -59,7 +73,7 @@ namespace KusakaFactory.Zatools.Modules
                 rotationConstraint.IsActive = true;
             }
 
-            Object.DestroyImmediate(influenceSettings);
+            UnityEngine.Object.DestroyImmediate(influenceSettings);
         }
     }
 }

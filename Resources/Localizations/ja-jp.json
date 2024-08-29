@@ -1,0 +1,4 @@
+{
+    "bari.non-canonical-scale": "Bone Array Rotation Influence: 非正規化スケールを検出しました",
+    "bari.non-canonical-scale:description": "親ボーンの挿入位置が指定された Offset Distance から離れていることを検出しました。これには Armature のスケールが 1 ではないなど、複数の原因が考えられます。\nRotation Constraint の動作がおかしい場合、Offset Distance を更に小さい値～ゼロに設定してみてください。"
+}
