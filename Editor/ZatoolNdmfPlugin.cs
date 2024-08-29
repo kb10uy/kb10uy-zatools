@@ -1,4 +1,3 @@
-
 #if KZT_NDMF
 
 using nadena.dev.ndmf;
