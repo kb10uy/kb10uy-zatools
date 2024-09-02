@@ -1,5 +1,3 @@
-#if KZT_NDMF
-
 using nadena.dev.ndmf;
 
 [assembly: ExportsPlugin(typeof(KusakaFactory.Zatools.ZatoolsNdmfPlugin))]
@@ -18,5 +16,3 @@ namespace KusakaFactory.Zatools
         }
     }
 }
-
-#endif

@@ -1,18 +1,17 @@
-#if KZT_NDMF
-
 using System;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
-using KusakaFactory.Zatools.Runtime;
 using nadena.dev.ndmf.localization;
+using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Modules
 {
     internal sealed class BoneArrayRotationInfluenceApplier : Pass<BoneArrayRotationInfluenceApplier>
     {
-        private readonly Lazy<Localizer> _localizer = new Lazy<Localizer>(() => ZatoolNdmfLocalizer.GetLocalizer());
+        private readonly Lazy<Localizer> _localizer = new Lazy<Localizer>(() => ZatoolLocalization.NdmfLocalizer);
 
         public override string QualifiedName => nameof(BoneArrayRotationInfluenceApplier);
         public override string DisplayName => "Apply skirt PhysBone influence";
@@ -77,5 +76,3 @@ namespace KusakaFactory.Zatools.Modules
         }
     }
 }
-
-#endif

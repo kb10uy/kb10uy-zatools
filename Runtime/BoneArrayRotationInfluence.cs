@@ -1,5 +1,3 @@
-#if KZT_NDMF
-
 using System;
 using UnityEngine;
 using VRC.SDKBase;
@@ -21,5 +19,3 @@ namespace KusakaFactory.Zatools.Runtime
         public float Influence = 1.0f;
     }
 }
-
-#endif

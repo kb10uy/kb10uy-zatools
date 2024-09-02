@@ -1,5 +1,3 @@
-#if KZT_NDMF
-
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -73,5 +71,3 @@ namespace KusakaFactory.Zatools.Inspector
         }
     }
 }
-
-#endif
