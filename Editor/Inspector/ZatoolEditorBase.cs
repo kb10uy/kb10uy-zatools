@@ -6,7 +6,7 @@ namespace KusakaFactory.Zatools.Inspector
 {
     internal abstract class ZatoolEditorBase : Editor
     {
-        private bool _initialized = false;
+        private VisualElement _boundElementRoot;
 
         protected virtual VisualElement CreateInspectorGUIImpl()
         {
@@ -15,19 +15,20 @@ namespace KusakaFactory.Zatools.Inspector
 
         public sealed override VisualElement CreateInspectorGUI()
         {
-            if (!_initialized)
+            if (_boundElementRoot == null)
             {
+                _boundElementRoot = new VisualElement();
                 ZatoolLocalization.OnNdmfLanguageChanged += RebuildUI;
-                _initialized = true;
             }
+            _boundElementRoot.Clear();
+            _boundElementRoot.Add(CreateInspectorGUIImpl());
 
-            return CreateInspectorGUIImpl();
+            return _boundElementRoot;
         }
 
         protected virtual void OnDestroy()
         {
             ZatoolLocalization.OnNdmfLanguageChanged -= RebuildUI;
-            _initialized = false;
         }
 
         private void RebuildUI()

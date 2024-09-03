@@ -6,9 +6,9 @@ using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Localization;
 
-namespace KusakaFactory.Zatools.Inspector
+namespace KusakaFactory.Zatools.Inspector.BoneArrayRotationInfluence
 {
-    [CustomEditor(typeof(BoneArrayRotationInfluence))]
+    [CustomEditor(typeof(Runtime.BoneArrayRotationInfluence))]
     internal sealed class BoneArrayRotationInfluenceInspector : ZatoolEditorBase
     {
         protected override VisualElement CreateInspectorGUIImpl()
@@ -40,7 +40,7 @@ namespace KusakaFactory.Zatools.Inspector
 
         private void ReplaceWithChildren(float influenceValue)
         {
-            var attachedObjectTransform = (target as BoneArrayRotationInfluence).transform;
+            var attachedObjectTransform = (target as Runtime.BoneArrayRotationInfluence).transform;
             var directChildTransforms = Enumerable.Range(0, attachedObjectTransform.childCount)
                 .Select((i) =>
                 {
@@ -53,7 +53,7 @@ namespace KusakaFactory.Zatools.Inspector
                 .ToList();
 
             serializedObject.Update();
-            var chainRoots = serializedObject.FindProperty(nameof(BoneArrayRotationInfluence.ChainRoots));
+            var chainRoots = serializedObject.FindProperty(nameof(Runtime.BoneArrayRotationInfluence.ChainRoots));
             chainRoots.ClearArray();
             for (var i = 0; i < directChildTransforms.Count; ++i)
             {
@@ -69,7 +69,7 @@ namespace KusakaFactory.Zatools.Inspector
         private void UpdateAllInfluences(float influenceValue)
         {
             serializedObject.Update();
-            var chainRoots = serializedObject.FindProperty(nameof(BoneArrayRotationInfluence.ChainRoots));
+            var chainRoots = serializedObject.FindProperty(nameof(Runtime.BoneArrayRotationInfluence.ChainRoots));
             for (var i = 0; i < chainRoots.arraySize; ++i)
             {
                 var currentItem = chainRoots.GetArrayElementAtIndex(i);
