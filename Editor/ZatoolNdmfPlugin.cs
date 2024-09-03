@@ -18,9 +18,9 @@ namespace KusakaFactory.Zatools
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .Run(new Modules.EnhancedEyePointerInstaller.EyeBonesModifier());
 
-            InPhase(BuildPhase.Optimizing)
-                .BeforePlugin("com.anatawa12.avatar-optimizer")
-                .Run(new Modules.KnownDataComponentRemover());
+            // InPhase(BuildPhase.Optimizing)
+            //     .BeforePlugin("com.anatawa12.avatar-optimizer")
+            //     .Run(new Modules.KnownDataComponentRemover());
         }
     }
 }
