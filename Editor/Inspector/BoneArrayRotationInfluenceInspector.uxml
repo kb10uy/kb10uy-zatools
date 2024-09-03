@@ -1,15 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <ui:VisualElement style="flex-grow: 1;">
-        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-left: 4px; margin-bottom: 8px;" />
-        <uie:PropertyField name="FieldCloseLoop" binding-path="CloseLoop" label="Bone array is close loop" tooltip="ChainRoots の最初と最後を繋げるかどうか" focusable="true" style="margin-right: 0; margin-top: 0; margin-bottom: 0; margin-left: 0;" />
-        <uie:PropertyField name="FieldParentOffsetDistance" binding-path="ParentOffsetDistance" label="Offset Distance" focusable="true" tooltip="親ボーンを生成する位置の Y 軸方向の距離" style="margin-right: 0; margin-top: 0; margin-bottom: 0; margin-left: 0;" />
+        <nadena.dev.ndmf.ui.LanguageSwitcher class="ndmf-tr" style="margin-left: 4px; margin-bottom: 8px;" />
+        <uie:PropertyField name="FieldCloseLoop" label="bari.inspector.close-loop" binding-path="CloseLoop" focusable="true" class="ndmf-tr" />
+        <uie:PropertyField name="FieldParentOffsetDistance" label="bari.inspector.offset-distance" binding-path="ParentOffsetDistance" focusable="true" class="ndmf-tr" />
         <ui:Label tabindex="-1" text="Sources" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelChainRoots" style="font-size: 12.5px; margin-left: 4px; -unity-font-style: bold; margin-top: 8px;" />
-        <ui:ListView name="FieldChainRoots" reorderable="true" show-add-remove-footer="true" binding-path="ChainRoots" show-border="true" header-title="Sources" virtualization-method="DynamicHeight" tooltip="ボーン鎖のリスト" reorder-mode="Animated" show-bound-collection-size="false" show-foldout-header="false" style="margin-right: 0; margin-top: 2px; margin-bottom: 0; margin-left: 4px;" />
-        <ui:Foldout text="Sources Manipulation" value="false">
-            <ui:Button text="Replace with direct children" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonReplaceWithChildren" tooltip="Sources をこの GameObject の直接の子のリストに設定する" style="margin-top: 8px; margin-right: 2px;" />
+        <ui:ListView name="FieldChainRoots" reorderable="true" show-add-remove-footer="true" binding-path="ChainRoots" show-border="true" header-title="Sources" virtualization-method="DynamicHeight" tooltip="ボーン鎖のリスト" reorder-mode="Animated" show-bound-collection-size="false" show-foldout-header="false" class="ndmf-tr" style="margin-right: 0; margin-top: 2px; margin-bottom: 0; margin-left: 4px;" />
+        <ui:Foldout text="Sources Manipulation" value="false" name="FoldoutManipulation">
+            <ui:Button text="bari.inspector.replace-bones" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonReplaceWithChildren" class="ndmf-tr" style="margin-top: 8px; margin-right: 2px;" />
             <ui:VisualElement style="flex-grow: 1; flex-direction: row; flex-shrink: 1;">
                 <ui:Slider high-value="1" name="SliderUpdateAllInfluences" show-input-field="true" style="flex-grow: 2; margin-right: 2px;" />
-                <ui:Button text="Update All Influence" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonUpdateAllInfluences" style="flex-grow: 1; padding-right: 12px; margin-right: 2px;" />
+                <ui:Button text="bari.inspector.update-influence" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonUpdateAllInfluences" class="ndmf-tr" style="flex-grow: 1; padding-right: 12px; margin-right: 2px;" />
             </ui:VisualElement>
         </ui:Foldout>
     </ui:VisualElement>

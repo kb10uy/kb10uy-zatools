@@ -48,7 +48,7 @@ namespace KusakaFactory.Zatools.Modules
                 var actualOffset = (center.Root.transform.position - parentTransform.position).magnitude;
                 if (!nonCanonicalDetected && actualOffset / influenceSettings.ParentOffsetDistance >= 1.05f)
                 {
-                    ErrorReport.ReportError(_localizer.Value, ErrorSeverity.Information, "bari.non-canonical-scale", influenceSettings.gameObject.name);
+                    ErrorReport.ReportError(_localizer.Value, ErrorSeverity.Information, "bari.report.non-canonical-scale", influenceSettings.gameObject.name);
                     nonCanonicalDetected = true;
                 }
 

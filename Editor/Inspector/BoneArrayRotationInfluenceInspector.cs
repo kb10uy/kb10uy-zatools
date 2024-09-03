@@ -2,23 +2,31 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Runtime;
+using KusakaFactory.Zatools.Localization;
 
 namespace KusakaFactory.Zatools.Inspector
 {
     [CustomEditor(typeof(BoneArrayRotationInfluence))]
-    internal sealed class BoneArrayRotationInfluenceInspector : Editor
+    internal sealed class BoneArrayRotationInfluenceInspector : ZatoolEditorBase
     {
-        public override VisualElement CreateInspectorGUI()
+        protected override VisualElement CreateInspectorGUIImpl()
         {
             var visualTree = InspectorUtil.LoadInspectorVisualTree("BoneArrayRotationInfluenceInspector");
             var visualTreeItem = InspectorUtil.LoadInspectorVisualTree("BoneArrayRotationInfluenceSource");
 
-            var inspector = new VisualElement();
-            visualTree.CloneTree(inspector);
+            var inspector = visualTree.CloneTree();
+            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
+            inspector.Bind(serializedObject);
 
             var sourcesList = inspector.Q<ListView>("FieldChainRoots");
-            sourcesList.makeItem = visualTreeItem.CloneTree;
+            sourcesList.makeItem = () =>
+            {
+                var item = visualTreeItem.CloneTree();
+                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                return item;
+            };
 
             var allInfluencesSlider = inspector.Q<Slider>("SliderUpdateAllInfluences");
             var replaceButton = inspector.Q<Button>("ButtonReplaceWithChildren");
