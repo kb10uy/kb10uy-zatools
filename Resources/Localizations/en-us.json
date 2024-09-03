@@ -14,5 +14,11 @@
     "bari.inspector.replace-bones": "Replace with Direct Children",
     "bari.inspector.replace-bones:tooltip": "Sets Sources from direct children of this GameObject", 
     "bari.inspector.update-influence": "Update All Influence",
-    "bari.inspector.update-influence:tooltip": "Sets all influence values of Sources with the slider value on left"
+    "bari.inspector.update-influence:tooltip": "Sets all influence values of Sources with the slider value on left",
+    "eepi.inspector.vrc-constraint": "Use VRC Constraint",
+    "eepi.inspector.vrc-constraint:tooltip": "Use VRC Aim Constraint instead of Unity's one. Must be used with EyePointer v1.2 or later.",
+    "eepi.inspector.dummy-bones": "Insert Dummy Bones",
+    "eepi.inspector.dummy-bones:tooltip": "Insert dummy eye bones between head and default eye bones.",
+    "eepi.inspector.fx-layer": "Generate Adapted FX Layer",
+    "eepi.inspector.fx-layer:tooltip": "Generate FX layer by Enhanced EyePointer Installer itself. Needs Animator as Code."
 }
