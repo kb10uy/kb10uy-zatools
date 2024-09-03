@@ -13,6 +13,10 @@ namespace KusakaFactory.Zatools
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new Modules.BoneArrayRotationInfluenceApplier());
+
+            InPhase(BuildPhase.Optimizing)
+                .BeforePlugin("com.anatawa12.avatar-optimizer")
+                .Run(new Modules.KnownDataComponentRemover());
         }
     }
 }

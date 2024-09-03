@@ -13,8 +13,8 @@ namespace KusakaFactory.Zatools.Inspector.BoneArrayRotationInfluence
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
-            var visualTree = InspectorUtil.LoadInspectorVisualTree("BoneArrayRotationInfluenceInspector");
-            var visualTreeItem = InspectorUtil.LoadInspectorVisualTree("BoneArrayRotationInfluenceSource");
+            var visualTree = Resources.LoadInspectorVisualTree("BoneArrayRotationInfluence/BoneArrayRotationInfluenceInspector.uxml");
+            var visualTreeItem = Resources.LoadInspectorVisualTree("BoneArrayRotationInfluence/BoneArrayRotationInfluenceSource.uxml");
 
             var inspector = visualTree.CloneTree();
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
