@@ -52,6 +52,7 @@ namespace KusakaFactory.Zatools.Localization
             return immutableTable;
         }
 
+        [MenuItem("Tools/kb10uy's Various Tools/Reload Localizations")]
         internal static void Invalidate()
         {
             Localizer.ReloadLocalizations();
