@@ -20,7 +20,7 @@ namespace KusakaFactory.Zatools.Localization
 
         internal static Localizer NdmfLocalizer { get; private set; }
 
-        internal static Localizer UILocalizer { get; private set; }
+        internal static UIElementLocalizer UILocalizer { get; private set; }
 
         private static Dictionary<string, ImmutableDictionary<string, string>> StringTableCache = new Dictionary<string, ImmutableDictionary<string, string>>();
 
@@ -29,9 +29,10 @@ namespace KusakaFactory.Zatools.Localization
             NdmfLocalizer = new Localizer(SupportedLanguages[0], () => SupportedLanguages.Select((l) =>
             {
                 var stringTable = LoadStringTableForLanguage(l);
-                Func<string, string> fetcher = (key) => stringTable.GetValueOrDefault(key, key);
+                Func<string, string> fetcher = (key) => stringTable.GetValueOrDefault(key);
                 return (l, fetcher);
             }).ToList());
+            UILocalizer = new UIElementLocalizer(NdmfLocalizer);
             LanguagePrefs.RegisterLanguageChangeCallback(typeof(ZatoolLocalization), (_) => OnNdmfLanguageChanged?.Invoke());
         }
 
@@ -53,8 +54,8 @@ namespace KusakaFactory.Zatools.Localization
 
         internal static void Invalidate()
         {
-            StringTableCache.Clear();
             Localizer.ReloadLocalizations();
+            StringTableCache.Clear();
         }
     }
 }

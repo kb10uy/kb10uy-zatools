@@ -7,8 +7,8 @@ namespace KusakaFactory.Zatools.Localization
 {
     internal sealed class UIElementLocalizer
     {
-        private Localizer _ndmfLocalizer;
-        private Dictionary<Type, Func<VisualElement, Action>> _elementTypedLocalizationActionCache = new Dictionary<Type, Func<VisualElement, Action>>();
+        private static Dictionary<Type, Func<VisualElement, Action>> ElementTypedLocalizationActionCache = new Dictionary<Type, Func<VisualElement, Action>>();
+        private readonly Localizer _ndmfLocalizer;
 
         internal UIElementLocalizer(Localizer ndmfLocalizer)
         {
@@ -23,14 +23,15 @@ namespace KusakaFactory.Zatools.Localization
 
         private void TraverseAndLocalize(VisualElement element)
         {
+            var elementType = element.GetType();
             if (element.ClassListContains("ndmf-tr"))
             {
-                var localizationOperation = GetLocalizationOperation(element.GetType());
+                var localizationOperation = GetLocalizationOperation(elementType);
                 if (localizationOperation != null)
                 {
-                    var updateLocalization = localizationOperation(element);
-                    LanguagePrefs.RegisterLanguageChangeCallback(element, (e) => updateLocalization());
-                    updateLocalization();
+                    var updater = localizationOperation(element);
+                    LanguagePrefs.RegisterLanguageChangeCallback(element, (e) => updater());
+                    updater();
                 }
             }
 
@@ -39,30 +40,39 @@ namespace KusakaFactory.Zatools.Localization
 
         private Func<VisualElement, Action> GetLocalizationOperation(Type elementType)
         {
-            if (_elementTypedLocalizationActionCache.TryGetValue(elementType, out var action)) return action;
-
-            Func<VisualElement, Action> registeredAction = null;
-
-            var labelProperty = elementType.GetProperty("text") ?? elementType.GetProperty("label");
-            if (labelProperty != null)
+            if (!ElementTypedLocalizationActionCache.TryGetValue(elementType, out var updater))
             {
-                registeredAction = (element) =>
+                var labelProperty = elementType.GetProperty("text") ?? elementType.GetProperty("label");
+                if (labelProperty == null)
                 {
-                    var key = labelProperty.GetValue(element) as string;
-                    Action updater = key != null ? () =>
+                    updater = null;
+                }
+                else
+                {
+                    updater = (element) =>
                     {
-                        var localizedLabel = _ndmfLocalizer.GetLocalizedString(key);
-                        var localizedTooltip = _ndmfLocalizer.TryGetLocalizedString($"{key}:tooltip", out var tooltipText) ? tooltipText : null;
-                        labelProperty.SetValue(element, localizedLabel);
-                        element.tooltip = localizedTooltip;
-                    }
-                    : () => { };
-                    return updater;
-                };
-                _elementTypedLocalizationActionCache[elementType] = registeredAction;
+                        var key = labelProperty.GetValue(element) as string;
+                        if (key != null)
+                        {
+                            return () =>
+                            {
+                                var localizedLabel = _ndmfLocalizer.GetLocalizedString(key);
+                                var localizedTooltip = _ndmfLocalizer.TryGetLocalizedString($"{key}:tooltip", out var tooltipText) ? tooltipText : null;
+                                labelProperty.SetValue(element, localizedLabel);
+                                element.tooltip = localizedTooltip;
+                            };
+                        }
+                        else
+                        {
+                            return () => { };
+                        }
+                    };
+                }
+
+                ElementTypedLocalizationActionCache[elementType] = updater;
             }
 
-            return registeredAction;
+            return updater;
         }
     }
 }
