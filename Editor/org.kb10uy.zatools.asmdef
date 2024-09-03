@@ -17,6 +17,7 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
+        "System.Collections.Immutable.dll",
         "Newtonsoft.Json.dll",
         "VRCSDKBase.dll",
         "VRCSDK3A.dll",
@@ -28,11 +29,6 @@
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [
-        {
-            "name": "nadena.dev.ndmf",
-            "expression": "1.4.0",
-            "define": "KZT_NDMF"
-        },
         {
             "name": "nadena.dev.modular-avatar",
             "expression": "1.9.0",

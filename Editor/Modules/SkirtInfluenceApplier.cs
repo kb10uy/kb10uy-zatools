@@ -1,19 +1,14 @@
-#if KZT_NDMF
-
-using System;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
+using KusakaFactory.Zatools.Localization;
 using KusakaFactory.Zatools.Runtime;
-using nadena.dev.ndmf.localization;
 
 namespace KusakaFactory.Zatools.Modules
 {
     internal sealed class BoneArrayRotationInfluenceApplier : Pass<BoneArrayRotationInfluenceApplier>
     {
-        private readonly Lazy<Localizer> _localizer = new Lazy<Localizer>(() => ZatoolNdmfLocalizer.GetLocalizer());
-
         public override string QualifiedName => nameof(BoneArrayRotationInfluenceApplier);
         public override string DisplayName => "Apply skirt PhysBone influence";
 
@@ -49,7 +44,7 @@ namespace KusakaFactory.Zatools.Modules
                 var actualOffset = (center.Root.transform.position - parentTransform.position).magnitude;
                 if (!nonCanonicalDetected && actualOffset / influenceSettings.ParentOffsetDistance >= 1.05f)
                 {
-                    ErrorReport.ReportError(_localizer.Value, ErrorSeverity.Information, "bari.non-canonical-scale", influenceSettings.gameObject.name);
+                    ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "bari.report.non-canonical-scale", influenceSettings.gameObject.name);
                     nonCanonicalDetected = true;
                 }
 
@@ -73,9 +68,7 @@ namespace KusakaFactory.Zatools.Modules
                 rotationConstraint.IsActive = true;
             }
 
-            UnityEngine.Object.DestroyImmediate(influenceSettings);
+            Object.DestroyImmediate(influenceSettings);
         }
     }
 }
-
-#endif

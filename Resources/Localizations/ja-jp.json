@@ -1,4 +1,16 @@
 {
-    "bari.non-canonical-scale": "Bone Array Rotation Influence: 非正規化スケールを検出しました",
-    "bari.non-canonical-scale:description": "親ボーンの挿入位置が指定された Offset Distance から離れていることを検出しました。これには Armature のスケールが 1 ではないなど、複数の原因が考えられます。\nRotation Constraint の動作がおかしい場合、Offset Distance を更に小さい値～ゼロに設定してみてください。"
+    "bari.report.non-canonical-scale": "Bone Array Rotation Influence: 非正規化スケールを検出しました",
+    "bari.report.non-canonical-scale:description": "親ボーンの挿入位置が指定された Offset Distance から離れていることを検出しました。これには Armature のスケールが 1 ではないなど、複数の原因が考えられます。\nRotation Constraint の動作がおかしい場合、Offset Distance を更に小さい値～ゼロに設定してみてください。",
+    "bari.inspector.close-loop": "ループ状のボーン列",
+    "bari.inspector.close-loop:tooltip": "ChainRoots の最初と最後を繋げるかどうか",
+    "bari.inspector.offset-distance": "オフセット距離",
+    "bari.inspector.offset-distance:tooltip": "親ボーンを生成する位置の Y 軸方向の距離",
+    "bari.inspector.root": "ルートボーン",
+    "bari.inspector.root:tooltip": "ボーン鎖のルートにする Transform",
+    "bari.inspector.influence": "影響度",
+    "bari.inspector.influence:tooltip": "このボーン鎖の Rotation Constraint に設定するウェイト",
+    "bari.inspector.replace-bones": "子 GameObject から Sources を設定",
+    "bari.inspector.replace-bones:tooltip": "Sources をこの GameObject の直接の子のリストに設定する", 
+    "bari.inspector.update-influence": "影響度を一括設定",
+    "bari.inspector.update-influence:tooltip": "左のスライダーの値で影響度を全て設定する"
 }

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1; padding-top: 2px; padding-right: 0; padding-bottom: 0; padding-left: 2px;">
+        <uie:ObjectField label="bari.inspector.root" binding-path="Root" name="FieldRoot" type="UnityEngine.Transform, UnityEngine.CoreModule" class="ndmf-tr" style="align-items: stretch; margin-top: 0; margin-right: 0; margin-bottom: 2px; margin-left: 0;" />
+        <ui:Slider label="bari.inspector.influence" high-value="1" name="FieldInfluence" focusable="true" binding-path="Influence" page-size="1" show-input-field="true" inverted="false" class="ndmf-tr" style="align-items: stretch; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+    </ui:VisualElement>
+</ui:UXML>
