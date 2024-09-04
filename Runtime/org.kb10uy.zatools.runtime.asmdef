@@ -11,12 +11,6 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "nadena.dev.ndmf",
-            "expression": "1.4.0",
-            "define": "KZT_NDMF"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }
