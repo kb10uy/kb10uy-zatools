@@ -22,6 +22,7 @@ namespace KusakaFactory.Zatools.Modules
         private void ProcessFor(AdHocBlendShapeMix mixComponent, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             var originalMesh = skinnedMeshRenderer.sharedMesh;
+            if (originalMesh == null) return;
             var blendShapeIndices = Enumerable.Range(0, originalMesh.blendShapeCount)
                 .ToDictionary((i) => originalMesh.GetBlendShapeName(i), (i) => i);
 

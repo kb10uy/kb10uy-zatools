@@ -32,6 +32,7 @@ namespace KusakaFactory.Zatools.Inspector.AdHocBlendShapeMix
             var component = target as Runtime.AdHocBlendShapeMix;
             var targetSkinnedMesh = component.GetComponent<SkinnedMeshRenderer>();
             var sharedMesh = targetSkinnedMesh.sharedMesh;
+            if (sharedMesh == null) return new string[] { };
 
             return Enumerable.Range(0, sharedMesh.blendShapeCount)
                 .Select((i) => sharedMesh.GetBlendShapeName(i))
