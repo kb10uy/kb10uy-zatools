@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; flex-basis: auto; margin-top: 2px; margin-bottom: 2px;">
+        <ui:DropdownField binding-path="FromBlendShape" name="FieldFromBlendShape" style="flex-direction: row; flex-grow: 1; align-self: stretch; width: 0; flex-basis: 0; margin-top: 0; margin-bottom: 0; margin-right: 8px; margin-left: 0;" />
+        <ui:DropdownField binding-path="ToBlendShape" name="FieldToBlendShape" style="flex-grow: 1; align-self: stretch; width: 0; flex-basis: 0; margin-top: 0; margin-right: 8px; margin-bottom: 0; margin-left: 0;" />
+        <ui:Slider high-value="1" name="FieldMixWeight" binding-path="MixWeight" low-value="-1" show-input-field="true" inverted="false" style="flex-grow: 1; align-self: stretch; flex-basis: 0; margin-top: 0; margin-bottom: 0;" />
+    </ui:VisualElement>
+</ui:UXML>
