@@ -43,7 +43,8 @@ namespace KusakaFactory.Zatools.Localization
             if (ElementTypedLocalizationActionCache.TryGetValue(elementType, out var cachedOperation)) return cachedOperation;
 
             Func<VisualElement, Action> operation = null;
-            PropertyInfo labelProperty = elementType.GetProperty("text") ?? elementType.GetProperty("label");
+            // DropdownField とかは label と text 両方あるけど前者しか Set できない
+            PropertyInfo labelProperty = elementType.GetProperty("label") ?? elementType.GetProperty("text");
             if (labelProperty != null)
             {
                 operation = (element) =>
