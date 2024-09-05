@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:TextField picking-mode="Ignore" name="FieldSearchQuery" tooltip="Search Query" max-length="32" style="margin-left: 2px; font-size: 14px;" />
+    <ui:ListView name="FieldBlendShapeNames" style="margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px;" />
+</ui:UXML>
