@@ -56,6 +56,7 @@ namespace KusakaFactory.Zatools.Modules
                         .Select((sdg) => (blendShapeIndices[sdg.Key], sdg.Key, sdg.Sum((d) => d.MixWeight)))
                         .ToArray()
                 })
+                .OrderBy((ad) => ad.TargetIndex)
                 .ToList();
         }
 
