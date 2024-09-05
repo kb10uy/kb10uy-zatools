@@ -3,8 +3,8 @@
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
         <uie:PropertyField name="FieldReplace" binding-path="Replace" label="ahbsm.inspector.replace" focusable="true" class="ndmf-tr" />
         <ui:VisualElement style="flex-grow: 1; flex-direction: row; padding-left: 28px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 0; border-left-width: 1px; border-top-left-radius: 2px; border-top-right-radius: 2px; border-left-color: rgb(26, 26, 26); border-right-color: rgb(26, 26, 26); border-top-color: rgb(26, 26, 26); border-bottom-color: rgb(26, 26, 26); margin-left: 4px; background-color: rgb(53, 53, 53); margin-top: 4px; padding-bottom: 6px; margin-bottom: -4px; padding-top: 2px;">
-            <ui:Label tabindex="-1" text="ahbsm.inspector.from" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelFrom" class="ndmf-tr" style="flex-grow: 1; flex-basis: 0;" />
-            <ui:Label tabindex="-1" text="ahbsm.inspector.to" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelTo" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
+            <ui:Label tabindex="-1" text="ahbsm.inspector.from" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelFrom" class="ndmf-tr" style="flex-grow: 1; flex-basis: 0; margin-right: 16px;" />
+            <ui:Label tabindex="-1" text="ahbsm.inspector.to" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelTo" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1; margin-right: 16px;" />
             <ui:Label tabindex="-1" text="ahbsm.inspector.weight" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelWeight" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
         </ui:VisualElement>
         <ui:ListView name="FieldMixDefinitions" binding-path="MixDefinitions" virtualization-method="DynamicHeight" reorderable="true" show-add-remove-footer="true" show-bound-collection-size="false" reorder-mode="Animated" show-border="true" show-foldout-header="false" style="margin-top: 0; margin-left: 4px;" />
