@@ -25,5 +25,11 @@
     "ahbsm.inspector.definitions": "コピー定義",
     "ahbsm.inspector.from": "コピー元",
     "ahbsm.inspector.to": "コピー先",
-    "ahbsm.inspector.weight": "係数"
+    "ahbsm.inspector.weight": "係数",
+    "ahbsm.inspector.manipulation": "その他の操作",
+    "ahbsm.inspector.save-json": "JSON に保存",
+    "ahbsm.inspector.load-json": "JSON から読み込み",
+    "ahbsm.inspector.from-regex": "コピー元の正規表現",
+    "ahbsm.inspector.to-regex": "コピー先の正規表現",
+    "ahbsm.inspector.append-regex": "コピー元を打ち消す定義をコピー先に追加"
 }

@@ -25,5 +25,11 @@
     "ahbsm.inspector.definitions": "Definitions",
     "ahbsm.inspector.from": "From",
     "ahbsm.inspector.to": "To",
-    "ahbsm.inspector.weight": "Weight"
+    "ahbsm.inspector.weight": "Weight",
+    "ahbsm.inspector.manipulation": "Manipulation",
+    "ahbsm.inspector.save-json": "Save to JSON",
+    "ahbsm.inspector.load-json": "Load from JSON",
+    "ahbsm.inspector.from-regex": "Regex for From",
+    "ahbsm.inspector.to-regex": "Regex for From",
+    "ahbsm.inspector.append-regex": "Append canceling defintions according to Regices"
 }
