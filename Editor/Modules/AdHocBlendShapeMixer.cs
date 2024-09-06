@@ -120,8 +120,6 @@ namespace KusakaFactory.Zatools.Modules
         {
             var meshVertices = originalMesh.vertexCount;
             var meshBlendShapes = originalMesh.blendShapeCount;
-            var definitionEnumerator = resolvedMixDefinitions.GetEnumerator();
-            var nextDefinition = definitionEnumerator.MoveNext() ? definitionEnumerator.Current : null;
             Vector3[] positionsResultBuffer = new Vector3[meshVertices];
             Vector3[] normalsResultBuffer = new Vector3[meshVertices];
             Vector3[] tangentsResultBuffer = new Vector3[meshVertices];
@@ -134,7 +132,7 @@ namespace KusakaFactory.Zatools.Modules
             foreach (var definition in resolvedMixDefinitions)
             {
                 originalMesh.GetBlendShapeFrameVertices(definition.TargetIndex, 0, positionsResultBuffer, normalsResultBuffer, tangentsResultBuffer);
-                foreach (var copySource in nextDefinition.Sources)
+                foreach (var copySource in definition.Sources)
                 {
                     originalMesh.GetBlendShapeFrameVertices(copySource.SourceIndex, 0, positionsSourceBuffer, normalsSourceBuffer, tangentsSourceBuffer);
                     for (int i = 0; i < meshVertices; ++i)

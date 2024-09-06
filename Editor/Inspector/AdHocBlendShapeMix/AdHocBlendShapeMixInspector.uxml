@@ -8,5 +8,16 @@
             <ui:Label tabindex="-1" text="ahbsm.inspector.weight" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelWeight" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
         </ui:VisualElement>
         <ui:ListView name="FieldMixDefinitions" binding-path="MixDefinitions" virtualization-method="DynamicHeight" reorderable="true" show-add-remove-footer="true" show-bound-collection-size="false" reorder-mode="Animated" show-border="true" show-foldout-header="false" style="margin-top: 0; margin-left: 4px;" />
+        <ui:Foldout text="ahbsm.inspector.manipulation" value="true" class="ndmf-tr">
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                <ui:Button text="ahbsm.inspector.save-json" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSaveToJson" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
+                <ui:Button text="ahbsm.inspector.load-json" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonLoadFromJson" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; margin-top: 8px;">
+                <ui:TextField picking-mode="Ignore" label="ahbsm.inspector.from-regex" name="FieldFromRegex" class="ndmf-tr" style="margin-right: 8px;" />
+                <ui:TextField picking-mode="Ignore" label="ahbsm.inspector.to-regex" name="FieldToRegex" class="ndmf-tr" style="margin-right: 8px;" />
+                <ui:Button text="ahbsm.inspector.append-regex" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonAppendWithRegex" class="ndmf-tr" style="margin-right: 4px;" />
+            </ui:VisualElement>
+        </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>
