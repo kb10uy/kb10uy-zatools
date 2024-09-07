@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <uie:ObjectField label="edx.mesh" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" name="FieldSkinnedMeshRenderer" class="ndmf-tr" />
+        <ui:Button text="edx.save-text" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSave" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" multiline="true" readonly="true" name="FieldNamesText" style="flex-basis: 0; flex-grow: 1; flex-direction: column;" />
+    </ui:VisualElement>
+</ui:UXML>

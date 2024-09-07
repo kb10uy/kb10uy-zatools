@@ -31,5 +31,10 @@
     "ahbsm.inspector.load-json": "Load from JSON",
     "ahbsm.inspector.from-regex": "Regex for From",
     "ahbsm.inspector.to-regex": "Regex for From",
-    "ahbsm.inspector.append-regex": "Append canceling defintions according to Regices"
+    "ahbsm.inspector.append-regex": "Append canceling defintions according to Regices",
+    "edx.save-text": "Save as Text File",
+    "edx.base-asset": "Base Asset",
+    "edx.root-path": "Root Path",
+    "edx.query": "Search Query (opt.)",
+    "edx.mesh": "Mesh"
 }
