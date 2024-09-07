@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <uie:ObjectField label="edx.base-asset" type="UnityEngine.Object, UnityEngine.CoreModule" name="FieldBaseAsset" allow-scene-objects="false" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" label="edx.root-path" name="FieldRootPath" is-delayed="true" class="ndmf-tr" />
+        <ui:Button text="edx.save-text" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSave" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" label="edx.query" name="FieldQuery" is-delayed="true" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" multiline="true" readonly="true" name="FieldListText" style="flex-basis: 0; flex-grow: 1; flex-direction: column;" />
+        <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row;">
+            <ui:Button text="&lt;&lt;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonPrevious" style="flex-basis: 0; flex-grow: 1;" />
+            <ui:Label tabindex="-1" text="0 / 0" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelPages" style="flex-basis: 0; flex-grow: 1; align-items: auto; justify-content: space-between; align-self: auto; -unity-text-align: middle-center;" />
+            <ui:Button text="&gt;&gt;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonNext" style="flex-basis: 0; flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
