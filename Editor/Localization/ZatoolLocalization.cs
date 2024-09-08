@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
-using UnityEngine;
 using UnityEditor;
 using nadena.dev.ndmf.localization;
 
@@ -15,6 +14,10 @@ namespace KusakaFactory.Zatools.Localization
         internal static readonly ImmutableList<string> SupportedLanguages = ImmutableList<string>.Empty
             .Add("en-us")
             .Add("ja-jp");
+
+        internal static readonly ImmutableDictionary<string, string> StringTableGuids = ImmutableDictionary<string, string>.Empty
+            .Add("en-us", "7d0e5e80e15dbb54a8d70bb23a19949d")
+            .Add("ja-jp", "262c402765bc89847879905644d0d439");
 
         internal static event Action OnNdmfLanguageChanged;
 
@@ -36,8 +39,6 @@ namespace KusakaFactory.Zatools.Localization
             LanguagePrefs.RegisterLanguageChangeCallback(typeof(ZatoolLocalization), (_) => OnNdmfLanguageChanged?.Invoke());
         }
 
-        internal static string GetStringTableJsonPath(string languageCode) => $"Packages/org.kb10uy.zatools/Resources/Localizations/{languageCode}.json";
-
         internal static ImmutableDictionary<string, string> LoadStringTableForLanguage(string languageCode)
         {
             if (StringTableCache.TryGetValue(languageCode, out var cached))
@@ -45,8 +46,10 @@ namespace KusakaFactory.Zatools.Localization
                 return cached;
             }
 
-            TextAsset asset = AssetDatabase.LoadAssetAtPath<TextAsset>(GetStringTableJsonPath(languageCode));
-            var stringTable = asset != null ? JsonConvert.DeserializeObject<Dictionary<string, string>>(asset.text) : new Dictionary<string, string>();
+            var stringTableText = Resources.LoadTextAssetByGuid(StringTableGuids[languageCode]);
+            var stringTable = stringTableText != null ?
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(stringTableText) :
+                new Dictionary<string, string>();
             var immutableTable = ImmutableDictionary.CreateRange(stringTable);
             StringTableCache.Add(languageCode, immutableTable);
             return immutableTable;
@@ -55,8 +58,8 @@ namespace KusakaFactory.Zatools.Localization
         [MenuItem("Tools/kb10uy's Various Tools/Reload Localizations")]
         internal static void Invalidate()
         {
-            Localizer.ReloadLocalizations();
             StringTableCache.Clear();
+            Localizer.ReloadLocalizations();
         }
     }
 }

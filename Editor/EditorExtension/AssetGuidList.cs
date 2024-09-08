@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadEditorExtensionVisualTree("AssetGuidList.uxml");
+            var visualTree = Resources.LoadVisualTreeByGuid("5ded7ab7b7f943448bcd01783bb476dd");
             visualTree.CloneTree(rootVisualElement);
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
@@ -92,7 +92,6 @@ namespace KusakaFactory.Zatools.EditorExtension
                 .Select((guid) => (guid, AssetDatabase.GUIDToAssetPath(guid)))
                 .Where((p) => p.Item2.Contains(_query.value))
                 .ToList();
-            Debug.Log($"results: {_results.Count}");
 
             _maxPagesCount = Math.Max(1, (_results.Count + (EntriesPerPage - 1)) / EntriesPerPage);
             _currentPage = 0;

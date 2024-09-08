@@ -1,29 +1,36 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
+using System.Collections.Generic;
 
 namespace KusakaFactory.Zatools
 {
     internal static class Resources
     {
-        private readonly static string InspectorRoot = "Packages/org.kb10uy.zatools/Editor/Inspector";
-        private readonly static string EditorExtensionRoot = "Packages/org.kb10uy.zatools/Editor/EditorExtension";
-        private readonly static string ResourceRoot = "Packages/org.kb10uy.zatools/Resources";
+        private readonly static Dictionary<string, VisualTreeAsset> VisualTreeAssetCache = new Dictionary<string, VisualTreeAsset>();
 
-        internal static VisualTreeAsset LoadInspectorVisualTree(string fileStem)
+        [MenuItem("Tools/kb10uy's Various Tools/Reload VisualTree Assets")]
+        internal static void InvalidateVisualTreeAssetCache()
         {
-            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{InspectorRoot}/{fileStem}");
+            VisualTreeAssetCache.Clear();
         }
 
-        internal static VisualTreeAsset LoadEditorExtensionVisualTree(string fileStem)
+        internal static VisualTreeAsset LoadVisualTreeByGuid(string guid)
         {
-            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{EditorExtensionRoot}/{fileStem}");
+            if (VisualTreeAssetCache.TryGetValue(guid, out var vta)) return vta;
+
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            if (assetPath == "") return null;
+            vta = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(assetPath);
+            VisualTreeAssetCache.Add(guid, vta);
+            return vta;
         }
 
-        internal static string LoadTextAsset(string relativePath)
+        internal static string LoadTextAssetByGuid(string guid)
         {
-            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>($"{ResourceRoot}/{relativePath}");
-            return textAsset.text;
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
+            return textAsset != null ? textAsset.text : null;
         }
     }
 }

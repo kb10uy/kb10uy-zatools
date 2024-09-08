@@ -26,7 +26,7 @@ namespace KusakaFactory.Zatools.Modules
 
         private static string[] LoadComponentNames()
         {
-            return Resources.LoadTextAsset("KnownDataComponents.txt")
+            return Resources.LoadTextAssetByGuid("dba4487e756ded24aba7a927f34b53dd")
                 .Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select((l) => l.Trim())
                 .Where((l) => !l.StartsWith("#"))

@@ -20,8 +20,8 @@ namespace KusakaFactory.Zatools.Inspector.AdHocBlendShapeMix
         protected override VisualElement CreateInspectorGUIImpl()
         {
             var blendShapeNames = FetchBlendShapeNames();
-            var visualTree = Resources.LoadInspectorVisualTree("AdHocBlendShapeMix/AdHocBlendShapeMixInspector.uxml");
-            var visualTreeItem = Resources.LoadInspectorVisualTree("AdHocBlendShapeMix/AdHocBlendShapeMixDefinition.uxml");
+            var visualTree = Resources.LoadVisualTreeByGuid("3ae61e75b4b01d348968e3115c250141");
+            var visualTreeItem = Resources.LoadVisualTreeByGuid("93fb3d754041c7242b94a55a4aea9bae");
 
             var inspector = visualTree.CloneTree();
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
@@ -182,8 +182,8 @@ namespace KusakaFactory.Zatools.Inspector.AdHocBlendShapeMix
 
             public override void OnOpen()
             {
-                var visualTree = Resources.LoadInspectorVisualTree("AdHocBlendShapeMix/AdHocBlendShapeMixBlendShapeSelector.uxml");
-                var visualTreeItem = Resources.LoadInspectorVisualTree("AdHocBlendShapeMix/AdHocBlendShapeMixBlendShapeItem.uxml");
+                var visualTree = Resources.LoadVisualTreeByGuid("7bb58b5cddd547a4088117846bea5180");
+                var visualTreeItem = Resources.LoadVisualTreeByGuid("3013bdc0f3fd3274db3da3b0709626ff");
 
                 visualTree.CloneTree(editorWindow.rootVisualElement);
 
