@@ -44,9 +44,22 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 
         private static (GameObject LeftEye, GameObject RightEye) LocateEyeBones(GameObject avatarRoot)
         {
+            var avatarDescriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
+            if (avatarDescriptor.enableEyeLook)
+            {
+                return LocateEyeBonesFromVRCAvatarDescriptor(avatarDescriptor);
+            }
+
             // TODO: もっと intelligent にする
             var leftEyeTransform = avatarRoot.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/LeftEye");
             var rightEyeTransform = avatarRoot.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/RightEye");
+            return (leftEyeTransform.gameObject, rightEyeTransform.gameObject);
+        }
+
+        private static (GameObject LeftEye, GameObject RightEye) LocateEyeBonesFromVRCAvatarDescriptor(VRCAvatarDescriptor avatarDescriptor)
+        {
+            var leftEyeTransform = avatarDescriptor.customEyeLookSettings.leftEye;
+            var rightEyeTransform = avatarDescriptor.customEyeLookSettings.rightEye;
             return (leftEyeTransform.gameObject, rightEyeTransform.gameObject);
         }
 
