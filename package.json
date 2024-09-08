@@ -1,23 +1,23 @@
 {
-  "name": "org.kb10uy.zatools",
-  "displayName": "kb10uy's Various Tools",
-  "version": "1.4.0",
-  "unity": "2022.3",
-  "description": "Various tools developed by kb10uy",
-  "documentationUrl": "https://zatools.kb10uy.dev",
-  "license": "Apache-2.0 OR MIT",
-  "licenseUrl": "https://github.com/kb10uy/kb10uy-zatools/blob/main/LICENSE",
-  "vrchatVersion": "2022.1.1",
-  "author": {
-    "name": "kb10uy",
-    "email": "kb10uy@kb10uy.org",
-    "url": "https://kb10uy.org"
-  },
-  "vpmDependencies": {
-    "com.vrchat.avatars": ">=3.7.0",
-    "nadena.dev.ndmf": ">=1.4.0"
-  },
-  "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.0"
-  }
+    "name": "org.kb10uy.zatools",
+    "displayName": "kb10uy's Various Tools",
+    "version": "1.4.0",
+    "unity": "2022.3",
+    "description": "Various tools developed by kb10uy",
+    "documentationUrl": "https://zatools.kb10uy.dev",
+    "license": "Apache-2.0 OR MIT",
+    "licenseUrl": "https://github.com/kb10uy/kb10uy-zatools/blob/main/LICENSE",
+    "vrchatVersion": "2022.1.1",
+    "author": {
+        "name": "kb10uy",
+        "email": "kb10uy@kb10uy.org",
+        "url": "https://kb10uy.org"
+    },
+    "vpmDependencies": {
+        "com.vrchat.avatars": ">=3.7.0",
+        "nadena.dev.ndmf": ">=1.4.0"
+    },
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.0"
+    }
 }
