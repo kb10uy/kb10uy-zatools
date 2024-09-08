@@ -19,7 +19,7 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadEditorExtensionVisualTree("BlendShapeList.uxml");
+            var visualTree = Resources.LoadVisualTreeByGuid("1fc5e174481e55c469b0104ab3b7dc2c");
             visualTree.CloneTree(rootVisualElement);
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 

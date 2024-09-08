@@ -10,7 +10,7 @@ namespace KusakaFactory.Zatools.Inspector.EnhancedEyePointerInstaller
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
-            var visualTree = Resources.LoadInspectorVisualTree("EnhancedEyePointerInstaller/EnhancedEyePointerInstallerInspector.uxml");
+            var visualTree = Resources.LoadVisualTreeByGuid("67cccac4d1dc9ee438b9d25aad817391");
 
             var inspector = visualTree.CloneTree();
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
