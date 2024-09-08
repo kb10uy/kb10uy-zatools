@@ -4,6 +4,7 @@ using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
+using KusakaFactory.Zatools.Localization;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
 namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
@@ -114,11 +115,29 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 
         private static void ReplaceAvatarDescriptorEyeBones(VRCAvatarDescriptor descriptor, GameObject leftEye, GameObject rightEye)
         {
-            if (!descriptor.enableEyeLook) return;
+            var eyeLookLeft = leftEye.transform;
+            var eyeLookRight = rightEye.transform;
+
+            if (!descriptor.enableEyeLook)
+            {
+                // Eye Look が Disabled のままだと特定条件で変な挙動になる
+                // 適当な GameObject を足して Eye Look を動作だけさせる
+                // see: https://github.com/kb10uy/kb10uy-zatools/issues/16#issuecomment-2336783558
+                var eyePlaceholder = new GameObject("__EEPI_EYE_PLACEHOLDER__");
+                eyePlaceholder.transform.parent = leftEye.transform.parent;
+                eyeLookLeft = eyePlaceholder.transform;
+                eyeLookRight = eyePlaceholder.transform;
+
+                // Disabled 相当のままになるように新しいのを割り当てる
+                descriptor.enableEyeLook = true;
+                descriptor.customEyeLookSettings = new VRCAvatarDescriptor.CustomEyeLookSettings();
+
+                ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.placeholder-inserted");
+            }
+
             var settings = descriptor.customEyeLookSettings;
-            settings.leftEye = leftEye.transform;
-            settings.rightEye = rightEye.transform;
-            // TODO: 角度の設定もいじるべき
+            settings.leftEye = eyeLookLeft;
+            settings.rightEye = eyeLookRight;
             descriptor.customEyeLookSettings = settings;
         }
     }
