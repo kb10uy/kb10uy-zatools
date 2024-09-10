@@ -17,7 +17,7 @@ namespace KusakaFactory.Zatools
             InPhase(BuildPhase.Transforming)
                 // cf. https://github.com/bdunderscore/modular-avatar/issues/1036
                 .AfterPlugin("nadena.dev.modular-avatar")
-                .Run(new Modules.EnhancedEyePointerInstaller.EyeBonesModifier());
+                .Run(new Modules.EnhancedEyePointerInstaller.EepiTransforming());
 
             // InPhase(BuildPhase.Optimizing)
             //     .BeforePlugin("com.anatawa12.avatar-optimizer")
