@@ -23,6 +23,8 @@
     "eepi.inspector.fx-layer:tooltip": "Generate FX layer by Enhanced EyePointer Installer itself. Needs Animator as Code.",
     "eepi.report.placeholder-inserted": "Enhanced EyePointer Installer: Eye Look enabled with placeholder settings",
     "eepi.report.placeholder-inserted:description": "Eye Look in Avatar Descriptor has been enabled with placeholder (i.e. VRChat still won't move your actual eye bones). This is a workaround for unexpected behavior in specific avatar states.",
+    "eepi.report.prefab-moved": "Enhanced EyePointer Installer: Eye Pointer prefab has been moved to avatar root",
+    "eepi.report.prefab-moved:description": "The prefab must be placed in avatar root to work properly. In most case, this process does not affect any other avatar functionality (unless animations refer the prefab).",
     "ahbsm.inspector.replace": "Overwrite values to 'To'",
     "ahbsm.inspector.definitions": "Definitions",
     "ahbsm.inspector.from": "From",
