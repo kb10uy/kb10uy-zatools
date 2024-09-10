@@ -9,15 +9,17 @@ using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
 namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 {
-    internal sealed class EyeBonesModifier : Pass<EyeBonesModifier>
+    internal sealed class EepiTransforming : Pass<EepiTransforming>
     {
-        public override string QualifiedName => nameof(EyeBonesModifier);
+        public override string QualifiedName => nameof(EepiTransforming);
         public override string DisplayName => "Substitute eye bones and add constraints to them";
 
         protected override void Execute(BuildContext context)
         {
             var state = context.GetState(InstallerState.Initializer);
             if (state.Installer == null) return;
+
+            EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer);
 
             var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarRootObject);
             if (state.Installer.DummyEyeBones)
@@ -41,6 +43,18 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             ReplaceAvatarDescriptorEyeBones(context.AvatarDescriptor, constrainedLeftEye, constrainedRightEye);
 
             state.Destroy();
+        }
+
+        private static void EnsureAvatarRootPlacement(GameObject avatarRoot, Installer installer)
+        {
+            var avatarTransform = avatarRoot.transform;
+            var installerTransform = installer.transform;
+            if (installerTransform != avatarTransform)
+            {
+                // アバタールートに移動する
+                installerTransform.parent = avatarTransform;
+                ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.prefab-moved");
+            }
         }
 
         private static (GameObject LeftEye, GameObject RightEye) LocateEyeBones(GameObject avatarRoot)
