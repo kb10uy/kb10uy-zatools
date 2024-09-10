@@ -153,10 +153,31 @@ namespace KusakaFactory.Zatools.Inspector.AdHocBlendShapeMix
 
             var fromButton = item.Q<Button>("FieldFromBlendShape");
             var toButton = item.Q<Button>("FieldToBlendShape");
+
+            AddContextMenuToButton(fromButton);
+            AddContextMenuToButton(toButton);
+
             fromButton.clicked += () => UnityEditor.PopupWindow.Show(fromButton.worldBound, new BlendShapeSelector(blendShapeNames, fromButton));
             toButton.clicked += () => UnityEditor.PopupWindow.Show(toButton.worldBound, new BlendShapeSelector(blendShapeNames, toButton));
 
             return item;
+        }
+
+        private static void AddContextMenuToButton(Button button)
+        {
+            button.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction("Copy", action =>
+                {
+                    GUIUtility.systemCopyBuffer = button.text;
+                });
+
+                evt.menu.AppendAction("Paste", action =>
+                {
+                    if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
+                        button.text = GUIUtility.systemCopyBuffer;
+                });
+            }));
         }
 
         internal sealed class BlendShapeSelector : PopupWindowContent
