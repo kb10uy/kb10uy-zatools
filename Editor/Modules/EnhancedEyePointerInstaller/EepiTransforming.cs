@@ -87,9 +87,8 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
         {
             if (originalEye == null) return null;
 
-            // TODO: もっと intelligent にする
-            var side = originalEye.name.Contains("L") || originalEye.name.Contains("left") ? "L" : "R";
-            var dummyEye = new GameObject($"DummyEye_{side}");
+            // originalEye があった場所に originalEye と同じ名前で作ってあげないとどこかで「見失って」誤動作する可能性が高い
+            var dummyEye = new GameObject(originalEye.name);
             dummyEye.transform.SetParent(originalEye.transform.parent, true);
             dummyEye.transform.position = originalEye.transform.position;
             dummyEye.transform.localRotation = Quaternion.identity;
@@ -129,29 +128,11 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 
         private static void ReplaceAvatarDescriptorEyeBones(VRCAvatarDescriptor descriptor, GameObject leftEye, GameObject rightEye)
         {
-            var eyeLookLeft = leftEye.transform;
-            var eyeLookRight = rightEye.transform;
-
-            if (!descriptor.enableEyeLook)
-            {
-                // Eye Look が Disabled のままだと特定条件で変な挙動になる
-                // 適当な GameObject を足して Eye Look を動作だけさせる
-                // see: https://github.com/kb10uy/kb10uy-zatools/issues/16#issuecomment-2336783558
-                var eyePlaceholder = new GameObject("__EEPI_EYE_PLACEHOLDER__");
-                eyePlaceholder.transform.parent = leftEye.transform.parent;
-                eyeLookLeft = eyePlaceholder.transform;
-                eyeLookRight = eyePlaceholder.transform;
-
-                // Disabled 相当のままになるように新しいのを割り当てる
-                descriptor.enableEyeLook = true;
-                descriptor.customEyeLookSettings = new VRCAvatarDescriptor.CustomEyeLookSettings();
-
-                ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.placeholder-inserted");
-            }
+            if (!descriptor.enableEyeLook) return;
 
             var settings = descriptor.customEyeLookSettings;
-            settings.leftEye = eyeLookLeft;
-            settings.rightEye = eyeLookRight;
+            settings.leftEye = leftEye.transform;
+            settings.rightEye = rightEye.transform;
             descriptor.customEyeLookSettings = settings;
         }
     }
