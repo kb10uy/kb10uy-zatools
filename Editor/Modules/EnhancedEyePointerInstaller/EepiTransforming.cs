@@ -6,6 +6,7 @@ using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Localization;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
+using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 
 namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 {
@@ -19,15 +20,19 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             var state = context.GetState(InstallerState.Initializer);
             if (state.Installer == null) return;
 
+            // アバタールート
             EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer);
 
+            // 対象の Eye ボーンと Eye Look 補正値の取得
             var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarRootObject);
+            var (lookAdjustLeft, lookAdjustRight) = (Quaternion.identity, Quaternion.identity);
             if (state.Installer.DummyEyeBones)
             {
-                constrainedLeftEye = SubstituteEyeBone(constrainedLeftEye);
-                constrainedRightEye = SubstituteEyeBone(constrainedRightEye);
+                (constrainedLeftEye, lookAdjustLeft) = SubstituteEyeBone(constrainedLeftEye);
+                (constrainedRightEye, lookAdjustRight) = SubstituteEyeBone(constrainedRightEye);
             }
 
+            // Aim Constraint の設定
             var target = LocateEyePointerTarget(state.Installer);
             if (state.Installer.VRCConstraint)
             {
@@ -40,7 +45,14 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
                 SetupConstaintsWithUnityVariant(target.transform, constrainedRightEye);
             }
 
-            ReplaceAvatarDescriptorEyeBones(context.AvatarDescriptor, constrainedLeftEye, constrainedRightEye);
+            // Eye Look の設定・修正
+            AdjustEyeLookSettings(
+                context.AvatarDescriptor,
+                constrainedLeftEye,
+                lookAdjustLeft,
+                constrainedRightEye,
+                lookAdjustRight
+            );
 
             state.Destroy();
         }
@@ -57,7 +69,7 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             }
         }
 
-        private static (GameObject LeftEye, GameObject RightEye) LocateEyeBones(GameObject avatarRoot)
+        private static (Transform LeftEye, Transform RightEye) LocateEyeBones(GameObject avatarRoot)
         {
             var avatarDescriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
             if (avatarDescriptor.enableEyeLook)
@@ -68,33 +80,33 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             return LocateEyeBonesUnityAvatarAsset(avatarRoot);
         }
 
-        private static (GameObject LeftEye, GameObject RightEye) LocateEyeBonesFromVRCAvatarDescriptor(VRCAvatarDescriptor avatarDescriptor)
+        private static (Transform LeftEye, Transform RightEye) LocateEyeBonesFromVRCAvatarDescriptor(VRCAvatarDescriptor avatarDescriptor)
         {
             var leftEyeTransform = avatarDescriptor.customEyeLookSettings.leftEye;
             var rightEyeTransform = avatarDescriptor.customEyeLookSettings.rightEye;
-            return (leftEyeTransform.gameObject, rightEyeTransform.gameObject);
+            return (leftEyeTransform, rightEyeTransform);
         }
 
-        private static (GameObject LeftEye, GameObject RightEye) LocateEyeBonesUnityAvatarAsset(GameObject avatarRoot)
+        private static (Transform LeftEye, Transform RightEye) LocateEyeBonesUnityAvatarAsset(GameObject avatarRoot)
         {
             var animator = avatarRoot.GetComponent<Animator>();
             var leftEyeTransform = animator.GetBoneTransform(HumanBodyBones.LeftEye);
             var rightEyeTransform = animator.GetBoneTransform(HumanBodyBones.RightEye);
-            return (leftEyeTransform.gameObject, rightEyeTransform.gameObject);
+            return (leftEyeTransform, rightEyeTransform);
         }
 
-        private static GameObject SubstituteEyeBone(GameObject originalEye)
+        private static (Transform, Quaternion) SubstituteEyeBone(Transform originalEye)
         {
-            if (originalEye == null) return null;
+            if (originalEye == null) return (null, Quaternion.identity);
 
             // TODO: もっと intelligent にする
             var side = originalEye.name.Contains("L") || originalEye.name.Contains("left") ? "L" : "R";
             var dummyEye = new GameObject($"DummyEye_{side}");
-            dummyEye.transform.SetParent(originalEye.transform.parent, true);
-            dummyEye.transform.position = originalEye.transform.position;
+            dummyEye.transform.SetParent(originalEye.parent, true);
+            dummyEye.transform.position = originalEye.position;
             dummyEye.transform.localRotation = Quaternion.identity;
             originalEye.transform.SetParent(dummyEye.transform, true);
-            return dummyEye;
+            return (dummyEye.transform, Quaternion.Inverse(originalEye.localRotation));
         }
 
         private static GameObject LocateEyePointerTarget(Installer installer)
@@ -103,11 +115,11 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             return eyePointerTargetTransform.gameObject;
         }
 
-        private static void SetupConstaintsWithVRCVariant(Transform targetTransform, GameObject constrainedEye)
+        private static void SetupConstaintsWithVRCVariant(Transform targetTransform, Transform constrainedEye)
         {
             if (constrainedEye == null) return;
 
-            var aimConstraint = constrainedEye.AddComponent<VRCAimConstraint>();
+            var aimConstraint = constrainedEye.gameObject.AddComponent<VRCAimConstraint>();
             aimConstraint.enabled = false;
             aimConstraint.Sources.Add(new VRCConstraintSource(targetTransform, 1.0f, Vector3.zero, Vector3.zero));
             aimConstraint.AffectsRotationZ = false;
@@ -115,11 +127,11 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             aimConstraint.IsActive = true;
         }
 
-        private static void SetupConstaintsWithUnityVariant(Transform targetTransform, GameObject constrainedEye)
+        private static void SetupConstaintsWithUnityVariant(Transform targetTransform, Transform constrainedEye)
         {
             if (constrainedEye == null) return;
 
-            var aimConstraint = constrainedEye.AddComponent<AimConstraint>();
+            var aimConstraint = constrainedEye.gameObject.AddComponent<AimConstraint>();
             aimConstraint.enabled = false;
             aimConstraint.AddSource(new ConstraintSource { sourceTransform = targetTransform, weight = 1.0f });
             aimConstraint.rotationAxis = Axis.X | Axis.Y;
@@ -127,32 +139,58 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             aimConstraint.constraintActive = true;
         }
 
-        private static void ReplaceAvatarDescriptorEyeBones(VRCAvatarDescriptor descriptor, GameObject leftEye, GameObject rightEye)
+        private static void AdjustEyeLookSettings(
+            VRCAvatarDescriptor descriptor,
+            Transform leftEye,
+            Quaternion leftEyeAdjustment,
+            Transform rightEye,
+            Quaternion rightEyeAdjustment
+        )
         {
-            var eyeLookLeft = leftEye.transform;
-            var eyeLookRight = rightEye.transform;
+            var adjustedSettings = descriptor.customEyeLookSettings;
+            adjustedSettings.leftEye = leftEye.transform;
+            adjustedSettings.rightEye = rightEye.transform;
 
-            if (!descriptor.enableEyeLook)
+            if (descriptor.enableEyeLook)
             {
-                // Eye Look が Disabled のままだと特定条件で変な挙動になる
-                // 適当な GameObject を足して Eye Look を動作だけさせる
-                // see: https://github.com/kb10uy/kb10uy-zatools/issues/16#issuecomment-2336783558
-                var eyePlaceholder = new GameObject("__EEPI_EYE_PLACEHOLDER__");
-                eyePlaceholder.transform.parent = leftEye.transform.parent;
-                eyeLookLeft = eyePlaceholder.transform;
-                eyeLookRight = eyePlaceholder.transform;
-
-                // Disabled 相当のままになるように新しいのを割り当てる
+                AdjustEyeRotations(adjustedSettings.eyesLookingStraight, leftEyeAdjustment, rightEyeAdjustment);
+                AdjustEyeRotations(adjustedSettings.eyesLookingUp, leftEyeAdjustment, rightEyeAdjustment);
+                AdjustEyeRotations(adjustedSettings.eyesLookingDown, leftEyeAdjustment, rightEyeAdjustment);
+                AdjustEyeRotations(adjustedSettings.eyesLookingLeft, leftEyeAdjustment, rightEyeAdjustment);
+                AdjustEyeRotations(adjustedSettings.eyesLookingRight, leftEyeAdjustment, rightEyeAdjustment);
+            }
+            else
+            {
+                // Eye Look は必ず有効にしなければならない
+                // さもないとキャリブレーション中やリモートアバターとして最初にロードされた時などにウェイトがかかってた状態に戻ってしまう
+                // see: https://github.com/kb10uy/kb10uy-zatools/issues/16
                 descriptor.enableEyeLook = true;
-                descriptor.customEyeLookSettings = new VRCAvatarDescriptor.CustomEyeLookSettings();
-
                 ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.placeholder-inserted");
+
+                var zeroedLooking = new CustomEyeLookSettings.EyeRotations
+                {
+                    linked = true,
+                    left = Quaternion.identity,
+                    right = Quaternion.identity
+                };
+                adjustedSettings.eyesLookingStraight = zeroedLooking;
+                adjustedSettings.eyesLookingUp = zeroedLooking;
+                adjustedSettings.eyesLookingDown = zeroedLooking;
+                adjustedSettings.eyesLookingLeft = zeroedLooking;
+                adjustedSettings.eyesLookingRight = zeroedLooking;
             }
 
-            var settings = descriptor.customEyeLookSettings;
-            settings.leftEye = eyeLookLeft;
-            settings.rightEye = eyeLookRight;
-            descriptor.customEyeLookSettings = settings;
+            descriptor.customEyeLookSettings = adjustedSettings;
+        }
+
+        private static void AdjustEyeRotations(
+            CustomEyeLookSettings.EyeRotations original,
+            Quaternion leftAdjustment,
+            Quaternion rightAdjustment
+        )
+        {
+            original.left = leftAdjustment * original.left;
+            original.right = rightAdjustment * original.right;
         }
     }
 }
