@@ -1,21 +1,33 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Localization;
-using UnityEditor.PackageManager;
 
 namespace KusakaFactory.Zatools.EditorExtension
 {
     internal sealed class CustomMipmapCombiner : EditorWindow
     {
+        [Serializable]
+        internal sealed class MipEntry
+        {
+            public Texture2D Source;
+            public int Bias = 0;
+            public int LevelGeq = 1;
+        }
+
         [SerializeField]
         private string AssetNameStem = "CustomMipmap";
         [SerializeField]
         private Texture2D Mip0Texture;
         [SerializeField]
         private MipEntry[] Entries;
+        [SerializeField]
+        private string TextureSizeString = "1024";
+        [SerializeField]
+        private string TextureFormatString = "RGBA32";
 
         private ObjectField _objectFieldMip0;
         private ListView _listViewSources;
@@ -43,6 +55,11 @@ namespace KusakaFactory.Zatools.EditorExtension
 
             _objectFieldMip0.RegisterValueChangedCallback((e) => UpdateCanGenerate());
             _listViewSources.makeItem = visualTreeItem.CloneTree;
+            _listViewSources.itemsAdded += (e) =>
+            {
+                // 最初の 1 個がゼロで初期化されるので明示的に 1 にしないといけない
+                foreach (var i in e) Entries[i].LevelGeq = 1;
+            };
             _textFieldAssetName.RegisterValueChangedCallback((e) => UpdateCanGenerate());
             _buttonGenerate.clicked += Generate;
 
@@ -64,18 +81,25 @@ namespace KusakaFactory.Zatools.EditorExtension
 
             // Compute Shader でテクスチャから受け取る値は sRGB to Linear などが適用されている
             // ここでは Linear で作らなければならない
-            var textureSize = 1024;
-            var textureAsset = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, true, true, true);
+            var textureSize = Convert.ToInt32(TextureSizeString);
+            var (textureFormat, bufferStride, kernalName, bufferBindName) = TextureFormatString switch
+            {
+                "RGBA32" => (TextureFormat.RGBA32, 4, "CopyToMipmapRgba32", "Rgba32Pixels"),
+                "RGBAFloat" => (TextureFormat.RGBAFloat, 16, "CopyToMipmapRgbaFloat", "RgbaFloatPixels"),
+                "RGBAHalf" => (TextureFormat.RGBAHalf, 8, "CopyToMipmapRgbaHalf", "RgbaHalfPixels"),
+                _ => throw new ArgumentException($"Unexpected Format String: {TextureFormatString}"),
+            };
+            var textureAsset = new Texture2D(textureSize, textureSize, textureFormat, true, true, true);
             var allPixelsCount = textureSize * textureSize;
 
             var computeShader = Resources.LoadComputeShaderByGuid("bad178b10407a8e4d9302af0b90c8578");
-            var computeKernelId = computeShader.FindKernel("CopyToMipmapRgba32");
-            var mipmapBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, allPixelsCount, 4);
-            var pixelBuffer = new byte[allPixelsCount * 4];
+            var computeKernelId = computeShader.FindKernel(kernalName);
+            var mipmapBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, allPixelsCount, bufferStride);
+            var pixelBuffer = new byte[allPixelsCount * bufferStride];
 
             var sourceTexture = Mip0Texture;
             var mipBias = 0;
-            computeShader.SetBuffer(computeKernelId, "MipmapPixels", mipmapBuffer);
+            computeShader.SetBuffer(computeKernelId, bufferBindName, mipmapBuffer);
             for (int mipLevel = 0; mipLevel < textureAsset.mipmapCount; ++mipLevel)
             {
                 // 今の mipLevel に対して LevelGeq がヒットしたら更新する                
@@ -101,14 +125,6 @@ namespace KusakaFactory.Zatools.EditorExtension
 
             var assetPath = $"Assets/{AssetNameStem}.asset";
             AssetDatabase.CreateAsset(textureAsset, assetPath);
-        }
-
-        [System.Serializable]
-        internal sealed class MipEntry
-        {
-            public Texture2D Source;
-            public int Bias = 0;
-            public int LevelGeq = 1;
         }
     }
 }
