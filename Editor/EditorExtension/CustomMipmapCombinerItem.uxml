@@ -2,14 +2,14 @@
     <ui:VisualElement style="flex-grow: 1;">
         <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
             <ui:VisualElement style="flex-grow: 1; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-basis: 0;">
-                <ui:Label tabindex="-1" text="Mip Level &gt;= " parse-escape-sequences="true" display-tooltip-when-elided="true" style="font-size: 12px; -unity-font-style: bold;" />
+                <ui:Label tabindex="-1" text="cmm.mip-geq" parse-escape-sequences="true" display-tooltip-when-elided="true" enable-rich-text="true" class="ndmf-tr" style="font-size: 12px; -unity-font-style: bold;" />
                 <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="LevelGeq" style="font-size: 12px; -unity-font-style: bold;" />
             </ui:VisualElement>
             <ui:SliderInt high-value="16" name="FieldLevelGeq" low-value="1" show-input-field="false" binding-path="LevelGeq" style="margin-bottom: 4px; flex-grow: 1; flex-basis: 0; align-self: center;" />
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 0; flex-direction: column;">
-            <uie:ObjectField label="Source Texture" allow-scene-objects="false" type="UnityEngine.Texture2D, UnityEngine.CoreModule" name="FieldSource" binding-path="Source" />
-            <ui:SliderInt label="Bias" high-value="16" name="FieldBias" low-value="-16" binding-path="Bias" show-input-field="true" />
+            <uie:ObjectField label="cmm.source" allow-scene-objects="false" type="UnityEngine.Texture2D, UnityEngine.CoreModule" name="FieldSource" binding-path="Source" class="ndmf-tr" />
+            <ui:SliderInt label="cmm.bias" high-value="16" name="FieldBias" low-value="-16" binding-path="Bias" show-input-field="true" class="ndmf-tr" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

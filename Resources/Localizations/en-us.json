@@ -40,5 +40,12 @@
     "edx.base-asset": "Base Asset",
     "edx.root-path": "Root Path",
     "edx.query": "Search Query (opt.)",
-    "edx.mesh": "Mesh"
+    "edx.mesh": "Mesh",
+    "cmm.size": "Size",
+    "cmm.format": "Format",
+    "cmm.mip0": "Mip 0",
+    "cmm.definitions": "Mip Source Definitions",
+    "cmm.mip-geq": "Mip >= ",
+    "cmm.source": "Source Texture",
+    "cmm.bias": "Bias"
 }

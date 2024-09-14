@@ -54,7 +54,12 @@ namespace KusakaFactory.Zatools.EditorExtension
             _buttonGenerate = rootVisualElement.Q<Button>("ButtonGenerate");
 
             _objectFieldMip0.RegisterValueChangedCallback((e) => UpdateCanGenerate());
-            _listViewSources.makeItem = visualTreeItem.CloneTree;
+            _listViewSources.makeItem = () =>
+            {
+                var item = visualTreeItem.CloneTree();
+                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                return item;
+            };
             _listViewSources.itemsAdded += (e) =>
             {
                 // 最初の 1 個がゼロで初期化されるので明示的に 1 にしないといけない
