@@ -1,7 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="flex-grow: 1;">
-        <ui:SliderInt label="Mip &gt;=" high-value="16" name="FieldTargetLevel" low-value="1" show-input-field="true" binding-path="LevelGeq" />
-        <uie:ObjectField label="Source Texture" allow-scene-objects="false" type="UnityEngine.Texture2D, UnityEngine.CoreModule" name="FieldSourceTexture" binding-path="Source" />
-        <ui:SliderInt label="Bias" high-value="16" name="FieldMipBias" low-value="-16" binding-path="Bias" show-input-field="true" />
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-basis: 0;">
+                <ui:Label tabindex="-1" text="Mip Level &gt;= " parse-escape-sequences="true" display-tooltip-when-elided="true" style="font-size: 12px; -unity-font-style: bold;" />
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="LevelGeq" style="font-size: 12px; -unity-font-style: bold;" />
+            </ui:VisualElement>
+            <ui:SliderInt high-value="16" name="FieldLevelGeq" low-value="1" show-input-field="false" binding-path="LevelGeq" style="margin-bottom: 4px; flex-grow: 1; flex-basis: 0; align-self: center;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; flex-direction: column;">
+            <uie:ObjectField label="Source Texture" allow-scene-objects="false" type="UnityEngine.Texture2D, UnityEngine.CoreModule" name="FieldSource" binding-path="Source" />
+            <ui:SliderInt label="Bias" high-value="16" name="FieldBias" low-value="-16" binding-path="Bias" show-input-field="true" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
