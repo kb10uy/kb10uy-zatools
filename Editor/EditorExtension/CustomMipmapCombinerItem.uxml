@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:SliderInt label="Mip &gt;=" high-value="16" name="FieldTargetLevel" low-value="1" show-input-field="true" binding-path="LevelGeq" />
+        <uie:ObjectField label="Source Texture" allow-scene-objects="false" type="UnityEngine.Texture2D, UnityEngine.CoreModule" name="FieldSourceTexture" binding-path="Source" />
+        <ui:SliderInt label="Bias" high-value="16" name="FieldMipBias" low-value="-16" binding-path="Bias" show-input-field="true" />
+    </ui:VisualElement>
+</ui:UXML>

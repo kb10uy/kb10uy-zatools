@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <uie:ObjectField label="Base Texture (Mip 0)" name="FieldMip0Texture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="Mip0Texture" />
+        <ui:Label tabindex="-1" text="Source Textures" parse-escape-sequences="true" display-tooltip-when-elided="true" style="margin-left: 4px;" />
+        <ui:ListView name="FieldSources" show-bound-collection-size="false" reorderable="true" show-border="true" virtualization-method="DynamicHeight" show-add-remove-footer="true" binding-path="Entries" reorder-mode="Animated" style="flex-grow: 1; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; align-items: stretch;">
+            <ui:Label tabindex="-1" text="Assets/" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center;" />
+            <ui:TextField picking-mode="Ignore" name="FieldAssetNameStem" binding-path="AssetNameStem" style="flex-grow: 1;" />
+            <ui:Label tabindex="-1" text=".asset" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center;" />
+        </ui:VisualElement>
+        <ui:Button text="Generate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonGenerate" />
+    </ui:VisualElement>
+</ui:UXML>

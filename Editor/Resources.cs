@@ -32,5 +32,12 @@ namespace KusakaFactory.Zatools
             var textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(assetPath);
             return textAsset != null ? textAsset.text : null;
         }
+
+        internal static ComputeShader LoadComputeShaderByGuid(string guid)
+        {
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var shader = AssetDatabase.LoadAssetAtPath<ComputeShader>(assetPath);
+            return shader;
+        }
     }
 }
