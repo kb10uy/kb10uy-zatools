@@ -40,5 +40,12 @@
     "edx.base-asset": "基準アセット",
     "edx.root-path": "基準パス",
     "edx.query": "検索クエリ(オプション)",
-    "edx.mesh": "メッシュ"
+    "edx.mesh": "メッシュ",
+    "cmm.size": "テクスチャサイズ",
+    "cmm.format": "フォーマット",
+    "cmm.mip0": "ミップレベル 0",
+    "cmm.definitions": "ミップマップコピー元定義",
+    "cmm.mip-geq": "ミップレベル >= ",
+    "cmm.source": "コピー元テクスチャ",
+    "cmm.bias": "バイアス"
 }

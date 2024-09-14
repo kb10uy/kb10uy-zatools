@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:DropdownField label="cmm.size" name="FieldSize" choices="32,64,128,256,512,1024,2048,4096" index="5" binding-path="TextureSizeString" class="ndmf-tr" />
+        <ui:DropdownField label="cmm.format" name="FieldFormat" choices="RGBA32,RGBAHalf,RGBAFloat" index="0" binding-path="TextureFormatString" class="ndmf-tr" />
+        <uie:ObjectField label="cmm.mip0" name="FieldMip0Texture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="Mip0Texture" class="ndmf-tr" />
+        <ui:Label tabindex="-1" text="cmm.definitions" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="margin-left: 4px; margin-top: 8px;" />
+        <ui:ListView name="FieldSources" show-bound-collection-size="false" reorderable="true" show-border="true" virtualization-method="DynamicHeight" show-add-remove-footer="true" binding-path="Entries" reorder-mode="Animated" style="flex-grow: 1; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; align-items: stretch;">
+            <ui:Label tabindex="-1" text="Assets/" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center;" />
+            <ui:TextField picking-mode="Ignore" name="FieldAssetNameStem" binding-path="AssetNameStem" style="flex-grow: 1;" />
+            <ui:Label tabindex="-1" text=".asset" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center;" />
+        </ui:VisualElement>
+        <ui:Button text="Generate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonGenerate" />
+    </ui:VisualElement>
+</ui:UXML>

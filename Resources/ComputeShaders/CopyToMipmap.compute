@@ -1,0 +1,50 @@
+#pragma kernel CopyToMipmapRgba32
+#pragma kernel CopyToMipmapRgbaFloat
+#pragma kernel CopyToMipmapRgbaHalf
+
+// コピー元テクスチャ
+Texture2D SourceTexture;
+SamplerState samplerSourceTexture;
+int MipBias;
+
+// コピー先バッファ
+RWStructuredBuffer<uint> Rgba32Pixels;
+RWStructuredBuffer<float4> RgbaFloatPixels;
+RWStructuredBuffer<uint2> RgbaHalfPixels;
+int MipLevel;
+int MipWidth;
+
+float4 SampleSourceTexture(uint3 id) {
+    float2 uv = (id.xy + float2(0.5, 0.5)) / float2(MipWidth, MipWidth);
+    return SourceTexture.SampleLevel(samplerSourceTexture, uv, max(0, MipLevel + MipBias));
+}
+
+[numthreads(1,1,1)]
+void CopyToMipmapRgba32(uint3 id: SV_DispatchThreadID) {
+    float4 textureColor = SampleSourceTexture(id);
+    float4 scaledColor = round(min(textureColor, float4(1.0, 1.0, 1.0, 1.0)) * 255.0);
+    uint bitColor =
+        ((uint)scaledColor.r) |
+        ((uint)scaledColor.g) << 8 |
+        ((uint)scaledColor.b) << 16 |
+        ((uint)scaledColor.a) << 24;
+    uint index = id.y * MipWidth + id.x;
+    Rgba32Pixels[index] = bitColor;
+}
+
+[numthreads(1,1,1)]
+void CopyToMipmapRgbaFloat(uint3 id: SV_DispatchThreadID) {
+    uint index = id.y * MipWidth + id.x;
+    RgbaFloatPixels[index] = SampleSourceTexture(id);
+}
+
+[numthreads(1,1,1)]
+void CopyToMipmapRgbaHalf(uint3 id: SV_DispatchThreadID) {
+    uint index = id.y * MipWidth + id.x;
+    float4 textureColor = SampleSourceTexture(id);
+    uint2 bitColor = uint2(
+        f32tof16(textureColor.r) | f32tof16(textureColor.g) << 16,
+        f32tof16(textureColor.b) | f32tof16(textureColor.a) << 16
+    );
+    RgbaHalfPixels[index] = bitColor;
+}
