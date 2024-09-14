@@ -1,0 +1,24 @@
+#pragma kernel CopyToMipmapRgba32
+
+// コピー元テクスチャ
+Texture2D SourceTexture;
+SamplerState samplerSourceTexture;
+int MipBias;
+
+// コピー先バッファ
+RWStructuredBuffer<uint> MipmapPixels;
+int MipLevel;
+int MipWidth;
+
+[numthreads(1,1,1)]
+void CopyToMipmapRgba32(uint3 id: SV_DispatchThreadID)
+{
+    float2 uv = (id.xy + float2(0.5, 0.5)) / float2(MipWidth, MipWidth);
+    float4 textureValue = SourceTexture.SampleLevel(samplerSourceTexture, uv, max(0, MipLevel + MipBias));
+
+    float4 scaledColor = round(min(textureValue, float4(1.0, 1.0, 1.0, 1.0)) * 255.0);
+    uint bitColor = ((uint)scaledColor.r) | ((uint)scaledColor.g) << 8 | ((uint)scaledColor.b) << 16 | ((uint)scaledColor.a) << 24;
+
+    uint pixelIndex = id.y * MipWidth + id.x;
+    MipmapPixels[pixelIndex] = bitColor;
+}
