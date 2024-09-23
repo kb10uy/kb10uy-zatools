@@ -52,7 +52,7 @@ namespace KusakaFactory.Zatools.EditorExtension
     // ヘッダー部分の描画
     private void DrawHeader()
     {
-      EditorGUILayout.LabelField("複数のアニメーションファイル間で足りないBlendShape操作を補完し、WriteDefalt ONの場合でも表情が破綻しないように修正できます。", EditorStyles.wordWrappedLabel);
+      EditorGUILayout.LabelField("複数のアニメーションファイル間で足りないBlendShape操作を補完し、表情が破綻しないように修正できます。", EditorStyles.wordWrappedLabel);
     }
 
     // ドラッグ＆ドロップエリアの描画
