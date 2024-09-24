@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;">
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <ui:Label tabindex="-1" text="BlendShapeName" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="BlendShapeName" name="LabelBlendShapeName" style="flex-grow: 1; margin-right: 0;" />
+            <ui:Label tabindex="-1" text="0" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="ItemCount" name="LabelItemCount" style="margin-right: 0;" />
+            <ui:Label tabindex="-1" text="key(s)" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+        </ui:VisualElement>
+        <ui:Foldout text="Keys to be added" name="Foldout" value="true">
+            <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" binding-path="Modifications" text="Modifications" />
+        </ui:Foldout>
+    </ui:VisualElement>
+</ui:UXML>

@@ -3,7 +3,16 @@
         <ui:VisualElement name="AnimationDropArea" style="flex-grow: 0; height: 64px; background-color: rgba(115, 115, 115, 0.3); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;">
             <ui:Label tabindex="-1" text="Drop Animation assets here" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center; -unity-text-align: middle-center; justify-content: flex-start; align-items: auto; flex-grow: 1; color: rgb(255, 255, 255); -unity-font-style: bold;" />
         </ui:VisualElement>
-        <ui:ListView name="FieldAnimationList" binding-path="TargetAnimations" show-bound-collection-size="false" virtualization-method="DynamicHeight" show-add-remove-footer="true" style="flex-grow: 1; margin-top: 0; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+        <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement style="flex-grow: 1; flex-basis: 0;">
+                <ui:Label tabindex="-1" text="Animations" parse-escape-sequences="true" display-tooltip-when-elided="true" style="margin-left: 4px; margin-bottom: 4px;" />
+                <ui:ListView name="FieldAnimationList" binding-path="TargetAnimations" show-bound-collection-size="false" virtualization-method="DynamicHeight" show-add-remove-footer="false" style="flex-grow: 1; margin-top: 0; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-basis: 0;" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; flex-basis: 0;">
+                <ui:Label tabindex="-1" text="Modifications Preview" parse-escape-sequences="true" display-tooltip-when-elided="true" style="margin-left: 4px; margin-bottom: 4px;" />
+                <ui:ListView name="FieldModificationList" virtualization-method="DynamicHeight" show-bound-collection-size="false" binding-path="ModificationPreviews" selection-type="None" style="margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-grow: 1; flex-basis: 0;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:Toggle label="Overwrite original file(s)" name="FieldOverwrite" binding-path="OverwriteAnimations" />
         <ui:DropdownField label="Filling Value" choices="All Zero,Copy from SkinnedMeshRenderer" index="0" name="FieldFillingValueMode" binding-path="FillingValueMode" style="align-items: center;" />
         <uie:ObjectField label="Value Source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" name="FieldFillingValueSource" binding-path="FillingValueSource" />

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-direction: row;">
+        <uie:ObjectField type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" binding-path="Clip" allow-scene-objects="false" class="unity-disabled" style="flex-grow: 1; flex-basis: 0;" />
+        <ui:Button text="-" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonRemove" />
+    </ui:VisualElement>
+</ui:UXML>
