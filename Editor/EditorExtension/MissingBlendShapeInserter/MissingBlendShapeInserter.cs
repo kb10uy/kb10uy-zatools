@@ -16,6 +16,8 @@ namespace KusakaFactory.Zatools.EditorExtension
         [SerializeField]
         private bool OverwriteAnimations = true;
         [SerializeField]
+        private string SaveDirectory = "";
+        [SerializeField]
         private string TargetAnimationPath = "Body";
         [SerializeField]
         private string FillingValueMode = "All Zero";
@@ -28,13 +30,16 @@ namespace KusakaFactory.Zatools.EditorExtension
         private TextField _targetAnimationPath;
         private DropdownField _fillingValueMode;
         private ObjectField _fillingValueSource;
+        private Toggle _overwrite;
+        private VisualElement _savePathElement;
+        private Button _openSavePath;
         private ListView _animationList;
         private ListView _modificationList;
 
         [MenuItem("Window/kb10uy/Missing BlendShape Inserter")]
         internal static void OpenWindow()
         {
-            GetWindowWithRect<MissingBlendShapeInserter>(new Rect(0, 0, 800, 600));
+            GetWindow<MissingBlendShapeInserter>();
         }
 
         internal void CreateGUI()
@@ -57,6 +62,12 @@ namespace KusakaFactory.Zatools.EditorExtension
             _fillingValueMode.RegisterValueChangedCallback((e) => OnFillingValueSettingsChanged());
             _fillingValueSource.RegisterValueChangedCallback((e) => OnFillingValueSettingsChanged());
 
+            _overwrite = rootVisualElement.Q<Toggle>("FieldOverwrite");
+            _savePathElement = rootVisualElement.Q<VisualElement>("SavePathElement");
+            _openSavePath = rootVisualElement.Q<Button>("OpenSavePath");
+            _overwrite.RegisterValueChangedCallback((e) => OnOverwriteChanged());
+            _openSavePath.clicked += OnOpenSavePath;
+
             _animationList = rootVisualElement.Q<ListView>("FieldAnimationList");
             _animationList.makeItem = OnAnimationListMakeItem;
             _animationList.bindItem = OnAnimationListBindItem;
@@ -70,6 +81,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             };
 
             OnFillingValueSettingsChanged();
+            OnOverwriteChanged();
         }
 
         private VisualElement OnAnimationListMakeItem()
@@ -112,8 +124,24 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         private void OnFillingValueSettingsChanged()
         {
-            _fillingValueSource.style.display = _fillingValueMode.index != 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            _fillingValueSource.SetEnabled(_fillingValueMode.index != 0);
             RefreshPreview();
+        }
+
+        private void OnOverwriteChanged()
+        {
+            _savePathElement.SetEnabled(!OverwriteAnimations);
+        }
+
+        private void OnOpenSavePath()
+        {
+            var path = EditorUtility.OpenFolderPanel("Select directory to save animations...", "", "");
+            if (string.IsNullOrWhiteSpace(path)) return;
+
+            var assetsPath = Application.dataPath;
+            if (!path.StartsWith(assetsPath)) return;
+
+            SaveDirectory = path;
         }
 
         private void UnionAppendClips(IEnumerable<AnimationClip> newClips)
