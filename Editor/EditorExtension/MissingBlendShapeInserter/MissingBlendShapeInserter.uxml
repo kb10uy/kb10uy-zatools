@@ -14,6 +14,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Toggle label="Overwrite original file(s)" name="FieldOverwrite" binding-path="OverwriteAnimations" />
+        <ui:TextField picking-mode="Ignore" label="Target Animation Path" value="Body" binding-path="TargetAnimationPath" is-delayed="true" name="FieldTargetAnimationPath" />
         <ui:DropdownField label="Filling Value" choices="All Zero,Copy from SkinnedMeshRenderer" index="0" name="FieldFillingValueMode" binding-path="FillingValueMode" style="align-items: center;" />
         <uie:ObjectField label="Value Source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" name="FieldFillingValueSource" binding-path="FillingValueSource" />
         <ui:Button text="Apply" parse-escape-sequences="true" display-tooltip-when-elided="true" style="margin-top: 8px;" />

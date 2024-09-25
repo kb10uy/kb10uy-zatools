@@ -16,6 +16,8 @@ namespace KusakaFactory.Zatools.EditorExtension
         [SerializeField]
         private bool OverwriteAnimations = true;
         [SerializeField]
+        private string TargetAnimationPath = "Body";
+        [SerializeField]
         private string FillingValueMode = "All Zero";
         [SerializeField]
         private SkinnedMeshRenderer FillingValueSource = null;
@@ -23,6 +25,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         private List<ModificationPreviewItem> ModificationPreviews = new List<ModificationPreviewItem>();
 
         private VisualElement _dropArea;
+        private TextField _targetAnimationPath;
         private DropdownField _fillingValueMode;
         private ObjectField _fillingValueSource;
         private ListView _animationList;
@@ -31,7 +34,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         [MenuItem("Window/kb10uy/Missing BlendShape Inserter")]
         internal static void OpenWindow()
         {
-            GetWindow<MissingBlendShapeInserter>();
+            GetWindowWithRect<MissingBlendShapeInserter>(new Rect(0, 0, 800, 600));
         }
 
         internal void CreateGUI()
@@ -42,13 +45,17 @@ namespace KusakaFactory.Zatools.EditorExtension
             rootVisualElement.Bind(new SerializedObject(this));
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
+            _targetAnimationPath = rootVisualElement.Q<TextField>("FieldTargetAnimationPath");
+            _targetAnimationPath.RegisterValueChangedCallback((e) => RefreshPreview());
+
             _dropArea = rootVisualElement.Q<VisualElement>("AnimationDropArea");
             _dropArea.RegisterCallback<DragUpdatedEvent>((e) => DragAndDrop.visualMode = DragAndDropVisualMode.Copy);
             _dropArea.RegisterCallback<DragPerformEvent>(OnAnimationDragPerform);
 
             _fillingValueMode = rootVisualElement.Q<DropdownField>("FieldFillingValueMode");
             _fillingValueSource = rootVisualElement.Q<ObjectField>("FieldFillingValueSource");
-            _fillingValueMode.RegisterValueChangedCallback((e) => UpdateFillingMode());
+            _fillingValueMode.RegisterValueChangedCallback((e) => OnFillingValueSettingsChanged());
+            _fillingValueSource.RegisterValueChangedCallback((e) => OnFillingValueSettingsChanged());
 
             _animationList = rootVisualElement.Q<ListView>("FieldAnimationList");
             _animationList.makeItem = OnAnimationListMakeItem;
@@ -62,7 +69,7 @@ namespace KusakaFactory.Zatools.EditorExtension
                 return item;
             };
 
-            UpdateFillingMode();
+            OnFillingValueSettingsChanged();
         }
 
         private VisualElement OnAnimationListMakeItem()
@@ -103,9 +110,10 @@ namespace KusakaFactory.Zatools.EditorExtension
             RefreshPreview();
         }
 
-        private void UpdateFillingMode()
+        private void OnFillingValueSettingsChanged()
         {
             _fillingValueSource.style.display = _fillingValueMode.index != 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            RefreshPreview();
         }
 
         private void UnionAppendClips(IEnumerable<AnimationClip> newClips)
@@ -120,10 +128,20 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         private void RefreshPreview()
         {
+            var process = new MissingBlendShapeInserterProcess(
+                TargetAnimations.Select((aci) => aci.Clip),
+                TargetAnimationPath,
+                FillingValueMode != "All Zero" ? FillingValueSource : null
+            );
+
             ModificationPreviews.Clear();
             foreach (var c in TargetAnimations)
             {
-                ModificationPreviews.Add(ModificationPreviewItem.Create(c.Clip.name, new[] { "aaa", "bbb", "ccc" }));
+                var missingBlendShapes = process
+                    .CalculateMissingBlendShapeNamesFor(c.Clip)
+                    .Select((bs) => (bs, process.GetCopyingBlendShapeValue(bs)));
+                var previewItem = ModificationPreviewItem.Create(c.Clip.name, missingBlendShapes.ToArray());
+                ModificationPreviews.Add(previewItem);
             }
         }
 
@@ -140,13 +158,14 @@ namespace KusakaFactory.Zatools.EditorExtension
             public int ItemCount;
             public string Modifications;
 
-            internal static ModificationPreviewItem Create(string name, string[] keys)
+            internal static ModificationPreviewItem Create(string name, IEnumerable<(string Name, float Value)> blendShapes)
             {
+                var values = blendShapes.ToList();
                 return new ModificationPreviewItem
                 {
                     BlendShapeName = name,
-                    ItemCount = keys.Length,
-                    Modifications = string.Join('\n', keys.Select((k) => $"{k}: 0.0")),
+                    ItemCount = values.Count,
+                    Modifications = string.Join('\n', values.Select((k) => $"{k.Name}: {k.Value}")),
                 };
             }
         }
