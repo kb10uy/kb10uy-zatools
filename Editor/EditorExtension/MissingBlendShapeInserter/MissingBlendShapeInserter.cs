@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Localization;
 
-namespace KusakaFactory.Zatools.EditorExtension
+namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
 {
     internal sealed class MissingBlendShapeInserter : EditorWindow
     {
@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         [SerializeField]
         private bool OverwriteAnimations = true;
         [SerializeField]
-        private string SaveDirectory = "";
+        private string SaveDirectory = "Assets";
         [SerializeField]
         private string TargetAnimationPath = "Body";
         [SerializeField]
@@ -27,14 +27,15 @@ namespace KusakaFactory.Zatools.EditorExtension
         private List<ModificationPreviewItem> ModificationPreviews = new List<ModificationPreviewItem>();
 
         private VisualElement _dropArea;
+        private ListView _animationList;
+        private ListView _modificationList;
         private TextField _targetAnimationPath;
         private DropdownField _fillingValueMode;
         private ObjectField _fillingValueSource;
         private Toggle _overwrite;
         private VisualElement _savePathElement;
         private Button _openSavePath;
-        private ListView _animationList;
-        private ListView _modificationList;
+        private Button _applyButton;
 
         [MenuItem("Window/kb10uy/Missing BlendShape Inserter")]
         internal static void OpenWindow()
@@ -49,6 +50,18 @@ namespace KusakaFactory.Zatools.EditorExtension
             visualTree.CloneTree(rootVisualElement);
             rootVisualElement.Bind(new SerializedObject(this));
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
+
+            _animationList = rootVisualElement.Q<ListView>("FieldAnimationList");
+            _animationList.makeItem = OnAnimationListMakeItem;
+            _animationList.bindItem = OnAnimationListBindItem;
+
+            _modificationList = rootVisualElement.Q<ListView>("FieldModificationList");
+            _modificationList.makeItem = () =>
+            {
+                var item = visualTreeModificationItem.CloneTree();
+                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                return item;
+            };
 
             _targetAnimationPath = rootVisualElement.Q<TextField>("FieldTargetAnimationPath");
             _targetAnimationPath.RegisterValueChangedCallback((e) => RefreshPreview());
@@ -68,17 +81,8 @@ namespace KusakaFactory.Zatools.EditorExtension
             _overwrite.RegisterValueChangedCallback((e) => OnOverwriteChanged());
             _openSavePath.clicked += OnOpenSavePath;
 
-            _animationList = rootVisualElement.Q<ListView>("FieldAnimationList");
-            _animationList.makeItem = OnAnimationListMakeItem;
-            _animationList.bindItem = OnAnimationListBindItem;
-
-            _modificationList = rootVisualElement.Q<ListView>("FieldModificationList");
-            _modificationList.makeItem = () =>
-            {
-                var item = visualTreeModificationItem.CloneTree();
-                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
-                return item;
-            };
+            _applyButton = rootVisualElement.Q<Button>("ApplyButton");
+            _applyButton.clicked += OnApply;
 
             OnFillingValueSettingsChanged();
             OnOverwriteChanged();
@@ -90,9 +94,11 @@ namespace KusakaFactory.Zatools.EditorExtension
             var item = visualTree.CloneTree();
             ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
 
+            var fillingToggle = item.Q<Toggle>();
             var field = item.Q<ObjectField>();
             var removeButton = item.Q<Button>();
             field.SetEnabled(false);
+            fillingToggle.RegisterValueChangedCallback((e) => OnItemFillingChanged(item.userData as AnimationClipItem, e.newValue));
             removeButton.clicked += () => OnRemoveItem(item.userData as AnimationClipItem);
 
             return item;
@@ -100,9 +106,18 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         private void OnAnimationListBindItem(VisualElement item, int index)
         {
-            var field = item.Q<ObjectField>();
-            field.value = TargetAnimations[index].Clip;
             item.userData = TargetAnimations[index];
+
+            var field = item.Q<ObjectField>();
+            var fillingToggle = item.Q<Toggle>();
+            field.value = TargetAnimations[index].Clip;
+            fillingToggle.value = TargetAnimations[index].ApplyFilling;
+        }
+
+        private void OnItemFillingChanged(AnimationClipItem item, bool newValue)
+        {
+            item.ApplyFilling = newValue;
+            RefreshPreview();
         }
 
         private void OnRemoveItem(AnimationClipItem item)
@@ -141,7 +156,22 @@ namespace KusakaFactory.Zatools.EditorExtension
             var assetsPath = Application.dataPath;
             if (!path.StartsWith(assetsPath)) return;
 
-            SaveDirectory = path;
+            // Application.dataPath は Assets/ を含むが SaveDirectory は Assets/**/* である必要がある
+            SaveDirectory = $"Assets/{path[assetsPath.Length..]}";
+        }
+
+        private void OnApply()
+        {
+            var process = new MissingBlendShapeInserterProcess(
+                TargetAnimations.Select((aci) => (aci.Clip, aci.ApplyFilling)),
+                TargetAnimationPath,
+                FillingValueMode != "All Zero" ? FillingValueSource : null,
+                OverwriteAnimations ? null : SaveDirectory
+            );
+            process.Apply();
+
+            TargetAnimations.Clear();
+            RefreshPreview();
         }
 
         private void UnionAppendClips(IEnumerable<AnimationClip> newClips)
@@ -150,33 +180,38 @@ namespace KusakaFactory.Zatools.EditorExtension
             foreach (var clip in newClips)
             {
                 if (!existingClips.Add(clip)) continue;
-                TargetAnimations.Add(new AnimationClipItem { Clip = clip });
+                TargetAnimations.Add(new AnimationClipItem { Clip = clip, ApplyFilling = true });
             }
         }
 
         private void RefreshPreview()
         {
             var process = new MissingBlendShapeInserterProcess(
-                TargetAnimations.Select((aci) => aci.Clip),
+                TargetAnimations.Select((aci) => (aci.Clip, aci.ApplyFilling)),
                 TargetAnimationPath,
-                FillingValueMode != "All Zero" ? FillingValueSource : null
+                FillingValueMode != "All Zero" ? FillingValueSource : null,
+                OverwriteAnimations ? null : SaveDirectory
             );
 
             ModificationPreviews.Clear();
             foreach (var c in TargetAnimations)
             {
+                if (!c.ApplyFilling) continue;
                 var missingBlendShapes = process
                     .CalculateMissingBlendShapeNamesFor(c.Clip)
                     .Select((bs) => (bs, process.GetCopyingBlendShapeValue(bs)));
                 var previewItem = ModificationPreviewItem.Create(c.Clip.name, missingBlendShapes.ToArray());
                 ModificationPreviews.Add(previewItem);
             }
+
+            _applyButton.SetEnabled(TargetAnimations.Count > 0);
         }
 
         [Serializable]
         internal sealed class AnimationClipItem
         {
             public AnimationClip Clip;
+            public bool ApplyFilling;
         }
 
         [Serializable]

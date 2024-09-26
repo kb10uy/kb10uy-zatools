@@ -22,6 +22,6 @@
             <ui:TextField picking-mode="Ignore" label="mbsi.save-path" name="FieldSaveDirectory" binding-path="SaveDirectory" class="ndmf-tr" style="flex-grow: 1; align-items: stretch; align-self: auto;" />
             <ui:Button text="mbsi.open" parse-escape-sequences="true" display-tooltip-when-elided="true" name="OpenSavePath" class="ndmf-tr" style="flex-grow: 0;" />
         </ui:VisualElement>
-        <ui:Button text="mbsi.apply" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="margin-top: 8px;" />
+        <ui:Button text="mbsi.apply" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ApplyButton" class="ndmf-tr" style="margin-top: 8px;" />
     </ui:VisualElement>
 </ui:UXML>
