@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/EditorExtension/MissingBlendShapeInserter/MissingBlendShapeInserter.uss?fileID=7433441132597879392&amp;guid=d8db796c360d62941aab3ee9f4d5df57&amp;type=3#MissingBlendShapeInserter" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:VisualElement name="AnimationDropArea" style="flex-grow: 0; height: 64px; background-color: rgba(115, 115, 115, 0.3); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;">
+            <ui:Label tabindex="-1" text="mbsi.drop-area" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="align-self: center; -unity-text-align: middle-center; justify-content: flex-start; align-items: auto; flex-grow: 1; color: rgb(255, 255, 255); -unity-font-style: bold;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement style="flex-grow: 1; flex-basis: 0;">
+                <ui:Label tabindex="-1" text="mbsi.animations" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="margin-left: 4px; margin-bottom: 4px;" />
+                <ui:ListView name="FieldAnimationList" binding-path="TargetAnimations" show-bound-collection-size="false" virtualization-method="DynamicHeight" show-add-remove-footer="false" style="flex-grow: 1; margin-top: 0; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-basis: 0;" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; flex-basis: 0;">
+                <ui:Label tabindex="-1" text="mbsi.modifications" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="margin-left: 4px; margin-bottom: 4px;" />
+                <ui:ListView name="FieldModificationList" virtualization-method="DynamicHeight" show-bound-collection-size="false" binding-path="ModificationPreviews" selection-type="None" style="margin-right: 4px; margin-bottom: 4px; margin-left: 4px; flex-grow: 1; flex-basis: 0;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:TextField picking-mode="Ignore" label="mbsi.target-path" value="Body" binding-path="TargetAnimationPath" is-delayed="true" name="FieldTargetAnimationPath" class="ndmf-tr" />
+        <ui:DropdownField label="mbsi.filling-mode" choices="All Zero,Copy from SkinnedMeshRenderer" index="0" name="FieldFillingValueMode" binding-path="FillingValueMode" class="ndmf-tr" style="align-items: center; margin-top: 6px;" />
+        <uie:ObjectField label="mbsi.filling-source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" name="FieldFillingValueSource" binding-path="FillingValueSource" class="ndmf-tr" />
+        <ui:Toggle label="mbsi.overwrite" name="FieldOverwrite" binding-path="OverwriteAnimations" class="ndmf-tr" style="margin-top: 6px;" />
+        <ui:VisualElement name="SavePathElement" style="flex-grow: 0; flex-direction: row;">
+            <ui:TextField picking-mode="Ignore" label="mbsi.save-path" name="FieldSaveDirectory" binding-path="SaveDirectory" class="ndmf-tr" style="flex-grow: 1; align-items: stretch; align-self: auto;" />
+            <ui:Button text="mbsi.open" parse-escape-sequences="true" display-tooltip-when-elided="true" name="OpenSavePath" class="ndmf-tr" style="flex-grow: 0;" />
+        </ui:VisualElement>
+        <ui:Button text="mbsi.apply" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ApplyButton" class="ndmf-tr" style="margin-top: 8px;" />
+    </ui:VisualElement>
+</ui:UXML>
