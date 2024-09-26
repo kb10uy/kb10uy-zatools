@@ -47,5 +47,17 @@
     "cmm.definitions": "Mip Source Definitions",
     "cmm.mip-geq": "Mip >= ",
     "cmm.source": "Source Texture",
-    "cmm.bias": "Bias"
+    "cmm.bias": "Bias",
+    "mbsi.drop-area": "Drag and drop AnimationClip assets here",
+    "mbsi.animations": "Target AnimationClip(s)",
+    "mbsi.modifications": "Modification Preview",
+    "mbsi.target-path": "Target GameObject Path",
+    "mbsi.filling-mode": "Filling Mode",
+    "mbsi.filling-source": "Filling Value Source",
+    "mbsi.overwrite": "Overwrite original file(s)",
+    "mbsi.save-path": "Save Path",
+    "mbsi.open": "Open...",
+    "mbsi.apply": "Applyh",
+    "mbsi.keys": "key(s)",
+    "mbsi.keys-header": "Key(s) to be added"
 }

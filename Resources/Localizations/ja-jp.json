@@ -47,5 +47,17 @@
     "cmm.definitions": "ミップマップコピー元定義",
     "cmm.mip-geq": "ミップレベル >= ",
     "cmm.source": "コピー元テクスチャ",
-    "cmm.bias": "バイアス"
+    "cmm.bias": "バイアス",
+    "mbsi.drop-area": "AnimationClip アセットをここにドラッグ&ドロップで追加",
+    "mbsi.animations": "対象の AnimationClip",
+    "mbsi.modifications": "追加される設定値",
+    "mbsi.target-path": "収集対象の GameObject のパス",
+    "mbsi.filling-mode": "追加で設定する値",
+    "mbsi.filling-source": "BlendShape 値のコピー元",
+    "mbsi.overwrite": "元アセットを上書きする",
+    "mbsi.save-path": "保存先",
+    "mbsi.open": "開く...",
+    "mbsi.apply": "適用",
+    "mbsi.keys": "件",
+    "mbsi.keys-header": "追加される BlendShape"
 }
