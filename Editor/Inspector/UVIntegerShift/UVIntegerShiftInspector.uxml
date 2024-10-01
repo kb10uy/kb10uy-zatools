@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <uie:PropertyField binding-path="DestinationUV" label="uis.inspector.destination" class="ndmf-tr" />
+        <uie:PropertyField binding-path="SourceUV" label="uis.inspector.source" class="ndmf-tr" />
+        <ui:SliderInt label="uis.inspector.shift-x" high-value="4" low-value="-4" show-input-field="true" binding-path="ShiftX" class="ndmf-tr" />
+        <ui:SliderInt label="uis.inspector.shift-y" high-value="4" low-value="-4" show-input-field="true" binding-path="ShiftY" class="ndmf-tr" />
+    </ui:VisualElement>
+</ui:UXML>
