@@ -13,7 +13,8 @@ namespace KusakaFactory.Zatools
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new Modules.BoneArrayRotationInfluenceApplier())
-                .Then.Run(new Modules.AdHocBlendShapeMixer());
+                .Then.Run(new Modules.AdHocBlendShapeMixer())
+                .Then.Run(new Modules.UVIntegerShifter());
             InPhase(BuildPhase.Transforming)
                 // cf. https://github.com/bdunderscore/modular-avatar/issues/1036
                 .AfterPlugin("nadena.dev.modular-avatar")
