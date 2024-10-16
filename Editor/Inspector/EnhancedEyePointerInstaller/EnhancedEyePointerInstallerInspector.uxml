@@ -1,8 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-bottom: 8px; margin-left: 4px;" />
-        <uie:PropertyField name="FieldVRCConstraint" binding-path="VRCConstraint" label="eepi.inspector.vrc-constraint" class="ndmf-tr" />
-        <uie:PropertyField name="FieldDummyBone" binding-path="DummyEyeBones" label="eepi.inspector.dummy-bones" class="ndmf-tr" />
-        <uie:PropertyField name="FieldAdaptedFXLayer" binding-path="AdaptedFXLayer" label="eepi.inspector.fx-layer" picking-mode="Ignore" class="ndmf-tr unity-disabled" />
+        <ui:Toggle label="eepi.inspector.vrc-constraint" binding-path="VRCConstraint" name="FieldVRCConstraint" class="ndmf-tr" />
+        <ui:Toggle label="eepi.inspector.dummy-bones" binding-path="DummyEyeBones" name="FieldDummyBone" class="ndmf-tr" />
+        <ui:Toggle label="eepi.inspector.fx-layer" binding-path="AdaptedFXLayer" name="FieldAdaptedFXLayer" class="ndmf-tr" />
+        <ui:Toggle label="eepi.inspector.override-weight" name="FieldOverrideGlobalWeight" binding-path="OverrideGlobalWeight" class="ndmf-tr" />
+        <ui:VisualElement name="GlobalWeightGroup" style="flex-grow: 1;">
+            <ui:Slider label="eepi.inspector.initial-weight" high-value="1" name="FieldInitialGlobalWeight" binding-path="InitialGlobalWeight" show-input-field="true" class="label-indent-1 ndmf-tr" />
+            <ui:Toggle label="eepi.inspector.add-weight-control" name="FieldAddGlobalWeightControl" binding-path="AddGlobalWeightControl" class="label-indent-1 ndmf-tr" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

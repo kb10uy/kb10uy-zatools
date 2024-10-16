@@ -1,0 +1,11 @@
+.unity-base-field__label {
+    width: 280px;
+}
+
+.label-indent-1 .unity-base-field__label {
+    padding-left: 12px;
+}
+
+.label-indent-2 .unity-base-field__label {
+    padding-left: 24px;
+}
