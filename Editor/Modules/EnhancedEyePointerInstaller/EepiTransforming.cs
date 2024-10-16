@@ -61,7 +61,7 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
         {
             var avatarTransform = avatarRoot.transform;
             var installerTransform = installer.transform;
-            if (installerTransform != avatarTransform)
+            if (installerTransform.parent != avatarTransform)
             {
                 // アバタールートに移動する
                 installerTransform.parent = avatarTransform;
