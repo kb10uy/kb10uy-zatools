@@ -9,5 +9,8 @@ namespace KusakaFactory.Zatools.Runtime
         public bool VRCConstraint = false;
         public bool DummyEyeBones = false;
         public bool AdaptedFXLayer = false;
+        public bool OverrideGlobalWeight = false;
+        public float InitialGlobalWeight = 1.0f;
+        public bool AddGlobalWeightControl = false;
     }
 }
