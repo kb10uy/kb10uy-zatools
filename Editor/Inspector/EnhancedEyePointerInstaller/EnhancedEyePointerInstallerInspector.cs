@@ -17,8 +17,13 @@ namespace KusakaFactory.Zatools.Inspector.EnhancedEyePointerInstaller
             inspector.Bind(serializedObject);
 
             // TODO: 実装したら AaC の存在チェックで制御する
-            var adaptedFXLayer = inspector.Q<PropertyField>("FieldAdaptedFXLayer");
+            var adaptedFXLayer = inspector.Q<Toggle>("FieldAdaptedFXLayer");
             adaptedFXLayer.SetEnabled(false);
+
+            var overrideGlobalWeight = inspector.Q<Toggle>("FieldOverrideGlobalWeight");
+            var globalWeightGroup = inspector.Q<VisualElement>("GlobalWeightGroup");
+            overrideGlobalWeight.RegisterValueChangedCallback((e) => globalWeightGroup.SetEnabled(e.newValue));
+            globalWeightGroup.SetEnabled(overrideGlobalWeight.value);
 
             return inspector;
         }

@@ -1,9 +1,13 @@
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEditor;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
+using nadena.dev.modular_avatar.core;
+using AnimatorAsCode.V1;
 using KusakaFactory.Zatools.Localization;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
@@ -34,15 +38,16 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 
             // Aim Constraint の設定
             var target = LocateEyePointerTarget(state.Installer);
+            Component leftAim, rightAim;
             if (state.Installer.VRCConstraint)
             {
-                SetupConstaintsWithVRCVariant(target.transform, constrainedLeftEye);
-                SetupConstaintsWithVRCVariant(target.transform, constrainedRightEye);
+                leftAim = SetupConstaintsWithVRCVariant(target.transform, constrainedLeftEye);
+                rightAim = SetupConstaintsWithVRCVariant(target.transform, constrainedRightEye);
             }
             else
             {
-                SetupConstaintsWithUnityVariant(target.transform, constrainedLeftEye);
-                SetupConstaintsWithUnityVariant(target.transform, constrainedRightEye);
+                leftAim = SetupConstaintsWithUnityVariant(target.transform, constrainedLeftEye);
+                rightAim = SetupConstaintsWithUnityVariant(target.transform, constrainedRightEye);
             }
 
             // Eye Look の設定・修正
@@ -54,6 +59,12 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
                 lookAdjustRight
             );
 
+            // Global Weight Override
+            if (state.Installer.OverrideGlobalWeight)
+            {
+                GenerateGlobalWeightOverride(context, state.Installer, leftAim, rightAim);
+            }
+
             state.Destroy();
         }
 
@@ -61,7 +72,7 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
         {
             var avatarTransform = avatarRoot.transform;
             var installerTransform = installer.transform;
-            if (installerTransform != avatarTransform)
+            if (installerTransform.parent != avatarTransform)
             {
                 // アバタールートに移動する
                 installerTransform.parent = avatarTransform;
@@ -115,9 +126,9 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             return eyePointerTargetTransform.gameObject;
         }
 
-        private static void SetupConstaintsWithVRCVariant(Transform targetTransform, Transform constrainedEye)
+        private static VRCAimConstraint SetupConstaintsWithVRCVariant(Transform targetTransform, Transform constrainedEye)
         {
-            if (constrainedEye == null) return;
+            if (constrainedEye == null) return null;
 
             var aimConstraint = constrainedEye.gameObject.AddComponent<VRCAimConstraint>();
             aimConstraint.enabled = false;
@@ -125,11 +136,13 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             aimConstraint.AffectsRotationZ = false;
             aimConstraint.Locked = true;
             aimConstraint.IsActive = true;
+
+            return aimConstraint;
         }
 
-        private static void SetupConstaintsWithUnityVariant(Transform targetTransform, Transform constrainedEye)
+        private static AimConstraint SetupConstaintsWithUnityVariant(Transform targetTransform, Transform constrainedEye)
         {
-            if (constrainedEye == null) return;
+            if (constrainedEye == null) return null;
 
             var aimConstraint = constrainedEye.gameObject.AddComponent<AimConstraint>();
             aimConstraint.enabled = false;
@@ -137,6 +150,8 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
             aimConstraint.rotationAxis = Axis.X | Axis.Y;
             aimConstraint.locked = true;
             aimConstraint.constraintActive = true;
+
+            return aimConstraint;
         }
 
         private static void AdjustEyeLookSettings(
@@ -191,6 +206,107 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
         {
             original.left = leftAdjustment * original.left;
             original.right = rightAdjustment * original.right;
+        }
+
+        private void GenerateGlobalWeightOverride(BuildContext context, Installer installer, Component leftAim, Component rightAim)
+        {
+            var aac = AacV1.Create(new AacConfiguration
+            {
+                SystemName = "EnhancedEyePointerInstaller",
+                AnimatorRoot = context.AvatarRootObject.transform,
+                DefaultValueRoot = context.AvatarRootObject.transform,
+                AssetKey = GUID.Generate().ToString(),
+                AssetContainer = context.AssetContainer,
+                ContainerMode = AacConfiguration.Container.OnlyWhenPersistenceRequired,
+                DefaultsProvider = new AacDefaultsProvider(false),
+            });
+            var fxController = aac.NewAnimatorController();
+            var layer = fxController.NewLayer("GlobalWeightOverride").WithWeight(0.0f);
+            var sepToggle = layer.BoolParameter("SEP/Toggle");
+            var sepGlobalWeight = layer.FloatParameter("SEP/GlobalWeight");
+
+            // Weight Animation
+            var weightProperty = installer.VRCConstraint ? "GlobalWeight" : "m_Weight";
+            var controlAnimation = aac.NewClip("GlobalWeightControl").Animating((ec) =>
+            {
+                var left = ec.BindingFromComponent(leftAim, weightProperty);
+                var right = ec.BindingFromComponent(rightAim, weightProperty);
+                var curve = new AnimationCurve(
+                    new Keyframe { time = 0.0f, value = 0.0f },
+                    new Keyframe { time = 100.0f, value = 1.0f }
+                );
+                AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetEditorCurve(ec.Clip, left, curve);
+                AnimationUtility.SetEditorCurve(ec.Clip, right, curve);
+            });
+
+            // Transition
+            var disabled = layer.NewState("Disabled").WithAnimation(controlAnimation).WithMotionTime(sepGlobalWeight);
+            var enabled = layer.NewState("Enabled").WithAnimation(controlAnimation).WithMotionTime(sepGlobalWeight);
+            disabled.TransitionsTo(enabled).When(sepToggle.IsTrue());
+            enabled.TransitionsTo(disabled).When(sepToggle.IsFalse());
+
+            // AnimatorLayerControl StateBehaviour
+            var disableLayer = disabled.CreateNewBehaviour<VRCAnimatorLayerControl>();
+            disableLayer.playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX;
+            disableLayer.layer = 0;
+            disableLayer.goalWeight = 0.0f;
+            disableLayer.blendDuration = 0.1f;
+            var enableLayer = enabled.CreateNewBehaviour<VRCAnimatorLayerControl>();
+            enableLayer.playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX;
+            enableLayer.layer = 0;
+            enableLayer.goalWeight = 1.0f;
+            enableLayer.blendDuration = 0.1f;
+
+            // MergeAnimator
+            var globalWeightControl = new GameObject("GlobalWeightControl");
+            globalWeightControl.transform.parent = installer.transform;
+            var mergeAnimator = globalWeightControl.AddComponent<ModularAvatarMergeAnimator>();
+            mergeAnimator.animator = fxController.AnimatorController;
+            mergeAnimator.layerPriority = 1000; // EyePointer のそれより後ならなんでもいい
+            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            mergeAnimator.deleteAttachedAnimator = false;
+            mergeAnimator.matchAvatarWriteDefaults = true;
+            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+
+            // Parameter
+            var parameters = globalWeightControl.AddComponent<ModularAvatarParameters>();
+            var globalWeightConfig = new ParameterConfig
+            {
+                nameOrPrefix = "SEP/GlobalWeight",
+                syncType = ParameterSyncType.Float,
+                saved = false,
+                localOnly = false,
+                hasExplicitDefaultValue = true,
+                defaultValue = installer.InitialGlobalWeight,
+            };
+            parameters.parameters.Add(globalWeightConfig);
+
+            // Control Puppet
+            if (installer.AddGlobalWeightControl)
+            {
+                // デフォルトのメニューが 7 項目しかない前提
+                // VRCExpressionsMenu をコピーして Radial Puppet を差し込む
+                var defaultMenuInstaller = installer.GetComponent<ModularAvatarMenuInstaller>();
+                var originalRootMenuAsset = defaultMenuInstaller.menuToAppend;
+                var copiedRootMenuAsset = Object.Instantiate(originalRootMenuAsset);
+                var originalMenuAsset = copiedRootMenuAsset.controls[0].subMenu;
+                var copiedMenuAsset = Object.Instantiate(originalMenuAsset);
+
+                copiedMenuAsset.controls.Add(new VRCExpressionsMenu.Control
+                {
+                    type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                    name = "EyePointer Weight",
+                    subParameters = new[] { new VRCExpressionsMenu.Control.Parameter { name = "SEP/GlobalWeight" } },
+                    value = installer.InitialGlobalWeight,
+                });
+
+                copiedRootMenuAsset.controls[0].subMenu = copiedMenuAsset;
+                defaultMenuInstaller.menuToAppend = copiedRootMenuAsset;
+            }
         }
     }
 }
