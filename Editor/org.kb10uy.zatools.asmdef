@@ -7,8 +7,7 @@
         "nadena.dev.ndmf.runtime",
         "nadena.dev.ndmf.vrchat",
         "nadena.dev.modular-avatar.core",
-        "AnimatorAsCode.V1",
-        "AnimatorAsCode.V1.VRChat"
+        "AnimatorAsCode.V1"
     ],
     "includePlatforms": [
         "Editor"
@@ -28,22 +27,6 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "nadena.dev.modular-avatar",
-            "expression": "1.9.0",
-            "define": "KZT_MODULAR_AVATAR"
-        },
-        {
-            "name": "dev.hai-vr.animator-as-code.v1",
-            "expression": "1.1.0",
-            "define": "KZT_ANIMATOR_AS_CODE"
-        },
-        {
-            "name": "dev.hai-vr.animator-as-code.v1.vrchat",
-            "expression": "1.1.0",
-            "define": "KZT_ANIMATOR_AS_CODE_VRC"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

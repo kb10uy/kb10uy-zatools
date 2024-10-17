@@ -15,7 +15,9 @@
     },
     "vpmDependencies": {
         "com.vrchat.avatars": ">=3.7.0",
-        "nadena.dev.ndmf": ">=1.4.0"
+        "nadena.dev.ndmf": ">=1.5.0",
+        "nadena.dev.modular-avatar": ">=1.10.0",
+        "dev.hai-vr.animator-as-code.v1": ">=1.1.0"
     },
     "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.0"
