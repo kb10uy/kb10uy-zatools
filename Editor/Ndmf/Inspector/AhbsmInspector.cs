@@ -12,10 +12,10 @@ using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Localization;
 using KusakaFactory.Zatools.Runtime;
 
-namespace KusakaFactory.Zatools.Inspector.AdHocBlendShapeMix
+namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    [CustomEditor(typeof(Runtime.AdHocBlendShapeMix))]
-    internal sealed class AdHocBlendShapeMixInspector : ZatoolEditorBase
+    [CustomEditor(typeof(AdHocBlendShapeMix))]
+    internal sealed class AhbsmInspector : ZatoolInspectorBase
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
