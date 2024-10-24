@@ -2,9 +2,9 @@ using UnityEngine.UIElements;
 using UnityEditor;
 using KusakaFactory.Zatools.Localization;
 
-namespace KusakaFactory.Zatools.Inspector
+namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    internal abstract class ZatoolEditorBase : Editor
+    internal abstract class ZatoolInspectorBase : Editor
     {
         private VisualElement _boundElementRoot;
 

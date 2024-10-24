@@ -12,7 +12,7 @@ using KusakaFactory.Zatools.Localization;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 
-namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
+namespace KusakaFactory.Zatools.Ndmf
 {
     internal sealed class EepiTransforming : Pass<EepiTransforming>
     {
@@ -21,7 +21,7 @@ namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
 
         protected override void Execute(BuildContext context)
         {
-            var state = context.GetState(InstallerState.Initializer);
+            var state = context.GetState(EepiState.Initializer);
             if (state.Installer == null) return;
 
             // アバタールート

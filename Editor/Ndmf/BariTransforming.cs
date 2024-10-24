@@ -5,12 +5,12 @@ using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Localization;
 using KusakaFactory.Zatools.Runtime;
 
-namespace KusakaFactory.Zatools.Modules
+namespace KusakaFactory.Zatools.Ndmf
 {
-    internal sealed class BoneArrayRotationInfluenceApplier : Pass<BoneArrayRotationInfluenceApplier>
+    internal sealed class BariTransforming : Pass<BariTransforming>
     {
-        public override string QualifiedName => nameof(BoneArrayRotationInfluenceApplier);
-        public override string DisplayName => "Apply skirt PhysBone influence";
+        public override string QualifiedName => nameof(BariTransforming);
+        public override string DisplayName => "Apply bone array influence";
 
         protected override void Execute(BuildContext context)
         {

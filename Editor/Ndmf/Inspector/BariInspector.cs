@@ -3,13 +3,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
-using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Runtime;
 
-namespace KusakaFactory.Zatools.Inspector.BoneArrayRotationInfluence
+namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    [CustomEditor(typeof(Runtime.BoneArrayRotationInfluence))]
-    internal sealed class BoneArrayRotationInfluenceInspector : ZatoolEditorBase
+    [CustomEditor(typeof(BoneArrayRotationInfluence))]
+    internal sealed class BariInspector : ZatoolInspectorBase
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

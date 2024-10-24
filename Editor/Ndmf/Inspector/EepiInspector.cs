@@ -2,11 +2,12 @@ using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Runtime;
 
-namespace KusakaFactory.Zatools.Inspector.EnhancedEyePointerInstaller
+namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    [CustomEditor(typeof(Runtime.EnhancedEyePointerInstaller))]
-    internal sealed class EnhancedEyePointerInstallerInspector : ZatoolEditorBase
+    [CustomEditor(typeof(EnhancedEyePointerInstaller))]
+    internal sealed class EepiInspector : ZatoolInspectorBase
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

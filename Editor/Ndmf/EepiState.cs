@@ -2,20 +2,20 @@ using UnityEngine;
 using nadena.dev.ndmf;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
-namespace KusakaFactory.Zatools.Modules.EnhancedEyePointerInstaller
+namespace KusakaFactory.Zatools.Ndmf
 {
-    internal sealed class InstallerState
+    internal sealed class EepiState
     {
         private Installer _installer = null;
 
         public Installer Installer => _installer;
 
-        private InstallerState(BuildContext context)
+        private EepiState(BuildContext context)
         {
             _installer = context.AvatarRootObject.GetComponentInChildren<Installer>();
         }
 
-        public static InstallerState Initializer(BuildContext context) => new InstallerState(context);
+        public static EepiState Initializer(BuildContext context) => new EepiState(context);
 
         public void Destroy()
         {
