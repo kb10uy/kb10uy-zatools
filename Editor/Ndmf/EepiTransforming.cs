@@ -28,7 +28,7 @@ namespace KusakaFactory.Zatools.Ndmf
             EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer);
 
             // 対象の Eye ボーンと Eye Look 補正値の取得
-            var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarRootObject);
+            var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarDescriptor);
             var (lookAdjustLeft, lookAdjustRight) = (Quaternion.identity, Quaternion.identity);
             if (state.Installer.DummyEyeBones)
             {
@@ -70,25 +70,29 @@ namespace KusakaFactory.Zatools.Ndmf
 
         private static void EnsureAvatarRootPlacement(GameObject avatarRoot, Installer installer)
         {
-            var avatarTransform = avatarRoot.transform;
+            // EyePointer の MergeAnimator が Absolute なら真にアバタールート
+            // Relative ならその Relative のルート
+            var epMergeAnimator = installer.GetComponent<ModularAvatarMergeAnimator>();
+            var installRootTransform = epMergeAnimator.pathMode == MergeAnimatorPathMode.Absolute ?
+                avatarRoot.transform :
+                epMergeAnimator.relativePathRoot.Get(epMergeAnimator).transform;
             var installerTransform = installer.transform;
-            if (installerTransform.parent != avatarTransform)
+            if (installerTransform.parent != installRootTransform)
             {
-                // アバタールートに移動する
-                installerTransform.parent = avatarTransform;
+                // installRootTransform に移動する
+                installerTransform.parent = installRootTransform;
                 ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.prefab-moved");
             }
         }
 
-        private static (Transform LeftEye, Transform RightEye) LocateEyeBones(GameObject avatarRoot)
+        private static (Transform LeftEye, Transform RightEye) LocateEyeBones(VRCAvatarDescriptor avatarDescriptor)
         {
-            var avatarDescriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
             if (avatarDescriptor.enableEyeLook)
             {
                 return LocateEyeBonesFromVRCAvatarDescriptor(avatarDescriptor);
             }
 
-            return LocateEyeBonesUnityAvatarAsset(avatarRoot);
+            return LocateEyeBonesUnityAvatarAsset(avatarDescriptor.gameObject);
         }
 
         private static (Transform LeftEye, Transform RightEye) LocateEyeBonesFromVRCAvatarDescriptor(VRCAvatarDescriptor avatarDescriptor)
