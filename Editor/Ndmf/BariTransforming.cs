@@ -3,6 +3,7 @@ using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.HarmonyPatch;
 using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf
@@ -54,18 +55,12 @@ namespace KusakaFactory.Zatools.Ndmf
                 var prev = hasPrev ? influenceSettings.ChainRoots[(i - 1) % chainsCount].Root : parentTransform;
                 var next = hasNext ? influenceSettings.ChainRoots[(i + 1) % chainsCount].Root : parentTransform;
 
-                // RotationOffset の計算
-                var middleQuaternion = Quaternion.Slerp(prev.rotation, next.rotation, 0.5f);
-                var rotationDiff = Quaternion.Inverse(middleQuaternion) * parentTransform.rotation;
-
                 // RotationConstraint の設定
                 var rotationConstraint = fakeParent.AddComponent<VRCRotationConstraint>();
-                rotationConstraint.RotationAtRest = parentTransform.localEulerAngles;
-                rotationConstraint.RotationOffset = rotationDiff.eulerAngles;
                 if (hasPrev) rotationConstraint.Sources.Add(new VRCConstraintSource(prev, 0.5f, Vector3.zero, Vector3.zero));
                 if (hasNext) rotationConstraint.Sources.Add(new VRCConstraintSource(next, 0.5f, Vector3.zero, Vector3.zero));
+                IsPlayingControlPatch.With(false, () => rotationConstraint.ActivateConstraint());
                 rotationConstraint.GlobalWeight = center.Influence;
-                rotationConstraint.IsActive = true;
             }
 
             Object.DestroyImmediate(influenceSettings);
