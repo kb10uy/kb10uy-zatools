@@ -18,6 +18,7 @@
     "precompiledReferences": [
         "System.Collections.Immutable.dll",
         "Newtonsoft.Json.dll",
+        "0Harmony.dll",
         "VRCSDKBase.dll",
         "VRCSDK3A.dll",
         "VRC.Dynamics.dll",
