@@ -74,7 +74,11 @@ namespace KusakaFactory.Zatools.EditorExtension
         {
             if (changeEvent.newValue == null) return;
 
+#pragma warning disable CS0436
+            // この Application は UnityEntgine.CoreModule.dll ではなく kb10uy-zatools のものを指す
             var projectRoot = Path.GetDirectoryName(Application.dataPath);
+#pragma warning restore CS0436
+
             var assetProjectPath = AssetDatabase.GetAssetPath(changeEvent.newValue);
             var assetFullPath = Path.Combine(projectRoot, assetProjectPath);
             if (!Directory.Exists(assetFullPath)) assetProjectPath = Path.GetDirectoryName(assetProjectPath);

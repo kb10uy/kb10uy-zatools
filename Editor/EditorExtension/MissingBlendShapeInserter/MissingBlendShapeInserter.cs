@@ -153,7 +153,11 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
             var path = EditorUtility.OpenFolderPanel("Select directory to save animations...", "", "");
             if (string.IsNullOrWhiteSpace(path)) return;
 
+#pragma warning disable CS0436
+            // この Application は UnityEntgine.CoreModule.dll ではなく kb10uy-zatools のものを指す
             var assetsPath = Application.dataPath;
+#pragma warning restore CS0436
+
             if (!path.StartsWith(assetsPath)) return;
 
             // Application.dataPath は Assets/ を含むが SaveDirectory は Assets/**/* である必要がある
