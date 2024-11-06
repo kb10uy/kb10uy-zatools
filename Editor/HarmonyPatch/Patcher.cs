@@ -12,6 +12,8 @@ namespace KusakaFactory.Zatools.HarmonyPatch
         {
             var harmony = new Harmony(HarmonyId);
             AssemblyReloadEvents.beforeAssemblyReload += () => harmony.UnpatchAll(HarmonyId);
+
+            IsPlayingControlPatch.Apply(harmony);
         }
     }
 }
