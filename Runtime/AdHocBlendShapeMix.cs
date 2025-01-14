@@ -4,7 +4,7 @@ using VRC.SDKBase;
 
 namespace KusakaFactory.Zatools.Runtime
 {
-    [AddComponentMenu("KusakaFactory/Mix BlendShapes on Build")]
+    [AddComponentMenu("KusakaFactory/Zatools Mix BlendShapes on Build")]
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public sealed class AdHocBlendShapeMix : MonoBehaviour, IEditorOnly
     {

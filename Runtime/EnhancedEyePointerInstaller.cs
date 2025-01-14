@@ -3,7 +3,7 @@ using VRC.SDKBase;
 
 namespace KusakaFactory.Zatools.Runtime
 {
-    [AddComponentMenu("KusakaFactory/Enhanced EyePointer Installer")]
+    [AddComponentMenu("KusakaFactory/Zatools Enhanced EyePointer Installer")]
     public sealed class EnhancedEyePointerInstaller : MonoBehaviour, IEditorOnly
     {
         public bool VRCConstraint = false;
