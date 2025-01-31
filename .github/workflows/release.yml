@@ -23,7 +23,7 @@ jobs:
           args: "-z -u"
 
       - name: "Create Release"
-        uses: "softprops/action-gh-release@v1"
+        uses: "softprops/action-gh-release@v2"
         if: ${{ steps.build.outputs.package-version != '0.0.0' }}
         with:
           tag_name: ${{ steps.build.outputs.package-version }}
