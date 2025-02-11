@@ -7,6 +7,8 @@ namespace KusakaFactory.Zatools
 {
     internal static class Resources
     {
+        internal readonly static string TagEditorOnly = "EditorOnly";
+
         private readonly static Dictionary<string, VisualTreeAsset> VisualTreeAssetCache = new Dictionary<string, VisualTreeAsset>();
 
         [MenuItem("Tools/kb10uy's Various Tools/Reload VisualTree Assets")]
