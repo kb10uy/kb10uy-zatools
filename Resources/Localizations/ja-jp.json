@@ -39,6 +39,8 @@
     "ahbsm.inspector.from-regex": "コピー元の正規表現",
     "ahbsm.inspector.to-regex": "コピー先の正規表現",
     "ahbsm.inspector.append-regex": "コピー元を打ち消す定義をコピー先に追加",
+    "eopr.report.not-editor-only": "非 EditorOnly GameObject にアタッチされています",
+    "eopr.report.not-editor-only:description": "EditorOnlyPropertyReplicator は EditorOnly に設定されている GameObject でのみ機能します。",
     "edx.save-text": "テキストファイルに保存",
     "edx.base-asset": "基準アセット",
     "edx.root-path": "基準パス",

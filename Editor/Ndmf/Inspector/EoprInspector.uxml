@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 4px; margin-right: 2px; margin-bottom: 4px; margin-left: 4px;" />
+        <ui:VisualElement style="flex-grow: 1; margin-top: 4px; margin-right: 2px; margin-bottom: 8px; margin-left: 4px;">
+            <ui:Label tabindex="-1" text="Targets" parse-escape-sequences="true" display-tooltip-when-elided="true" style="-unity-font-style: bold; margin-top: 0; margin-right: 0; margin-bottom: 4px; margin-left: 0;" />
+            <ui:ListView name="FieldTargets" binding-path="Targets" reorderable="true" virtualization-method="DynamicHeight" show-add-remove-footer="true" show-border="true" show-bound-collection-size="false" reorder-mode="Animated" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+        </ui:VisualElement>
+        <ui:Toggle label="Copy BlendShapes" name="FieldEnableBlendShape" binding-path="EnableSmrBlendShapes" style="margin-left: 4px;" />
+        <ui:VisualElement name="BlendShapeExclusion" style="flex-grow: 1; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;">
+            <ui:Label tabindex="-1" text="Exclusions" parse-escape-sequences="true" display-tooltip-when-elided="true" style="-unity-font-style: normal; margin-top: 4px; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" binding-path="SmrBlendShapesExclusion" name="FIeldBlendShapeExclusion" show-border="true" style="margin-top: 4px; margin-left: 0;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

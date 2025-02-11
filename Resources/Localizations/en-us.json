@@ -39,6 +39,8 @@
     "ahbsm.inspector.from-regex": "Regex for From",
     "ahbsm.inspector.to-regex": "Regex for From",
     "ahbsm.inspector.append-regex": "Append canceling defintions according to Regices",
+    "eopr.report.not-editor-only": "Attached to non-EditorOnly GameObject",
+    "eopr.report.not-editor-only:description": "EditorOnlyPropertyReplicator performs its functionality only when attached to EditorOnly GameObject. Ignored.",
     "edx.save-text": "Save as Text File",
     "edx.base-asset": "Base Asset",
     "edx.root-path": "Root Path",
