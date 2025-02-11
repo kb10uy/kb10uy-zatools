@@ -10,9 +10,14 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Configure()
         {
+            InPhase(BuildPhase.Resolving)
+                .BeforePlugin("nadena.dev.modular-avatar")
+                .Run(new EoprResolving());
+
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
+                .Then.Run(new EoprTransforming())
                 .Then.Run(new AhbsmTransforming())
                 .Then.Run(new EepiTransforming());
         }
