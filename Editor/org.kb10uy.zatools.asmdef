@@ -7,7 +7,8 @@
         "nadena.dev.ndmf.runtime",
         "nadena.dev.ndmf.vrchat",
         "nadena.dev.modular-avatar.core",
-        "AnimatorAsCode.V1"
+        "AnimatorAsCode.V1",
+        "com.anatawa12.avatar-optimizer.api.editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -28,6 +29,12 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.anatawa12.avatar-optimizer",
+            "expression": "[1.8,2.0)",
+            "define": "ZATOOLS_AAO_EXISTS"
+        }
+    ],
     "noEngineReferences": false
 }

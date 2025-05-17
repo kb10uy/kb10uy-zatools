@@ -1,4 +1,5 @@
 using nadena.dev.ndmf;
+using nadena.dev.ndmf.animator;
 
 [assembly: ExportsPlugin(typeof(KusakaFactory.Zatools.Ndmf.ZatoolsPlugin))]
 namespace KusakaFactory.Zatools.Ndmf
@@ -10,11 +11,34 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Configure()
         {
+            var bari = new BariTransforming();
+            var ahbsm = new AhbsmTransforming();
+            var eepi = new EepiTransforming();
+            var pbfctt = new PbfcttTransforming();
+
+            // Before MA
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
-                .Run(new BariTransforming())
-                .Then.Run(new AhbsmTransforming())
-                .Then.Run(new EepiTransforming());
+                .Run(bari)
+                .Then.Run(ahbsm);
+
+            // Before MA with VirtualControllerContext
+            InPhase(BuildPhase.Transforming)
+                .BeforePlugin("nadena.dev.modular-avatar")
+                .WithRequiredExtension(typeof(VirtualControllerContext), (seq) =>
+                {
+                    seq.Run(eepi);
+                });
+
+            // After MA
+            InPhase(BuildPhase.Transforming)
+                .AfterPlugin("nadena.dev.modular-avatar")
+                .Run(pbfctt);
+
+            // After AAO
+            InPhase(BuildPhase.Optimizing)
+                .AfterPlugin("com.anatawa12.avatar-optimizer")
+                .Run(new PbfcttTransforming.OptimizingDeletion());
         }
     }
 }
