@@ -8,6 +8,10 @@ using PbfcttComponent = KusakaFactory.Zatools.Runtime.PBFingerColliderTransferTa
 using System.Linq;
 using System;
 
+#if ZATOOLS_AAO_EXISTS
+using Anatawa12.AvatarOptimizer.API;
+#endif
+
 namespace KusakaFactory.Zatools.Ndmf
 {
     internal sealed class PbfcttTransforming : Pass<PbfcttTransforming>
@@ -82,8 +86,29 @@ namespace KusakaFactory.Zatools.Ndmf
                     break;
                 default: throw new ArgumentException($"prohibited index: {index}");
             }
+        }
 
-            UnityObject.DestroyImmediate(transferTarget);
+        internal sealed class OptimizingDeletion : Pass<OptimizingDeletion>
+        {
+            protected override void Execute(BuildContext context)
+            {
+                var targetComponents = context.AvatarRootObject.GetComponentsInChildren<PbfcttComponent>();
+                foreach (var targetComponent in targetComponents) UnityObject.DestroyImmediate(targetComponent);
+            }
         }
     }
+
+#if ZATOOLS_AAO_EXISTS
+    [ComponentInformation(typeof(PbfcttComponent))]
+    internal sealed class PbfcttComponentInformation : ComponentInformation<PbfcttComponent>
+    {
+        protected override void CollectDependency(PbfcttComponent component, ComponentDependencyCollector collector)
+        {
+            // Trace and Optimize で仮の親が削除されてしまうので登録する
+            // もしかしたら AAO 側の考慮もれかも (cf. https://misskey.niri.la/notes/a7vplgv5wa)
+            Debug.LogWarning($"fixing {component.transform.name} / {component.transform.parent.name}");
+            collector.AddDependency(component.transform, component.transform.parent);
+        }
+    }
+#endif
 }
