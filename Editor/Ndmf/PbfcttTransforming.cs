@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
@@ -5,8 +7,6 @@ using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Localization;
 using UnityObject = UnityEngine.Object;
 using PbfcttComponent = KusakaFactory.Zatools.Runtime.PBFingerColliderTransferTarget;
-using System.Linq;
-using System;
 
 #if ZATOOLS_AAO_EXISTS
 using Anatawa12.AvatarOptimizer.API;
@@ -39,13 +39,13 @@ namespace KusakaFactory.Zatools.Ndmf
 
         private void Transfer(BuildContext context, PbfcttComponent transferTarget, int index)
         {
-            // VRChat クライアントで実行される際、Finger Collider は*極めて*非直感的な方法で配置される
-            // 中間オブジェクトを挟むことで設定時の見た目通りに配置されるようにする必要がある
+            // Finger Collider は PB の連続ボーンのように parent transform に依存する
+            // parent transform から target transform に向かってカプセルが"生える"ように配置される
             // see also: https://note.com/labo405/n/nac5615af9b0e
-            // カプセルの"下端"の位置に仮想的な親を作って transferTarget をその子にする
+
+            // PBFCTT で設定されたカプセルの下端 (-Y endpoint) に親となる transform を挿入し、設定されたカプセルと同じ形状になるようにする
             var halfLength = Math.Max(transferTarget.Length / 2.0f - transferTarget.Radius, 0.0001f);
             var targetParentTransform = transferTarget.transform.parent;
-
             var intermediateParent = new GameObject($"{transferTarget.name}_Start");
             intermediateParent.transform.SetParent(transferTarget.transform, false);
             intermediateParent.transform.localPosition = Vector3.down * halfLength;
@@ -85,6 +85,8 @@ namespace KusakaFactory.Zatools.Ndmf
                     break;
                 default: throw new ArgumentException($"prohibited index: {index}");
             }
+
+            // UnityObject.DestroyImmediate(transferTarget);
         }
 
         internal sealed class OptimizingDeletion : Pass<OptimizingDeletion>
@@ -98,14 +100,12 @@ namespace KusakaFactory.Zatools.Ndmf
     }
 
 #if ZATOOLS_AAO_EXISTS
+    // TODO: anatawa12/AvatarOptimizer#1453 がリリースされたら削除
     [ComponentInformation(typeof(PbfcttComponent))]
     internal sealed class PbfcttComponentInformation : ComponentInformation<PbfcttComponent>
     {
         protected override void CollectDependency(PbfcttComponent component, ComponentDependencyCollector collector)
         {
-            // Trace and Optimize で仮の親が削除されてしまうので登録する
-            // もしかしたら AAO 側の考慮もれかも (cf. https://misskey.niri.la/notes/a7vplgv5wa)
-            Debug.LogWarning($"fixing {component.transform.name} / {component.transform.parent.name}");
             collector.AddDependency(component.transform, component.transform.parent);
         }
     }
