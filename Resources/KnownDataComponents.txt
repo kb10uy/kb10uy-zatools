@@ -1,3 +1,0 @@
-# PVLController
-# https://pogapoganyaa.booth.pm/items/5245784
-PogapogaEditor.PvlcComponent.ButtonOperatedDroneInfo
