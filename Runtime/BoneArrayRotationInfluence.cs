@@ -5,6 +5,7 @@ using VRC.SDKBase;
 namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools Apply Rotation Influence for Bone Array")]
+    [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
     public sealed class BoneArrayRotationInfluence : MonoBehaviour, IEditorOnly
     {
         public RotationInfluence[] ChainRoots = new[] { new RotationInfluence() };

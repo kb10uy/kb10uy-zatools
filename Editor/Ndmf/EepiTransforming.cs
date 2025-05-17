@@ -6,6 +6,7 @@ using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
+using nadena.dev.ndmf.animator;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
 using KusakaFactory.Zatools.Localization;
@@ -21,6 +22,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Execute(BuildContext context)
         {
+            var virtualControllerContext = context.Extension<VirtualControllerContext>();
             var state = context.GetState(EepiState.Initializer);
             if (state.Installer == null) return;
 
