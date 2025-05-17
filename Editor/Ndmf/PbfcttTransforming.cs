@@ -43,7 +43,7 @@ namespace KusakaFactory.Zatools.Ndmf
             // 中間オブジェクトを挟むことで設定時の見た目通りに配置されるようにする必要がある
             // see also: https://note.com/labo405/n/nac5615af9b0e
             // カプセルの"下端"の位置に仮想的な親を作って transferTarget をその子にする
-            var halfLength = Math.Max(transferTarget.Length / 2.0f, 0.0001f);
+            var halfLength = Math.Max(transferTarget.Length / 2.0f - transferTarget.Radius, 0.0001f);
             var targetParentTransform = transferTarget.transform.parent;
 
             var intermediateParent = new GameObject($"{transferTarget.name}_Start");
@@ -60,9 +60,8 @@ namespace KusakaFactory.Zatools.Ndmf
                 position = Vector3.zero,
                 rotation = Quaternion.identity,
                 radius = transferTarget.Radius,
-                height = transferTarget.Length,
+                height = transferTarget.Length - transferTarget.Radius * 2.0f,
             };
-            Debug.Log(transferTarget.name);
 
             switch (index)
             {
