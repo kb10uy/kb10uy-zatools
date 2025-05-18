@@ -43,20 +43,24 @@ namespace KusakaFactory.Zatools.Ndmf
             // parent transform から target transform に向かってカプセルが"生える"ように配置される
             // see also: https://note.com/labo405/n/nac5615af9b0e
 
+            //          |
+            // S--------T
+            // \--------C........
             // PBFCTT で設定されたカプセルの下端 (-Y endpoint) に親となる transform を挿入し、設定されたカプセルと同じ形状になるようにする
-            var halfLength = Math.Max(transferTarget.Length / 2.0f - transferTarget.Radius, 0.0001f);
-            var targetParentTransform = transferTarget.transform.parent;
-            var intermediateParent = new GameObject($"{transferTarget.name}_Start");
-            intermediateParent.transform.SetParent(transferTarget.transform, false);
-            intermediateParent.transform.localPosition = Vector3.down * halfLength;
-            intermediateParent.transform.SetParent(targetParentTransform, true);
-            transferTarget.transform.SetParent(intermediateParent.transform, true);
+            var colliderCenter = new GameObject($"{transferTarget.name}_Center");
+            colliderCenter.transform.SetParent(transferTarget.transform, false);
+
+            var colliderStart = new GameObject($"{transferTarget.name}_Start");
+            colliderStart.transform.SetParent(colliderCenter.transform, false);
+            colliderStart.transform.localPosition = Vector3.down * Math.Max(transferTarget.Length / 2.0f - transferTarget.Radius, 0.0001f);
+            colliderStart.transform.SetParent(transferTarget.transform, true);
+            colliderCenter.transform.SetParent(colliderStart.transform, true);
 
             var colliderConfig = new VRCAvatarDescriptor.ColliderConfig
             {
                 isMirrored = false,
                 state = VRCAvatarDescriptor.ColliderConfig.State.Custom,
-                transform = transferTarget.transform,
+                transform = colliderCenter.transform,
                 position = Vector3.zero,
                 rotation = Quaternion.identity,
                 radius = transferTarget.Radius,
@@ -106,7 +110,10 @@ namespace KusakaFactory.Zatools.Ndmf
     {
         protected override void CollectDependency(PbfcttComponent component, ComponentDependencyCollector collector)
         {
-            collector.AddDependency(component.transform, component.transform.parent);
+            foreach (var child in component.GetComponentsInChildren<Transform>())
+            {
+                collector.AddDependency(component.transform, child);
+            }
         }
     }
 #endif
