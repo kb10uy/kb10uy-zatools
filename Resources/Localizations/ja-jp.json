@@ -24,6 +24,7 @@
     "eepi.inspector.override-weight": "Global Weight を上書きする",
     "eepi.inspector.initial-weight": "Global Weight の初期値",
     "eepi.inspector.add-weight-control": "Global Weight の操作 Puppet を追加する",
+    "eepi.inspector.separate-head-root": "別のアバター頭部のルート(上級者向け)",
     "eepi.report.placeholder-inserted": "Enhanced EyePointer Installer: Eye Look を空の値で有効化しました",
     "eepi.report.placeholder-inserted:description": "Avatar Descriptor の Eye Look が無効な場合、特定条件で誤動作することが確認されています。ワークアラウンドとして無意味な値で Eye Look が有効化されています(VRChat 側に実際の Eye ボーンを操作されることはありません)。",
     "eepi.report.prefab-moved": "Enhanced EyePointer Installer: Eye Pointer のプレハブをアバタールートに移動しました",
