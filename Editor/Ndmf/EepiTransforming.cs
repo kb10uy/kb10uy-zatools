@@ -72,13 +72,18 @@ namespace KusakaFactory.Zatools.Ndmf
 
         private static void EnsureAvatarRootPlacement(GameObject avatarRoot, Installer installer)
         {
-            // EyePointer の MergeAnimator が Absolute なら真にアバタールート
-            // Relative ならその Relative のルート
-            var epMergeAnimator = installer.GetComponent<ModularAvatarMergeAnimator>();
-            var installRootTransform = epMergeAnimator.pathMode == MergeAnimatorPathMode.Absolute ?
-                avatarRoot.transform :
-                epMergeAnimator.relativePathRoot.Get(epMergeAnimator).transform;
+            // SeparateHeadAvatarRoot が設定されている場合、付属している(はずの)MergeAnimator を相対モードにしてルートを設定する
+            if (installer.SeparateHeadAvatarRoot != null)
+            {
+                var epMergeAnimator = installer.GetComponent<ModularAvatarMergeAnimator>();
+                epMergeAnimator.pathMode = MergeAnimatorPathMode.Relative;
+                epMergeAnimator.relativePathRoot.Set(installer.SeparateHeadAvatarRoot);
+            }
+
             var installerTransform = installer.transform;
+            var installRootTransform = installer.SeparateHeadAvatarRoot != null
+                ? installer.SeparateHeadAvatarRoot.transform
+                : avatarRoot.transform;
             if (installerTransform.parent != installRootTransform)
             {
                 // installRootTransform に移動する
