@@ -24,6 +24,7 @@
     "eepi.inspector.override-weight": "Override Global Weight",
     "eepi.inspector.initial-weight": "Initial Weight",
     "eepi.inspector.add-weight-control": "Add Weight Control Puppet",
+    "eepi.inspector.separate-head-root": "Separate Avatar Head Root (Advanced)",
     "eepi.report.placeholder-inserted": "Enhanced EyePointer Installer: Eye Look enabled with placeholder settings",
     "eepi.report.placeholder-inserted:description": "Eye Look in Avatar Descriptor has been enabled with placeholder (i.e. VRChat still won't move your actual eye bones). This is a workaround for unexpected behavior in specific avatar states.",
     "eepi.report.prefab-moved": "Enhanced EyePointer Installer: Eye Pointer prefab has been moved to avatar root",

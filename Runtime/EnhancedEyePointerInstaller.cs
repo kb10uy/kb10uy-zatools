@@ -13,5 +13,6 @@ namespace KusakaFactory.Zatools.Runtime
         public bool OverrideGlobalWeight = false;
         public float InitialGlobalWeight = 1.0f;
         public bool AddGlobalWeightControl = false;
+        public GameObject SeparateHeadAvatarRoot = null;
     }
 }
