@@ -34,11 +34,6 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .Run(pbfctt);
-
-            // After AAO
-            InPhase(BuildPhase.Optimizing)
-                .AfterPlugin("com.anatawa12.avatar-optimizer")
-                .Run(new PbfcttTransforming.OptimizingDeletion());
         }
     }
 }
