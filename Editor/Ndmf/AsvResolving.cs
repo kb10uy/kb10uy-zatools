@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using nadena.dev.ndmf;
 using nadena.dev.modular_avatar.core;
+using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
@@ -30,8 +31,10 @@ namespace KusakaFactory.Zatools.Ndmf
 
             foreach (var armatureLike in armatureLikeTransforms)
             {
+                if (armatureLike.TryGetComponent<AvatarStatusValidatorIgnoredArmature>(out var ignoredArmature)) continue;
                 if (armatureLike.TryGetComponent<ModularAvatarMergeArmature>(out var mergeArmature)) continue;
                 if (armatureLike.parent == context.AvatarRootTransform) continue;
+
                 ErrorReport.ReportError(new ZatoolNdmfError(armatureLike.gameObject, ErrorSeverity.Error, "asv.report.suspicious-unmerged-armature"));
             }
         }
