@@ -11,29 +11,28 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Configure()
         {
-            var bari = new BariTransforming();
-            var ahbsm = new AhbsmTransforming();
-            var eepi = new EepiTransforming();
-            var pbfctt = new PbfcttTransforming();
+            // Resolving
+            InPhase(BuildPhase.Resolving)
+                .Run(new AsvResolving());
 
-            // Before MA
+            // Transforming before MA
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
-                .Run(bari)
-                .Then.Run(ahbsm);
+                .Run(new BariTransforming())
+                .Then.Run(new AhbsmTransforming());
 
-            // Before MA with VirtualControllerContext
+            // Transforming before MA with VirtualControllerContext
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .WithRequiredExtension(typeof(VirtualControllerContext), (seq) =>
                 {
-                    seq.Run(eepi);
+                    seq.Run(new EepiTransforming());
                 });
 
-            // After MA
+            // Transforming after MA
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
-                .Run(pbfctt);
+                .Run(new PbfcttTransforming());
         }
     }
 }
