@@ -9,7 +9,6 @@ using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
-using KusakaFactory.Zatools.Localization;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 
@@ -88,7 +87,7 @@ namespace KusakaFactory.Zatools.Ndmf
             {
                 // installRootTransform に移動する
                 installerTransform.parent = installRootTransform;
-                ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.prefab-moved");
+                ErrorReport.ReportError(new ZatoolNdmfError(ErrorSeverity.Information, "eepi.report.prefab-moved"));
             }
         }
 
@@ -191,7 +190,7 @@ namespace KusakaFactory.Zatools.Ndmf
                 // さもないとキャリブレーション中やリモートアバターとして最初にロードされた時などにウェイトがかかってた状態に戻ってしまう
                 // see: https://github.com/kb10uy/kb10uy-zatools/issues/16
                 descriptor.enableEyeLook = true;
-                ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "eepi.report.placeholder-inserted");
+                ErrorReport.ReportError(new ZatoolNdmfError(descriptor, ErrorSeverity.Information, "eepi.report.placeholder-inserted"));
 
                 var zeroedLooking = new CustomEyeLookSettings.EyeRotations
                 {

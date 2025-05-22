@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.ndmf;
-using KusakaFactory.Zatools.Localization;
 using UnityObject = UnityEngine.Object;
 using PbfcttComponent = KusakaFactory.Zatools.Runtime.PBFingerColliderTransferTarget;
 
@@ -24,7 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf
             {
                 if (index >= MaxTargets)
                 {
-                    ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.NonFatal, "pbfctt.report.too-many-targets", component.name);
+                    ErrorReport.ReportError(new ZatoolNdmfError(component.gameObject, ErrorSeverity.NonFatal, "pbfctt.report.too-many-targets", component.name));
                     UnityObject.DestroyImmediate(component);
                     continue;
                 }

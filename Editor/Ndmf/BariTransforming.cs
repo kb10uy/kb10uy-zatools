@@ -2,7 +2,6 @@ using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
-using KusakaFactory.Zatools.Localization;
 using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf
@@ -44,7 +43,12 @@ namespace KusakaFactory.Zatools.Ndmf
                 var actualOffset = (center.Root.transform.position - parentTransform.position).magnitude;
                 if (!nonCanonicalDetected && actualOffset / influenceSettings.ParentOffsetDistance >= 1.05f)
                 {
-                    ErrorReport.ReportError(ZatoolLocalization.NdmfLocalizer, ErrorSeverity.Information, "bari.report.non-canonical-scale", influenceSettings.gameObject.name);
+                    ErrorReport.ReportError(new ZatoolNdmfError(
+                        center.Root.gameObject,
+                        ErrorSeverity.Information,
+                        "bari.report.non-canonical-scale",
+                        influenceSettings.gameObject.name
+                    ));
                     nonCanonicalDetected = true;
                 }
 
