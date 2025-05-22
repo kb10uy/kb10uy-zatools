@@ -6,6 +6,7 @@ using UnityEngine;
 using nadena.dev.ndmf;
 using nadena.dev.modular_avatar.core;
 using KusakaFactory.Zatools.Runtime;
+using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
@@ -31,7 +32,11 @@ namespace KusakaFactory.Zatools.Ndmf
 
             foreach (var armatureLike in armatureLikeTransforms)
             {
-                if (armatureLike.TryGetComponent<AvatarStatusValidatorIgnoredArmature>(out var ignoredArmature)) continue;
+                if (armatureLike.TryGetComponent<AvatarStatusValidatorIgnoredArmature>(out var ignoredArmature))
+                {
+                    UnityObject.DestroyImmediate(ignoredArmature);
+                    continue;
+                }
                 if (armatureLike.TryGetComponent<ModularAvatarMergeArmature>(out var mergeArmature)) continue;
                 if (armatureLike.parent == context.AvatarRootTransform) continue;
 
