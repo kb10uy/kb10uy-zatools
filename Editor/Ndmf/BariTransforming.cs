@@ -3,6 +3,7 @@ using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Runtime;
+using KusakaFactory.Zatools.Ndmf.Framework;
 
 namespace KusakaFactory.Zatools.Ndmf
 {

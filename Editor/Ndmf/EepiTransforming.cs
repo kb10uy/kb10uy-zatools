@@ -9,6 +9,7 @@ using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
+using KusakaFactory.Zatools.Ndmf.Framework;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 

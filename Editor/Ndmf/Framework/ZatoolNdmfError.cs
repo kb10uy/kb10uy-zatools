@@ -4,7 +4,7 @@ using nadena.dev.ndmf;
 using nadena.dev.ndmf.localization;
 using KusakaFactory.Zatools.Localization;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Framework
 {
     internal sealed class ZatoolNdmfError : SimpleError
     {
