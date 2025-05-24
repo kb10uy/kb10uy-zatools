@@ -13,53 +13,104 @@ namespace KusakaFactory.Zatools.Ndmf
 {
     internal sealed class AsvResolving : Pass<AsvResolving>
     {
-        private static readonly ImmutableArray<ArmatureLikeDetector> ArmatureLikeDetectors = ImmutableArray.CreateRange(new[] {
-            new ArmatureLikeDetector("Armature|アーマチュア|ｱｰﾏﾁｭｱ", (t) => t),
-            new ArmatureLikeDetector("^hips?$", (t) => t.parent),
+        // セフィラちゃんの armature root が "Sonia" だったりするので子に Hips があるかどうかでも判定する必要が多分ある
+        private static readonly ImmutableArray<Func<Transform, bool>> ArmatureLikeDetectors = ImmutableArray.CreateRange(new Func<Transform, bool>[] {
+            (t) => Regex.IsMatch(t.name, "Armature|アーマチュア|ｱｰﾏﾁｭｱ" , RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+            (t) => t.EnumerateDirectChildren().Any((c) => Regex.IsMatch(c.name, "^Hips?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
         });
 
         protected override void Execute(BuildContext context)
         {
-            ScanUnmergedArmature(context);
+            ScanUnmergedArmaturesIn(context, context.AvatarRootTransform, ArmatureLikeStatus.Unrelated);
         }
 
-        private void ScanUnmergedArmature(BuildContext context)
+        private void ScanUnmergedArmaturesIn(BuildContext context, Transform root, ArmatureLikeStatus status)
         {
-            var avatarGameObjects = context.AvatarRootObject.GetComponentsInChildren<Transform>(true);
-            var armatureLikeTransforms = avatarGameObjects
-                .SelectMany((t) => ArmatureLikeDetectors.Select((d) => d.SearchRootFor(t)))
-                .Where((t) => t != null)
-                .Distinct();
+            // strict mode (Indirect を警告・エラーにする) の実装のために直接枝刈りしない
 
-            foreach (var armatureLike in armatureLikeTransforms)
+            if (root.TryGetComponent<AvatarStatusValidatorIgnoredArmature>(out var ignoredArmature))
             {
-                if (armatureLike.TryGetComponent<AvatarStatusValidatorIgnoredArmature>(out var ignoredArmature))
-                {
-                    UnityObject.DestroyImmediate(ignoredArmature);
-                    continue;
-                }
-                if (armatureLike.TryGetComponent<ModularAvatarMergeArmature>(out var mergeArmature)) continue;
-                if (armatureLike.parent == context.AvatarRootTransform) continue;
-
-                ErrorReport.ReportError(new ZatoolNdmfError(armatureLike.gameObject, ErrorSeverity.Error, "asv.report.suspicious-unmerged-armature"));
+                status = ArmatureLikeStatus.Ignored;
+                UnityObject.DestroyImmediate(ignoredArmature);
             }
+
+            // status の更新
+            switch (status)
+            {
+                case ArmatureLikeStatus.Ignored:
+                case ArmatureLikeStatus.MergeTarget:
+                    break;
+
+                case ArmatureLikeStatus.Unrelated:
+                    if (root.parent == context.AvatarRootTransform) status = ArmatureLikeStatus.MergeTarget;
+                    if (root.TryGetComponent<ModularAvatarBoneProxy>(out var _)) status = ArmatureLikeStatus.Proxyed;
+                    break;
+
+                case ArmatureLikeStatus.DirectlyMerged:
+                    // 今見ているのが armature-like でないか、Merge Armature が付いていればそのまま
+                    if (!ArmatureLikeDetectors.Any((detector) => detector(root))) break;
+                    if (root.TryGetComponent<ModularAvatarMergeArmature>(out var _)) break;
+                    status = root.TryGetComponent<ModularAvatarBoneProxy>(out var _) ? ArmatureLikeStatus.Proxyed : ArmatureLikeStatus.IndirectlyMerged;
+                    break;
+
+                case ArmatureLikeStatus.IndirectlyMerged:
+                    // 今見ているのが armature-like でないか、Merge Armature が付いていなければそのまま
+                    if (!ArmatureLikeDetectors.Any((detector) => detector(root))) break;
+                    if (!root.TryGetComponent<ModularAvatarMergeArmature>(out var _)) break;
+                    status = root.TryGetComponent<ModularAvatarBoneProxy>(out var _) ? ArmatureLikeStatus.Proxyed : ArmatureLikeStatus.DirectlyMerged;
+                    break;
+
+                case ArmatureLikeStatus.Proxyed:
+                    // armature-like で Merge Armature が付いていれば DireclyMerged にする
+                    if (!ArmatureLikeDetectors.Any((detector) => detector(root))) break;
+                    if (root.TryGetComponent<ModularAvatarMergeArmature>(out var _)) status = ArmatureLikeStatus.DirectlyMerged;
+                    break;
+
+                default:
+                    throw new InvalidOperationException("unexpected state");
+            }
+
+            // Unreleated な armature-like をエラー対象とする
+            if (status == ArmatureLikeStatus.Unrelated && ArmatureLikeDetectors.Any((detector) => detector(root)))
+            {
+                ErrorReport.ReportError(new ZatoolNdmfError(root.gameObject, ErrorSeverity.Error, "asv.report.suspicious-unmerged-armature"));
+            }
+
+            // 子の走査
+            foreach (var child in root.EnumerateDirectChildren()) ScanUnmergedArmaturesIn(context, child, status);
         }
 
-        private sealed class ArmatureLikeDetector
+        internal enum ArmatureLikeStatus
         {
-            private Regex _pattern;
-            private Func<Transform, Transform> _rootFilter;
+            /// <summary>
+            /// Armature と関係がない。
+            /// </summary>
+            Unrelated,
 
-            public ArmatureLikeDetector(string pattern, Func<Transform, Transform> filter)
-            {
-                _pattern = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                _rootFilter = filter;
-            }
+            /// <summary>
+            /// Zatools Ignored Armature によって無視される範囲にある。
+            /// </summary>
+            Ignored,
 
-            public Transform SearchRootFor(Transform current)
-            {
-                return _pattern.IsMatch(current.name) ? _rootFilter(current) : null;
-            }
+            /// <summary>
+            /// 他の armature-like のマージ先になる。
+            /// </summary>
+            MergeTarget,
+
+            /// <summary>
+            /// 最も近い armature-like がマージされる。
+            /// </summary>
+            DirectlyMerged,
+
+            /// <summary>
+            /// アバタールートまでのどこかで armature-like がマージされるが、最も近いものはマージされない。
+            /// </summary>
+            IndirectlyMerged,
+
+            /// <summary>
+            /// 最も近い armature-like よりも近くに Bone Proxy がある。
+            /// </summary>
+            Proxyed,
         }
     }
 }
