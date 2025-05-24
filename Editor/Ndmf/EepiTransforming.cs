@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEditor;
@@ -7,11 +9,13 @@ using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
+using nadena.dev.ndmf.runtime;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
 using KusakaFactory.Zatools.Ndmf.Framework;
-using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
+using UnityObject = UnityEngine.Object;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
+using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
@@ -27,7 +31,7 @@ namespace KusakaFactory.Zatools.Ndmf
             if (state.Installer == null) return;
 
             // アバタールート
-            EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer);
+            EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer, state.MergeAnimator);
 
             // 対象の Eye ボーンと Eye Look 補正値の取得
             var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarDescriptor);
@@ -52,6 +56,15 @@ namespace KusakaFactory.Zatools.Ndmf
                 rightAim = SetupConstaintsWithUnityVariant(target.transform, constrainedRightEye);
             }
 
+            // AnimatorController/AnimationClip の修正
+            if (state.Installer.AdaptedFXLayer)
+            {
+                var virtualController = virtualControllerContext.Controllers[state.MergeAnimator];
+                var leftPath = RuntimeUtil.RelativePath(context.AvatarRootObject, constrainedLeftEye.gameObject);
+                var rightPath = RuntimeUtil.RelativePath(context.AvatarRootObject, constrainedRightEye.gameObject);
+                AdaptBundledAnimationController(virtualController, state.Installer.DummyEyeBones, leftPath, rightPath);
+            }
+
             // Eye Look の設定・修正
             AdjustEyeLookSettings(
                 context.AvatarDescriptor,
@@ -70,14 +83,13 @@ namespace KusakaFactory.Zatools.Ndmf
             state.Destroy();
         }
 
-        private static void EnsureAvatarRootPlacement(GameObject avatarRoot, Installer installer)
+        private static void EnsureAvatarRootPlacement(GameObject avatarRoot, Installer installer, ModularAvatarMergeAnimator mergeAnimator)
         {
             // SeparateHeadAvatarRoot が設定されている場合、付属している(はずの)MergeAnimator を相対モードにしてルートを設定する
             if (installer.SeparateHeadAvatarRoot != null)
             {
-                var epMergeAnimator = installer.GetComponent<ModularAvatarMergeAnimator>();
-                epMergeAnimator.pathMode = MergeAnimatorPathMode.Relative;
-                epMergeAnimator.relativePathRoot.Set(installer.SeparateHeadAvatarRoot);
+                mergeAnimator.pathMode = MergeAnimatorPathMode.Relative;
+                mergeAnimator.relativePathRoot.Set(installer.SeparateHeadAvatarRoot);
             }
 
             var installerTransform = installer.transform;
@@ -163,6 +175,37 @@ namespace KusakaFactory.Zatools.Ndmf
             aimConstraint.constraintActive = true;
 
             return aimConstraint;
+        }
+
+        private static void AdaptBundledAnimationController(VirtualAnimatorController controller, bool useDummyBones, string leftPath, string rightPath)
+        {
+            // 収録されている各種パスパターンのうち 1 種類だけ残して置き換える
+            var preservedEyeComponent = useDummyBones ? "DummyEye_" : "Eye_";
+            var fromLeftPath = $"Armature/Hips/Spine/Chest/Neck/Head/{preservedEyeComponent}L";
+            var fromRightPath = $"Armature/Hips/Spine/Chest/Neck/Head/{preservedEyeComponent}R";
+            Func<string, string> pathRewriter = (path) =>
+            {
+                if (path.StartsWith("EyePointer")) return path;
+                if (path == fromLeftPath) return leftPath;
+                if (path == fromRightPath) return rightPath;
+                return null;
+            };
+
+            var virtualMotions = controller.Layers.SelectMany((l) => l.StateMachine.States.Select((st) => st.State.Motion));
+            foreach (var virtualMotion in virtualMotions) RewriteVirtualMotion(virtualMotion, pathRewriter);
+        }
+
+        private static void RewriteVirtualMotion(VirtualMotion motion, Func<string, string> pathRewriter)
+        {
+            switch (motion)
+            {
+                case VirtualClip clip:
+                    clip.EditPaths(pathRewriter);
+                    break;
+                case VirtualBlendTree blendTree:
+                    foreach (var childMotion in blendTree.Children) RewriteVirtualMotion(childMotion.Motion, pathRewriter);
+                    break;
+            }
         }
 
         private static void AdjustEyeLookSettings(
@@ -303,9 +346,9 @@ namespace KusakaFactory.Zatools.Ndmf
                 // VRCExpressionsMenu をコピーして Radial Puppet を差し込む
                 var defaultMenuInstaller = installer.GetComponent<ModularAvatarMenuInstaller>();
                 var originalRootMenuAsset = defaultMenuInstaller.menuToAppend;
-                var copiedRootMenuAsset = Object.Instantiate(originalRootMenuAsset);
+                var copiedRootMenuAsset = UnityObject.Instantiate(originalRootMenuAsset);
                 var originalMenuAsset = copiedRootMenuAsset.controls[0].subMenu;
-                var copiedMenuAsset = Object.Instantiate(originalMenuAsset);
+                var copiedMenuAsset = UnityObject.Instantiate(originalMenuAsset);
 
                 copiedMenuAsset.controls.Add(new VRCExpressionsMenu.Control
                 {
