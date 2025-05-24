@@ -4,12 +4,12 @@
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-bottom: 8px; margin-left: 4px;" />
         <ui:Toggle label="eepi.inspector.vrc-constraint" binding-path="VRCConstraint" name="FieldVRCConstraint" class="ndmf-tr" />
         <ui:Toggle label="eepi.inspector.dummy-bones" binding-path="DummyEyeBones" name="FieldDummyBone" class="ndmf-tr" />
-        <ui:Toggle label="eepi.inspector.fx-layer" binding-path="AdaptedFXLayer" name="FieldAdaptedFXLayer" class="ndmf-tr" />
         <ui:Toggle label="eepi.inspector.override-weight" name="FieldOverrideGlobalWeight" binding-path="OverrideGlobalWeight" class="ndmf-tr" />
         <ui:VisualElement name="GlobalWeightGroup" style="flex-grow: 1;">
             <ui:Slider label="eepi.inspector.initial-weight" high-value="1" name="FieldInitialGlobalWeight" binding-path="InitialGlobalWeight" show-input-field="true" class="label-indent-1 ndmf-tr" />
             <ui:Toggle label="eepi.inspector.add-weight-control" name="FieldAddGlobalWeightControl" binding-path="AddGlobalWeightControl" class="label-indent-1 ndmf-tr" />
         </ui:VisualElement>
+        <ui:Toggle label="eepi.inspector.fx-layer" binding-path="AdaptedFXLayer" name="FieldAdaptedFXLayer" class="ndmf-tr" />
         <uie:ObjectField label="eepi.inspector.separate-head-root" name="FieldSeparateHeadAvatarRoot" binding-path="SeparateHeadAvatarRoot" type="UnityEngine.GameObject, UnityEngine.CoreModule" class="ndmf-tr" />
     </ui:VisualElement>
 </ui:UXML>

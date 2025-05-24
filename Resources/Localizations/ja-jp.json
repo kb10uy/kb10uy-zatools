@@ -19,7 +19,7 @@
     "eepi.inspector.vrc-constraint:tooltip": "Unity の Aim Constraint ではなく VRC Aim Constraint を使用する。EyePointer v1.2 以降が必要です",
     "eepi.inspector.dummy-bones": "ダミーボーンを挿入する",
     "eepi.inspector.dummy-bones:tooltip": "標準の Eye ボーンの回転が (0, 0, 0) から離れている場合に補正する",
-    "eepi.inspector.fx-layer": "最適化された FX Layer を生成する",
+    "eepi.inspector.fx-layer": "FX Layer をアバターに適応させる",
     "eepi.inspector.fx-layer:tooltip": "Enhanced EyePointer Installer 側で専用の FX Layer を生成する。 Animator as Code が必要です",
     "eepi.inspector.override-weight": "Global Weight を上書きする",
     "eepi.inspector.initial-weight": "Global Weight の初期値",
