@@ -42,7 +42,8 @@ namespace KusakaFactory.Zatools.Ndmf
                     break;
 
                 case ArmatureLikeStatus.Unrelated:
-                    if (root.parent == context.AvatarRootTransform) status = ArmatureLikeStatus.MergeTarget;
+                    if (ArmatureLikeDetectors.Any((detector) => detector(root)) && root.parent == context.AvatarRootTransform) status = ArmatureLikeStatus.MergeTarget;
+                    if (root.TryGetComponent<ModularAvatarMergeArmature>(out var _)) status = ArmatureLikeStatus.DirectlyMerged;
                     if (root.TryGetComponent<ModularAvatarBoneProxy>(out var _)) status = ArmatureLikeStatus.Proxyed;
                     break;
 
