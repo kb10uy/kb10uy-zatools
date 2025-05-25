@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.Ndmf
         private EepiState(BuildContext context)
         {
             _installer = context.AvatarRootObject.GetComponentInChildren<Installer>();
-            _mergeAnimator = _installer.GetComponent<ModularAvatarMergeAnimator>();
+            if (_installer != null) _mergeAnimator = _installer.GetComponent<ModularAvatarMergeAnimator>();
         }
 
         public static EepiState Initializer(BuildContext context) => new EepiState(context);
