@@ -185,7 +185,7 @@ namespace KusakaFactory.Zatools.Ndmf
             var fromRightPath = $"Armature/Hips/Spine/Chest/Neck/Head/{preservedEyeComponent}R";
             Func<string, string> pathRewriter = (path) =>
             {
-                if (path.StartsWith("EyePointer")) return path;
+                if (path.StartsWith("EyePointer") || path == leftPath || path == rightPath) return path;
                 if (path == fromLeftPath) return leftPath;
                 if (path == fromRightPath) return rightPath;
                 return null;

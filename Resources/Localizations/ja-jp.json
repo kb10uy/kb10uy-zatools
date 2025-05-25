@@ -20,7 +20,7 @@
     "eepi.inspector.dummy-bones": "ダミーボーンを挿入する",
     "eepi.inspector.dummy-bones:tooltip": "標準の Eye ボーンの回転が (0, 0, 0) から離れている場合に補正する",
     "eepi.inspector.fx-layer": "FX Layer をアバターに適応させる",
-    "eepi.inspector.fx-layer:tooltip": "Enhanced EyePointer Installer 側で専用の FX Layer を生成する。 Animator as Code が必要です",
+    "eepi.inspector.fx-layer:tooltip": "EyePointer 標準で対応していないアーマチュア構成に適応させる。通常はオフで問題ありません",
     "eepi.inspector.override-weight": "Global Weight を上書きする",
     "eepi.inspector.initial-weight": "Global Weight の初期値",
     "eepi.inspector.add-weight-control": "Global Weight の操作 Puppet を追加する",
