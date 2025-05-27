@@ -49,6 +49,8 @@
     "asv.inspector.ignored-armature-help": "この Armature は Avatar Status Validator で無視されます。",
     "asv.report.suspicious-unmerged-armature": "Avatar Status Validator: MA Merge Armature が設定されていない可能性があります",
     "asv.report.suspicious-unmerged-armature:description": "意図されている場合は Zatools Ignored Armature を当該 Armature オブジェクトに追加してください。",
+    "asv.report.suspicious-unmerged-armature-warning": "Avatar Status Validator: MA Merge Armature が設定されていない可能性があります",
+    "asv.report.suspicious-unmerged-armature-warning:description": "標準的でない構成のアーマチュアが検出されました。問題が起きていなければこの警告は無視できます。",
     "edx.save-text": "テキストファイルに保存",
     "edx.base-asset": "基準アセット",
     "edx.root-path": "基準パス",
