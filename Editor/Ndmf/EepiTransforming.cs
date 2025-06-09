@@ -258,8 +258,8 @@ namespace KusakaFactory.Zatools.Ndmf
             Quaternion rightAdjustment
         )
         {
-            original.left = leftAdjustment * original.left;
-            original.right = rightAdjustment * original.right;
+            original.left = original.left * leftAdjustment;
+            original.right = original.right * rightAdjustment;
         }
 
         private void GenerateGlobalWeightOverride(BuildContext context, Installer installer, Component leftAim, Component rightAim)
