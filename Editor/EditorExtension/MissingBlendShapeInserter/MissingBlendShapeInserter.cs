@@ -45,11 +45,11 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("c798de8d04ea7a94f90be7c714bf91bc");
-            var visualTreeModificationItem = Resources.LoadVisualTreeByGuid("9d7ee19df1e2ff8438dfbe6cbabde51a");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("c798de8d04ea7a94f90be7c714bf91bc");
+            var visualTreeModificationItem = ZatoolsResources.LoadVisualTreeByGuid("9d7ee19df1e2ff8438dfbe6cbabde51a");
             visualTree.CloneTree(rootVisualElement);
             rootVisualElement.Bind(new SerializedObject(this));
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
             _animationList = rootVisualElement.Q<ListView>("FieldAnimationList");
             _animationList.makeItem = OnAnimationListMakeItem;
@@ -59,7 +59,7 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
             _modificationList.makeItem = () =>
             {
                 var item = visualTreeModificationItem.CloneTree();
-                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
                 return item;
             };
 
@@ -90,9 +90,9 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
 
         private VisualElement OnAnimationListMakeItem()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("206be82acb6e5494b856612308ba47b9");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("206be82acb6e5494b856612308ba47b9");
             var item = visualTree.CloneTree();
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
 
             var fillingToggle = item.Q<Toggle>();
             var field = item.Q<ObjectField>();

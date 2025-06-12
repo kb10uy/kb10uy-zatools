@@ -9,7 +9,7 @@ using nadena.dev.ndmf.localization;
 namespace KusakaFactory.Zatools.Localization
 {
     [InitializeOnLoad]
-    internal static class ZatoolLocalization
+    internal static class ZatoolsLocalization
     {
         internal static readonly ImmutableList<string> SupportedLanguages = ImmutableList<string>.Empty
             .Add("en-us")
@@ -27,7 +27,7 @@ namespace KusakaFactory.Zatools.Localization
 
         private static Dictionary<string, ImmutableDictionary<string, string>> StringTableCache = new Dictionary<string, ImmutableDictionary<string, string>>();
 
-        static ZatoolLocalization()
+        static ZatoolsLocalization()
         {
             NdmfLocalizer = new Localizer(SupportedLanguages[0], () => SupportedLanguages.Select((l) =>
             {
@@ -36,7 +36,7 @@ namespace KusakaFactory.Zatools.Localization
                 return (l, fetcher);
             }).ToList());
             UILocalizer = new UIElementLocalizer(NdmfLocalizer);
-            LanguagePrefs.RegisterLanguageChangeCallback(typeof(ZatoolLocalization), (_) => OnNdmfLanguageChanged?.Invoke());
+            LanguagePrefs.RegisterLanguageChangeCallback(typeof(ZatoolsLocalization), (_) => OnNdmfLanguageChanged?.Invoke());
         }
 
         internal static ImmutableDictionary<string, string> LoadStringTableForLanguage(string languageCode)
@@ -46,7 +46,7 @@ namespace KusakaFactory.Zatools.Localization
                 return cached;
             }
 
-            var stringTableText = Resources.LoadTextAssetByGuid(StringTableGuids[languageCode]);
+            var stringTableText = ZatoolsResources.LoadTextAssetByGuid(StringTableGuids[languageCode]);
             var stringTable = stringTableText != null ?
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(stringTableText) :
                 new Dictionary<string, string>();
@@ -55,7 +55,7 @@ namespace KusakaFactory.Zatools.Localization
             return immutableTable;
         }
 
-        [MenuItem("Tools/kb10uy's Various Tools/Reload Localizations")]
+        [MenuItem("Tools/kb10uy's Various Tools/Debug/Reload Localizations")]
         internal static void Invalidate()
         {
             StringTableCache.Clear();

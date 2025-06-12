@@ -8,7 +8,7 @@ namespace KusakaFactory.Zatools.Ndmf.Framework
 {
     internal sealed class ZatoolNdmfError : SimpleError
     {
-        public override Localizer Localizer => ZatoolLocalization.NdmfLocalizer;
+        public override Localizer Localizer => ZatoolsLocalization.NdmfLocalizer;
         public override ErrorSeverity Severity => _severity;
         public override string TitleKey => _titleKey;
         public override string DetailsKey => $"{_titleKey}:description";

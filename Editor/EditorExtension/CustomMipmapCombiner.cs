@@ -42,11 +42,11 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("0504f6ce497ece94c9c422bab44edd97");
-            var visualTreeItem = Resources.LoadVisualTreeByGuid("ea294add14a5e8540aa84981c1a1787a");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("0504f6ce497ece94c9c422bab44edd97");
+            var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("ea294add14a5e8540aa84981c1a1787a");
             visualTree.CloneTree(rootVisualElement);
             rootVisualElement.Bind(new SerializedObject(this));
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
             _objectFieldMip0 = rootVisualElement.Q<ObjectField>("FieldMip0Texture");
             _listViewSources = rootVisualElement.Q<ListView>("FieldSources");
@@ -57,7 +57,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             _listViewSources.makeItem = () =>
             {
                 var item = visualTreeItem.CloneTree();
-                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
                 return item;
             };
             _listViewSources.itemsAdded += (e) =>
@@ -97,7 +97,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             var textureAsset = new Texture2D(textureSize, textureSize, textureFormat, true, true, true);
             var allPixelsCount = textureSize * textureSize;
 
-            var computeShader = Resources.LoadComputeShaderByGuid("bad178b10407a8e4d9302af0b90c8578");
+            var computeShader = ZatoolsResources.LoadComputeShaderByGuid("bad178b10407a8e4d9302af0b90c8578");
             var computeKernelId = computeShader.FindKernel(kernalName);
             var mipmapBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, allPixelsCount, bufferStride);
             var pixelBuffer = new byte[allPixelsCount * bufferStride];

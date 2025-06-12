@@ -37,9 +37,9 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("5ded7ab7b7f943448bcd01783bb476dd");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("5ded7ab7b7f943448bcd01783bb476dd");
             visualTree.CloneTree(rootVisualElement);
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
             _asset = rootVisualElement.Q<ObjectField>("FieldBaseAsset");
             _rootPath = rootVisualElement.Q<TextField>("FieldRootPath");

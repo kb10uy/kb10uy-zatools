@@ -13,18 +13,18 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("118660a517f14de40a86c9557b662079");
-            var visualTreeItem = Resources.LoadVisualTreeByGuid("a0ad0c33fe70b9047950e262da80535f");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("118660a517f14de40a86c9557b662079");
+            var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("a0ad0c33fe70b9047950e262da80535f");
 
             var inspector = visualTree.CloneTree();
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
             var sourcesList = inspector.Q<ListView>("FieldChainRoots");
             sourcesList.makeItem = () =>
             {
                 var item = visualTreeItem.CloneTree();
-                ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+                ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
                 return item;
             };
 
