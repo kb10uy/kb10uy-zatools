@@ -18,7 +18,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (_boundElementRoot == null)
             {
                 _boundElementRoot = new VisualElement();
-                ZatoolLocalization.OnNdmfLanguageChanged += RebuildUI;
+                ZatoolsLocalization.OnNdmfLanguageChanged += RebuildUI;
             }
             _boundElementRoot.Clear();
             _boundElementRoot.Add(CreateInspectorGUIImpl());
@@ -28,7 +28,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         protected virtual void OnDestroy()
         {
-            ZatoolLocalization.OnNdmfLanguageChanged -= RebuildUI;
+            ZatoolsLocalization.OnNdmfLanguageChanged -= RebuildUI;
         }
 
         private void RebuildUI()

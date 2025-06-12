@@ -11,10 +11,10 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("3c4f3df91aae55345ae01e667d8a056f");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("3c4f3df91aae55345ae01e667d8a056f");
 
             var inspector = visualTree.CloneTree();
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
             return inspector;

@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace KusakaFactory.Zatools
 {
-    internal static class Resources
+    internal static class ZatoolsResources
     {
         private readonly static Dictionary<string, VisualTreeAsset> VisualTreeAssetCache = new Dictionary<string, VisualTreeAsset>();
 
-        [MenuItem("Tools/kb10uy's Various Tools/Reload VisualTree Assets")]
+        [MenuItem("Tools/kb10uy's Various Tools/Debug/Reload VisualTree Assets")]
         internal static void InvalidateVisualTreeAssetCache()
         {
             VisualTreeAssetCache.Clear();

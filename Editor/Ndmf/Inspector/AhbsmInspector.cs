@@ -20,11 +20,11 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         protected override VisualElement CreateInspectorGUIImpl()
         {
             var blendShapeNames = FetchBlendShapeNames();
-            var visualTree = Resources.LoadVisualTreeByGuid("3ae61e75b4b01d348968e3115c250141");
-            var visualTreeItem = Resources.LoadVisualTreeByGuid("93fb3d754041c7242b94a55a4aea9bae");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("3ae61e75b4b01d348968e3115c250141");
+            var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("93fb3d754041c7242b94a55a4aea9bae");
 
             var inspector = visualTree.CloneTree();
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(inspector);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
             var definitionsList = inspector.Q<ListView>("FieldMixDefinitions");
@@ -149,7 +149,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private static VisualElement MakeDefinitionItem(VisualTreeAsset visualTreeItem, List<string> blendShapeNames)
         {
             var item = visualTreeItem.CloneTree();
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(item);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
 
             var fromButton = item.Q<Button>("FieldFromBlendShape");
             var toButton = item.Q<Button>("FieldToBlendShape");
@@ -203,8 +203,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             public override void OnOpen()
             {
-                var visualTree = Resources.LoadVisualTreeByGuid("7bb58b5cddd547a4088117846bea5180");
-                var visualTreeItem = Resources.LoadVisualTreeByGuid("3013bdc0f3fd3274db3da3b0709626ff");
+                var visualTree = ZatoolsResources.LoadVisualTreeByGuid("7bb58b5cddd547a4088117846bea5180");
+                var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("3013bdc0f3fd3274db3da3b0709626ff");
 
                 visualTree.CloneTree(editorWindow.rootVisualElement);
 

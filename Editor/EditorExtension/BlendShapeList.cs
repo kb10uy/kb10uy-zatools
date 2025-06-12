@@ -19,9 +19,9 @@ namespace KusakaFactory.Zatools.EditorExtension
 
         internal void CreateGUI()
         {
-            var visualTree = Resources.LoadVisualTreeByGuid("1fc5e174481e55c469b0104ab3b7dc2c");
+            var visualTree = ZatoolsResources.LoadVisualTreeByGuid("1fc5e174481e55c469b0104ab3b7dc2c");
             visualTree.CloneTree(rootVisualElement);
-            ZatoolLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(rootVisualElement);
 
             var rendererField = rootVisualElement.Q<ObjectField>("FieldSkinnedMeshRenderer");
             var namesField = rootVisualElement.Q<TextField>("FieldNamesText");
