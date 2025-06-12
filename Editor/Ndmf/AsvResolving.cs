@@ -30,6 +30,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Execute(BuildContext context)
         {
+            if (!ZatoolsConfiguration.Load().EnableAsvScanUnmergedArmature) return;
             ScanUnmergedArmaturesIn(context, context.AvatarRootTransform, ArmatureLikeStatus.Unrelated);
         }
 

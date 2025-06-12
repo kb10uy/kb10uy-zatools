@@ -9,12 +9,7 @@ namespace KusakaFactory.Zatools
     {
         internal sealed class ConfigurationObject
         {
-            public bool EnableAsvScanUnmergedArmature;
-
-            internal ConfigurationObject()
-            {
-                EnableAsvScanUnmergedArmature = false;
-            }
+            public bool EnableAsvScanUnmergedArmature = false;
         }
 
         [MenuItem(MENU_PREFIX_ASV + "Scan suspicious unmerged armature")]
