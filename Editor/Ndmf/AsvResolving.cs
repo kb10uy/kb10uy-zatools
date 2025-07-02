@@ -30,11 +30,11 @@ namespace KusakaFactory.Zatools.Ndmf
 
         protected override void Execute(BuildContext context)
         {
-            if (!ZatoolsConfiguration.Load().EnableAsvScanUnmergedArmature) return;
-            ScanUnmergedArmaturesIn(context, context.AvatarRootTransform, ArmatureLikeStatus.Unrelated);
+            var errorEnabled = ZatoolsConfiguration.Load().EnableAsvScanUnmergedArmature;
+            ScanUnmergedArmaturesIn(context, context.AvatarRootTransform, ArmatureLikeStatus.Unrelated, errorEnabled);
         }
 
-        private void ScanUnmergedArmaturesIn(BuildContext context, Transform root, ArmatureLikeStatus status)
+        private void ScanUnmergedArmaturesIn(BuildContext context, Transform root, ArmatureLikeStatus status, bool errorEnabled)
         {
             // strict mode (Indirect を警告・エラーにする) の実装のために直接枝刈りしない
 
@@ -82,13 +82,13 @@ namespace KusakaFactory.Zatools.Ndmf
             }
 
             // Unreleated な armature-like をエラー対象とする
-            if (status == ArmatureLikeStatus.Unrelated && CheckArmatureLike(root, out var errorData))
+            if (status == ArmatureLikeStatus.Unrelated && CheckArmatureLike(root, out var errorData) && errorEnabled)
             {
                 ErrorReport.ReportError(new ZatoolNdmfError(root.gameObject, errorData.Severity, errorData.Id));
             }
 
             // 子の走査
-            foreach (var child in root.EnumerateDirectChildren()) ScanUnmergedArmaturesIn(context, child, status);
+            foreach (var child in root.EnumerateDirectChildren()) ScanUnmergedArmaturesIn(context, child, status, errorEnabled);
         }
 
         private bool CheckArmatureLike(Transform root, out (ErrorSeverity Severity, string Id) errorData)
