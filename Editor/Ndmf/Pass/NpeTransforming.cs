@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEditor;
 using nadena.dev.ndmf;
-using nadena.dev.ndmf.preview;
-using KusakaFactory.Zatools.Ndmf.Framework;
-using UnityObject = UnityEngine.Object;
-using NpeComponent = KusakaFactory.Zatools.Runtime.NdmfPreviewExample;
+using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
@@ -17,19 +8,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     {
         protected override void Execute(BuildContext context)
         {
-        }
-    }
-
-    internal sealed class NpeRenderFilter : ZatoolRenderFilter<NpeComponent>
-    {
-        public ImmutableList<RenderGroup> GetTargetGroups(ComputeContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IRenderFilterNode> Instantiate(RenderGroup group, IEnumerable<(Renderer, Renderer)> proxyPairs, ComputeContext context)
-        {
-            throw new NotImplementedException();
+            var components = context.AvatarRootObject.GetComponentsInChildren<NdmfPreviewExample>();
+            foreach (var component in components) Object.DestroyImmediate(component);
         }
     }
 }

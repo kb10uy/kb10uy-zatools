@@ -1,6 +1,7 @@
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using KusakaFactory.Zatools.Ndmf.Pass;
+using KusakaFactory.Zatools.Ndmf.Preview;
 
 [assembly: ExportsPlugin(typeof(KusakaFactory.Zatools.Ndmf.ZatoolsNdmfPlugin))]
 namespace KusakaFactory.Zatools.Ndmf
@@ -20,7 +21,8 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
-                .Then.Run(new AhbsmTransforming());
+                .Then.Run(new AhbsmTransforming())
+                .Then.Run(new NpeTransforming()).PreviewingWith(new NpeRenderFilter());
 
             // Transforming before MA with VirtualControllerContext
             InPhase(BuildPhase.Transforming)
