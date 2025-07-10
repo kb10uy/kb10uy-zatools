@@ -7,7 +7,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(AvatarStatusValidatorIgnoredArmature))]
-    internal sealed class AsvIgnoredArmatureInspector : ZatoolInspectorBase
+    internal sealed class AsvIgnoredArmatureInspector : ZatoolInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

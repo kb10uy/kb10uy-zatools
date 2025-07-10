@@ -4,7 +4,7 @@ using KusakaFactory.Zatools.Localization;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    internal abstract class ZatoolInspectorBase : Editor
+    internal abstract class ZatoolInspector : Editor
     {
         private VisualElement _boundElementRoot;
 

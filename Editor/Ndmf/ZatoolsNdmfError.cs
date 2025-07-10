@@ -6,7 +6,7 @@ using KusakaFactory.Zatools.Localization;
 
 namespace KusakaFactory.Zatools.Ndmf.Framework
 {
-    internal sealed class ZatoolNdmfError : SimpleError
+    internal sealed class ZatoolsNdmfError : SimpleError
     {
         public override Localizer Localizer => ZatoolsLocalization.NdmfLocalizer;
         public override ErrorSeverity Severity => _severity;
@@ -18,14 +18,14 @@ namespace KusakaFactory.Zatools.Ndmf.Framework
         private readonly string _titleKey;
         private readonly string[] _descriptionInterpolations;
 
-        public ZatoolNdmfError(ErrorSeverity severity, string key, params object[] descArgs)
+        public ZatoolsNdmfError(ErrorSeverity severity, string key, params object[] descArgs)
         {
             _titleKey = key;
             _severity = severity;
             _descriptionInterpolations = descArgs.Select((x) => x.ToString()).ToArray();
         }
 
-        public ZatoolNdmfError(Object target, ErrorSeverity severity, string key, params object[] descArgs)
+        public ZatoolsNdmfError(Object target, ErrorSeverity severity, string key, params object[] descArgs)
         {
             _titleKey = key;
             _severity = severity;

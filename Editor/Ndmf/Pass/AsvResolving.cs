@@ -9,7 +9,7 @@ using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Framework;
 using UnityObject = UnityEngine.Object;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AsvResolving : Pass<AsvResolving>
     {
@@ -84,7 +84,7 @@ namespace KusakaFactory.Zatools.Ndmf
             // Unreleated な armature-like をエラー対象とする
             if (status == ArmatureLikeStatus.Unrelated && CheckArmatureLike(root, out var errorData) && errorEnabled)
             {
-                ErrorReport.ReportError(new ZatoolNdmfError(root.gameObject, errorData.Severity, errorData.Id));
+                ErrorReport.ReportError(new ZatoolsNdmfError(root.gameObject, errorData.Severity, errorData.Id));
             }
 
             // 子の走査
