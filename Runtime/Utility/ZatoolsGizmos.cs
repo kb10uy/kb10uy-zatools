@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Runtime.Utility
 {
-    internal static class ZatoolGizmos
+    internal static class ZatoolsGizmos
     {
         public static void WithContext(Matrix4x4 matrix, Color color, Action draw)
         {

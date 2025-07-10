@@ -7,7 +7,7 @@ using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
 using AhbsmComponent = KusakaFactory.Zatools.Runtime.AdHocBlendShapeMix;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AhbsmTransforming : Pass<AhbsmTransforming>
     {

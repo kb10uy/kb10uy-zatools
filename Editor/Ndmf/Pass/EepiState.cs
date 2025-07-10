@@ -3,7 +3,7 @@ using nadena.dev.ndmf;
 using nadena.dev.modular_avatar.core;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class EepiState
     {

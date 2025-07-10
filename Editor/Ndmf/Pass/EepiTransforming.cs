@@ -17,7 +17,7 @@ using UnityObject = UnityEngine.Object;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class EepiTransforming : Pass<EepiTransforming>
     {
@@ -100,7 +100,7 @@ namespace KusakaFactory.Zatools.Ndmf
             {
                 // installRootTransform に移動する
                 installerTransform.parent = installRootTransform;
-                ErrorReport.ReportError(new ZatoolNdmfError(ErrorSeverity.Information, "eepi.report.prefab-moved"));
+                ErrorReport.ReportError(new ZatoolsNdmfError(ErrorSeverity.Information, "eepi.report.prefab-moved"));
             }
         }
 
@@ -234,7 +234,7 @@ namespace KusakaFactory.Zatools.Ndmf
                 // さもないとキャリブレーション中やリモートアバターとして最初にロードされた時などにウェイトがかかってた状態に戻ってしまう
                 // see: https://github.com/kb10uy/kb10uy-zatools/issues/16
                 descriptor.enableEyeLook = true;
-                ErrorReport.ReportError(new ZatoolNdmfError(descriptor, ErrorSeverity.Information, "eepi.report.placeholder-inserted"));
+                ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Information, "eepi.report.placeholder-inserted"));
 
                 var zeroedLooking = new CustomEyeLookSettings.EyeRotations
                 {

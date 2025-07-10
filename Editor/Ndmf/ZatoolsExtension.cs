@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Ndmf.Framework
 {
-    internal static class ZatoolExtension
+    internal static class ZatoolsExtension
     {
         public static IEnumerable<Transform> EnumerateDirectChildren(this Transform parent)
         {

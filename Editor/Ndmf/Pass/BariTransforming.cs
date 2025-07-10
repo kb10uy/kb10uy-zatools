@@ -5,7 +5,7 @@ using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Framework;
 
-namespace KusakaFactory.Zatools.Ndmf
+namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class BariTransforming : Pass<BariTransforming>
     {
@@ -44,7 +44,7 @@ namespace KusakaFactory.Zatools.Ndmf
                 var actualOffset = (center.Root.transform.position - parentTransform.position).magnitude;
                 if (!nonCanonicalDetected && actualOffset / influenceSettings.ParentOffsetDistance >= 1.05f)
                 {
-                    ErrorReport.ReportError(new ZatoolNdmfError(
+                    ErrorReport.ReportError(new ZatoolsNdmfError(
                         center.Root.gameObject,
                         ErrorSeverity.Information,
                         "bari.report.non-canonical-scale",

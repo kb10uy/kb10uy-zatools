@@ -15,7 +15,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(AdHocBlendShapeMix))]
-    internal sealed class AhbsmInspector : ZatoolInspectorBase
+    internal sealed class AhbsmInspector : ZatoolInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
