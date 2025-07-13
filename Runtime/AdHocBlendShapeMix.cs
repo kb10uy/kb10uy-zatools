@@ -13,10 +13,19 @@ namespace KusakaFactory.Zatools.Runtime
     }
 
     [Serializable]
-    public sealed class BlendShapeMixDefinition
+    public sealed class BlendShapeMixDefinition : IEquatable<BlendShapeMixDefinition>
     {
         public string FromBlendShape = "";
         public string ToBlendShape = "";
         public float MixWeight = 0.0f;
+
+        public bool Equals(BlendShapeMixDefinition other) =>
+            (other != null)
+            && FromBlendShape == other.FromBlendShape
+            && ToBlendShape == other.ToBlendShape
+            && MixWeight == other.MixWeight;
+
+        public override bool Equals(object obj) => Equals(obj as BlendShapeMixDefinition);
+        public override int GetHashCode() => (FromBlendShape, ToBlendShape, MixWeight).GetHashCode();
     }
 }
