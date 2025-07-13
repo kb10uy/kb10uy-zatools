@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.ndmf;
+using nadena.dev.ndmf.vrchat;
 using KusakaFactory.Zatools.Ndmf.Framework;
 using UnityObject = UnityEngine.Object;
 using PbfcttComponent = KusakaFactory.Zatools.Runtime.PBFingerColliderTransferTarget;
@@ -35,6 +36,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void Transfer(BuildContext context, PbfcttComponent transferTarget, int index)
         {
+            var avatarDescriptor = context.VRChatAvatarDescriptor();
+
             // Finger Collider は PB の連続ボーンのように parent transform に依存する
             // parent transform から target transform に向かってカプセルが"生える"ように配置される
             // see also: https://note.com/labo405/n/nac5615af9b0e
@@ -66,22 +69,22 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             switch (index)
             {
                 case 0:
-                    context.AvatarDescriptor.collider_fingerLittleL = colliderConfig;
+                    avatarDescriptor.collider_fingerLittleL = colliderConfig;
                     break;
                 case 1:
-                    context.AvatarDescriptor.collider_fingerLittleR = colliderConfig;
+                    avatarDescriptor.collider_fingerLittleR = colliderConfig;
                     break;
                 case 2:
-                    context.AvatarDescriptor.collider_fingerRingL = colliderConfig;
+                    avatarDescriptor.collider_fingerRingL = colliderConfig;
                     break;
                 case 3:
-                    context.AvatarDescriptor.collider_fingerRingR = colliderConfig;
+                    avatarDescriptor.collider_fingerRingR = colliderConfig;
                     break;
                 case 4:
-                    context.AvatarDescriptor.collider_fingerMiddleL = colliderConfig;
+                    avatarDescriptor.collider_fingerMiddleL = colliderConfig;
                     break;
                 case 5:
-                    context.AvatarDescriptor.collider_fingerMiddleR = colliderConfig;
+                    avatarDescriptor.collider_fingerMiddleR = colliderConfig;
                     break;
                 default: throw new ArgumentException($"prohibited index: {index}");
             }

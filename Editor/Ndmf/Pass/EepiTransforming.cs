@@ -10,6 +10,7 @@ using VRC.SDK3.Dynamics.Constraint.Components;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using nadena.dev.ndmf.runtime;
+using nadena.dev.ndmf.vrchat;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
 using KusakaFactory.Zatools.Ndmf.Framework;
@@ -26,6 +27,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         protected override void Execute(BuildContext context)
         {
+            // MEMO: NDMF Portable Component で eye が取れるようになったら移行できるかも
+            var avatarDescriptor = context.VRChatAvatarDescriptor();
             var virtualControllerContext = context.Extension<VirtualControllerContext>();
             var state = context.GetState(EepiState.Initializer);
             if (state.Installer == null) return;
@@ -34,7 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             EnsureAvatarRootPlacement(context.AvatarRootObject, state.Installer, state.MergeAnimator);
 
             // 対象の Eye ボーンと Eye Look 補正値の取得
-            var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(context.AvatarDescriptor);
+            var (constrainedLeftEye, constrainedRightEye) = LocateEyeBones(avatarDescriptor);
             var (lookAdjustLeft, lookAdjustRight) = (Quaternion.identity, Quaternion.identity);
             if (state.Installer.DummyEyeBones)
             {
@@ -67,7 +70,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             // Eye Look の設定・修正
             AdjustEyeLookSettings(
-                context.AvatarDescriptor,
+                avatarDescriptor,
                 constrainedLeftEye,
                 lookAdjustLeft,
                 constrainedRightEye,
