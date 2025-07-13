@@ -13,7 +13,6 @@ using nadena.dev.ndmf.runtime;
 using nadena.dev.ndmf.vrchat;
 using nadena.dev.modular_avatar.core;
 using AnimatorAsCode.V1;
-using KusakaFactory.Zatools.Ndmf.Framework;
 using UnityObject = UnityEngine.Object;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;

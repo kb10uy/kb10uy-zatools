@@ -5,7 +5,6 @@ using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.vrchat;
-using KusakaFactory.Zatools.Ndmf.Framework;
 using UnityObject = UnityEngine.Object;
 using PbfcttComponent = KusakaFactory.Zatools.Runtime.PBFingerColliderTransferTarget;
 

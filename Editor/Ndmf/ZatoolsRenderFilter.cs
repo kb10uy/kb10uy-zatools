@@ -8,11 +8,21 @@ using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
 
-namespace KusakaFactory.Zatools.Ndmf.Framework
+namespace KusakaFactory.Zatools.Ndmf
 {
     internal abstract class ZatoolsRenderFilter<TComponent> : IRenderFilter
     where TComponent : ZatoolsMeshEditingComponent
     {
+        private readonly TogglablePreviewNode _toggleNode;
+
+        protected ZatoolsRenderFilter(string name, string qualifiedName)
+        {
+            _toggleNode = TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}");
+        }
+
+        public IEnumerable<TogglablePreviewNode> GetPreviewControlNodes() => new[] { _toggleNode };
+        public bool IsEnabled(ComputeContext context) => context.Observe(_toggleNode.IsEnabled);
+
         public ImmutableList<RenderGroup> GetTargetGroups(ComputeContext context) =>
             context.GetComponentsByType<TComponent>()
                 .Select((c) => (Renderer: c.GetComponent<SkinnedMeshRenderer>(), Component: c))

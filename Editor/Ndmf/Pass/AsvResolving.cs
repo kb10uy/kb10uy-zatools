@@ -6,7 +6,6 @@ using UnityEngine;
 using nadena.dev.ndmf;
 using nadena.dev.modular_avatar.core;
 using KusakaFactory.Zatools.Runtime;
-using KusakaFactory.Zatools.Ndmf.Framework;
 using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass

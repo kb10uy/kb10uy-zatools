@@ -2,12 +2,13 @@ using System.Threading.Tasks;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
-using KusakaFactory.Zatools.Ndmf.Framework;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class NpeRenderFilter : ZatoolsRenderFilter<NdmfPreviewExample>
     {
+        internal NpeRenderFilter() : base("NDMF Preview Example", "ndmf-preview-example") { }
+
         internal override ZatoolsRenderFilterNode<NdmfPreviewExample> CreateNode() => new NpeRenderFilterNode();
     }
 

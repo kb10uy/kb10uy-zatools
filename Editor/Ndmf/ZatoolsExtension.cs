@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace KusakaFactory.Zatools.Ndmf.Framework
+namespace KusakaFactory.Zatools.Ndmf
 {
     internal static class ZatoolsExtension
     {
