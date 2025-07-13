@@ -8,7 +8,7 @@ using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
 
-namespace KusakaFactory.Zatools.Ndmf.Framework
+namespace KusakaFactory.Zatools.Ndmf
 {
     internal abstract class ZatoolsRenderFilter<TComponent> : IRenderFilter
     where TComponent : ZatoolsMeshEditingComponent

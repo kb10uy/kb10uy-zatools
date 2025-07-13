@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
-using KusakaFactory.Zatools.Ndmf.Framework;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
