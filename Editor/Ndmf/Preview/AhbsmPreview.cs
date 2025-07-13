@@ -34,12 +34,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
                 context.Observe(
                     c,
                     (c) => c.MixDefinitions.FixSources(),
-                    (oldList, newList) =>
-                    {
-                        var changed = oldList.SequenceEqual(newList);
-                        if (!changed) Debug.Log("comparison reported change");
-                        return changed;
-                    }
+                    (oldList, newList) => oldList.SequenceEqual(newList)
                 ),
                 c.Replace
             ));
@@ -58,20 +53,5 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             return default;
         }
-
-        /*
-        internal override Task<IRenderFilterNode> Refresh(
-            SkinnedMeshRenderer original,
-            SkinnedMeshRenderer proxyed,
-            ComputeContext context,
-            RenderAspects updatedAspects
-        )
-        {
-            Debug.Log($"refreshing preview node: {updatedAspects}");
-            return updatedAspects == RenderAspects.Shapes ?
-                Task.FromResult((IRenderFilterNode)this) :
-                Task.FromResult<IRenderFilterNode>(null);
-        }
-        */
     }
 }
