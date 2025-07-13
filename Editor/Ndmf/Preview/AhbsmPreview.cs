@@ -26,7 +26,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ComputeContext context
         )
         {
-            Debug.Log("recalculating mesh");
             // 直前の RenderFilterNode の処理が適用されている方から取る
             var originalMesh = proxyed.sharedMesh;
             var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(originalMesh);
