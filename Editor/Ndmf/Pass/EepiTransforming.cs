@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -21,6 +22,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class EepiTransforming : Pass<EepiTransforming>
     {
+        internal const string GlobalWeightParameterName = "SEP/GlobalWeight";
+
         public override string QualifiedName => nameof(EepiTransforming);
         public override string DisplayName => "Substitute eye bones and add constraints to them";
 
@@ -332,7 +335,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var parameters = globalWeightControl.AddComponent<ModularAvatarParameters>();
             var globalWeightConfig = new ParameterConfig
             {
-                nameOrPrefix = "SEP/GlobalWeight",
+                nameOrPrefix = GlobalWeightParameterName,
                 syncType = ParameterSyncType.Float,
                 saved = false,
                 localOnly = false,
@@ -356,12 +359,42 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 {
                     type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
                     name = "EyePointer Weight",
-                    subParameters = new[] { new VRCExpressionsMenu.Control.Parameter { name = "SEP/GlobalWeight" } },
+                    subParameters = new[] { new VRCExpressionsMenu.Control.Parameter { name = GlobalWeightParameterName } },
                     value = installer.InitialGlobalWeight,
                 });
 
                 copiedRootMenuAsset.controls[0].subMenu = copiedMenuAsset;
                 defaultMenuInstaller.menuToAppend = copiedRootMenuAsset;
+            }
+        }
+    }
+
+    [ParameterProviderFor(typeof(Installer))]
+    internal sealed class EepiExtendedParameters : IParameterProvider
+    {
+        private readonly Installer _installer;
+
+        public EepiExtendedParameters(Installer installer)
+        {
+            _installer = installer;
+        }
+
+        public IEnumerable<ProvidedParameter> GetSuppliedParameters(BuildContext context)
+        {
+            if (_installer.OverrideGlobalWeight && _installer.AddGlobalWeightControl)
+            {
+                yield return new ProvidedParameter(
+                    EepiTransforming.GlobalWeightParameterName,
+                    ParameterNamespace.Animator,
+                    _installer,
+                    ZatoolsNdmfPlugin.Instance,
+                    AnimatorControllerParameterType.Float
+                )
+                {
+                    WantSynced = true,
+                    IsHidden = false,
+                    DefaultValue = _installer.InitialGlobalWeight,
+                };
             }
         }
     }
