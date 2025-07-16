@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
         private Button _openSavePath;
         private Button _applyButton;
 
-        [MenuItem("Window/kb10uy/Missing BlendShape Inserter")]
+        [MenuItem("Window/Zatools: kb10uy's Various Tools/Missing BlendShape Inserter")]
         internal static void OpenWindow()
         {
             GetWindow<MissingBlendShapeInserter>();

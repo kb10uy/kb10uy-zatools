@@ -55,7 +55,7 @@ namespace KusakaFactory.Zatools.Localization
             return immutableTable;
         }
 
-        [MenuItem("Tools/kb10uy's Various Tools/Debug/Reload Localizations")]
+        [MenuItem("Tools/Zatools: kb10uy's Various Tools/Debug/Reload Localizations")]
         internal static void Invalidate()
         {
             StringTableCache.Clear();

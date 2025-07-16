@@ -34,7 +34,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         private TextField _textFieldAssetName;
         private Button _buttonGenerate;
 
-        [MenuItem("Window/kb10uy/Custom Mipmap Combiner")]
+        [MenuItem("Window/Zatools: kb10uy's Various Tools/Custom Mipmap Combiner")]
         internal static void OpenWindow()
         {
             GetWindow<CustomMipmapCombiner>();

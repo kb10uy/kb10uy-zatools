@@ -5,10 +5,10 @@ namespace KusakaFactory.Zatools.EditorExtension
 {
     internal static class AnimationAnalysis
     {
-        [MenuItem("Assets/kb10uy's Various Tools/List property paths on log", validate = true)]
+        [MenuItem("Assets/Zatools: kb10uy's Various Tools/List property paths on log", validate = true)]
         private static bool CanListPropertyPaths() => Selection.activeObject is AnimationClip;
 
-        [MenuItem("Assets/kb10uy's Various Tools/List property paths on log")]
+        [MenuItem("Assets/Zatools: kb10uy's Various Tools/List property paths on log")]
         private static void ListPropertyPaths()
         {
             var animationClip = Selection.activeObject as AnimationClip;
