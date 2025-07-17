@@ -1,5 +1,4 @@
-# kb10uy's Various Tools
-previously known as *kb10uy zatools (雑なツール、雑ール)*
+# Zatools: kb10uy's Various Tools
 
 ## インストール
 1. [Haï~氏のリポジトリ](https://docs.hai-vr.dev/docs/products/listing)をあらかじめ追加しておく
