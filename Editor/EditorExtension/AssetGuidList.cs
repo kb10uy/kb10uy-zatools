@@ -29,7 +29,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         private int _maxPagesCount = 1;
         private int _currentPage = 0;
 
-        [MenuItem("Window/kb10uy/Asset GUID List")]
+        [MenuItem("Window/Zatools: kb10uy's Various Tools/Asset GUID List")]
         internal static void OpenWindow()
         {
             GetWindow<AssetGuidList>();

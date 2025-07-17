@@ -11,7 +11,7 @@ namespace KusakaFactory.Zatools.EditorExtension
 {
     internal sealed class BlendShapeList : EditorWindow
     {
-        [MenuItem("Window/kb10uy/BlendShape List")]
+        [MenuItem("Window/Zatools: kb10uy's Various Tools/BlendShape List")]
         internal static void OpenWindow()
         {
             GetWindow<BlendShapeList>();

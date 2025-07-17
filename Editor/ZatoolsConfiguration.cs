@@ -30,7 +30,7 @@ namespace KusakaFactory.Zatools
         #region Others
 
         private const string EDITOR_USER_SETTINGS_KEY = "ZatoolsConfigurationJson";
-        private const string MENU_PREFIX_ASV = "Tools/kb10uy's Various Tools/Avatar Status Validator/";
+        private const string MENU_PREFIX_ASV = "Tools/Zatools: kb10uy's Various Tools/Avatar Status Validator/";
         private static ConfigurationObject _current = null;
         private static ConfigurationObject Current
         {

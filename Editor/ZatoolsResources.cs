@@ -9,7 +9,7 @@ namespace KusakaFactory.Zatools
     {
         private readonly static Dictionary<string, VisualTreeAsset> VisualTreeAssetCache = new Dictionary<string, VisualTreeAsset>();
 
-        [MenuItem("Tools/kb10uy's Various Tools/Debug/Reload VisualTree Assets")]
+        [MenuItem("Tools/Zatools: kb10uy's Various Tools/Debug/Reload VisualTree Assets")]
         internal static void InvalidateVisualTreeAssetCache()
         {
             VisualTreeAssetCache.Clear();
