@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace KusakaFactory.Zatools.Runtime
@@ -8,5 +7,13 @@ namespace KusakaFactory.Zatools.Runtime
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public sealed class AdHocNormalBending : ZatoolsMeshEditingComponent
     {
+        public Texture2D Mask;
+        public NormalBendMaskMode Mode;
+    }
+
+    public enum NormalBendMaskMode
+    {
+        TakeWhite,
+        TakeBlack,
     }
 }
