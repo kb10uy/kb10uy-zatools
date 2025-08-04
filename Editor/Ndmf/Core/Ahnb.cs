@@ -14,25 +14,23 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// </summary>
         /// <param name="modifyingMesh"></param>
         /// <param name="maskTexture">マスクテクスチャ。isReadable でなければならない</param>
-        internal static void ProcessTest1(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, Texture2D maskTexture, NormalBendMaskMode mode)
+        internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
         {
             // TODO: BoneWeight1 を使う
-            var vertices = new List<Vector3>(modifyingMesh.vertexCount);
             var normals = new List<Vector3>(modifyingMesh.vertexCount);
             var uvs = new List<Vector2>(modifyingMesh.vertexCount);
             var boneWeights = new List<BoneWeight>(modifyingMesh.vertexCount);
             var bindposes = new List<Matrix4x4>(modifyingMesh.bindposeCount);
-            modifyingMesh.GetVertices(vertices);
             modifyingMesh.GetNormals(normals);
             modifyingMesh.GetUVs(0, uvs);
             modifyingMesh.GetBoneWeights(boneWeights);
             modifyingMesh.GetBindposes(bindposes);
             var bones = referencingRenderer.bones;
 
-            var mask = new TextureMask(maskTexture, mode switch
+            var mask = new TextureMask(parameters.MaskTexture, parameters.MaskMode switch
             {
-                NormalBendMaskMode.TakeWhite => TextureMask.Mode.TakeWhite,
-                NormalBendMaskMode.TakeBlack => TextureMask.Mode.TakeBlack,
+                NormalBendMaskMode.White => TextureMask.Mode.TakeWhite,
+                NormalBendMaskMode.Black => TextureMask.Mode.TakeBlack,
                 _ => throw new InvalidOperationException("unknown mode"),
             });
 
@@ -41,29 +39,67 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 .Select((i) => bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity)
                 .ToList();
 
-            var worldSpaceDirection = new Vector4(0.0f, 0.05f, 0.0f, 0.0f);
-
-            for (var i = 0; i < vertices.Count; ++i)
+            for (var i = 0; i < normals.Count; ++i)
             {
                 if (!mask.Take(uvs[i].x, uvs[i].y)) continue;
 
                 // ボーン変形を受ける行列を計算
                 // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
                 var boneWeight = boneWeights[i];
-                var matrix = ExtraMath.BlendMatrices(
+                var inverseMatrix = ExtraMath.BlendMatrices(
                     currentBoneDeforms,
                     (boneWeight.boneIndex0, boneWeight.weight0),
                     (boneWeight.boneIndex1, boneWeight.weight1),
                     (boneWeight.boneIndex2, boneWeight.weight2),
                     (boneWeight.boneIndex3, boneWeight.weight3)
-                );
-                var inverseMatrix = matrix.inverse;
-                var delta = inverseMatrix * worldSpaceDirection;
+                ).inverse;
 
-                vertices[i] += new Vector3(delta.x, delta.y, delta.z);
+                var originalNormal = Quaternion.LookRotation(normals[i]);
+                var directedNormal = Quaternion.LookRotation(inverseMatrix.MultiplyVector(parameters.WorldSpaceForward));
+                var bentNormal = Quaternion.Lerp(originalNormal, directedNormal, parameters.Weight);
+                normals[i] = bentNormal * Vector3.forward;
             }
 
-            modifyingMesh.SetVertices(vertices);
+            modifyingMesh.SetNormals(normals);
+        }
+
+        internal struct FixedParameters : IEquatable<FixedParameters>
+        {
+            internal Vector3 WorldSpaceForward;
+            internal float Weight;
+            internal Texture2D MaskTexture;
+            internal bool CanReadMask;
+            internal NormalBendMaskMode MaskMode;
+
+            internal static FixedParameters FixFromComponent(AdHocNormalBending component)
+            {
+                var directionSource = component.Direction != null ? component.Direction : component.transform;
+                return new FixedParameters()
+                {
+                    WorldSpaceForward = directionSource.forward,
+                    Weight = component.Weight,
+                    MaskTexture = component.Mask,
+                    MaskMode = component.Mode,
+                    CanReadMask = component.Mask != null && component.Mask.isReadable,
+                };
+            }
+
+            public bool Equals(FixedParameters other)
+            {
+                return (WorldSpaceForward - other.WorldSpaceForward).sqrMagnitude < 0.0001f
+                    && Mathf.Approximately(Weight, other.Weight)
+                    && MaskTexture == other.MaskTexture
+                    && CanReadMask == other.CanReadMask
+                    && MaskMode == other.MaskMode;
+            }
+
+            public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
+
+            public override int GetHashCode() => (WorldSpaceForward, MaskTexture, MaskMode).GetHashCode();
+
+            public static bool operator ==(FixedParameters lhs, FixedParameters rhs) => lhs.Equals(rhs);
+
+            public static bool operator !=(FixedParameters lhs, FixedParameters rhs) => !(lhs == rhs);
         }
     }
 }

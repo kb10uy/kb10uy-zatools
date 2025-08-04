@@ -7,13 +7,15 @@ namespace KusakaFactory.Zatools.Runtime
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public sealed class AdHocNormalBending : ZatoolsMeshEditingComponent
     {
+        public Transform Direction;
+        public float Weight = 1.0f;
         public Texture2D Mask;
-        public NormalBendMaskMode Mode;
+        public NormalBendMaskMode Mode = NormalBendMaskMode.White;
     }
 
     public enum NormalBendMaskMode
     {
-        TakeWhite,
-        TakeBlack,
+        White,
+        Black,
     }
 }
