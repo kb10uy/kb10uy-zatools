@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             var observedDefinitions = components.Select((c) => (
                 context.Observe(
                     c,
-                    (c) => c.MixDefinitions.FixSources(),
+                    (c) => c.MixDefinitions != null ? c.MixDefinitions.FixSources() : ImmutableArray<(string, string, float)>.Empty,
                     (oldList, newList) => oldList.SequenceEqual(newList)
                 ),
                 c.Replace

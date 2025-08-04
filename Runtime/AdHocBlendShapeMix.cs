@@ -9,7 +9,7 @@ namespace KusakaFactory.Zatools.Runtime
     public sealed class AdHocBlendShapeMix : ZatoolsMeshEditingComponent
     {
         public bool Replace = true;
-        public BlendShapeMixDefinition[] MixDefinitions;
+        public BlendShapeMixDefinition[] MixDefinitions = new BlendShapeMixDefinition[] { };
     }
 
     [Serializable]
