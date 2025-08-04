@@ -6,5 +6,6 @@
         <ui:Slider label="anhb.inspector.weight" high-value="1" name="FieldWeight" binding-path="Weight" show-input-field="true" direction="Horizontal" class="ndmf-tr" />
         <uie:ObjectField label="anhb.inspector.mask-texture" name="FieldMask" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="Mask" class="ndmf-tr" />
         <ui:EnumField label="anhb.inspector.mask-mode" type="KusakaFactory.Zatools.Runtime.NormalBendMaskMode, org.kb10uy.zatools.runtime" binding-path="Mode" name="FieldMode" class="ndmf-tr" />
+        <ui:HelpBox message-type="Warning" text="ahnb.report.unreadable-mask" name="MaskTextureWarning" class="ndmf-tr" />
     </ui:VisualElement>
 </ui:UXML>
