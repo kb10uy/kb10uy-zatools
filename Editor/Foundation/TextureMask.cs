@@ -18,10 +18,18 @@ namespace KusakaFactory.Zatools.Foundation
 
         internal TextureMask(Texture2D texture, Mode mode)
         {
-            if (!texture.isReadable) throw new ArgumentException("texture is not readable");
-            _pixels = texture.GetPixels32();
-            _width = texture.width;
-            _height = texture.height;
+            if (texture != null && texture.isReadable)
+            {
+                _pixels = texture.GetPixels32();
+                _width = texture.width;
+                _height = texture.height;
+            }
+            else
+            {
+                _pixels = new[] { new Color32(255, 255, 255, 255) };
+                _width = 1;
+                _height = 1;
+            }
             _mode = mode;
         }
 
