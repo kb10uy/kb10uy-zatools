@@ -28,7 +28,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         {
             // コンポーネント側の値の変更と各ボーンの位置変化を監視
             var observedParameters = components.Select((c) => context.Observe(c, Ahnb.FixedParameters.FixFromComponent, (op, np) => op == np));
-            foreach (var bone in original.bones) context.Observe(bone, (t) => t.worldToLocalMatrix);
+            foreach (var bone in original.bones) if (bone != null) context.Observe(bone, (t) => t.worldToLocalMatrix);
 
             foreach (var parameters in observedParameters) Ahnb.Process(proxyed, duplicatedMesh, parameters);
 
