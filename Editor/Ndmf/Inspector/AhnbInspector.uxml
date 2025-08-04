@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <uie:ObjectField label="anhb.inspector.direction" binding-path="Direction" type="UnityEngine.Transform, UnityEngine.CoreModule" name="FieldDirection" class="ndmf-tr" />
+        <ui:Slider label="anhb.inspector.weight" high-value="1" name="FieldWeight" binding-path="Weight" show-input-field="true" direction="Horizontal" class="ndmf-tr" />
+        <uie:ObjectField label="anhb.inspector.mask-texture" name="FieldMask" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="Mask" class="ndmf-tr" />
+        <ui:EnumField label="anhb.inspector.mask-mode" type="KusakaFactory.Zatools.Runtime.NormalBendMaskMode, org.kb10uy.zatools.runtime" binding-path="Mode" name="FieldMode" class="ndmf-tr" />
+    </ui:VisualElement>
+</ui:UXML>

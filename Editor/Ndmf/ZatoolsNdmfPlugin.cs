@@ -21,6 +21,7 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
+                .Then.Run(new AhnbTransforming()).PreviewingWith(new AhnbRenderFilter())
                 .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter())
                 .Then.Run(new NpeTransforming()).PreviewingWith(new NpeRenderFilter());
 
