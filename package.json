@@ -1,7 +1,7 @@
 {
     "name": "org.kb10uy.zatools",
     "displayName": "Zatools: kb10uy's Various Tools",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "unity": "2022.3",
     "description": "Various tools developed by kb10uy",
     "documentationUrl": "https://zatools.kb10uy.dev",
