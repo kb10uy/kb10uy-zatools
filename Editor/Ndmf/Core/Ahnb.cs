@@ -63,6 +63,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
 
             modifyingMesh.SetNormals(normals);
+            modifyingMesh.RecalculateTangents();
         }
 
         internal struct FixedParameters : IEquatable<FixedParameters>
@@ -85,6 +86,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     CanReadMask = component.Mask != null && component.Mask.isReadable,
                 };
             }
+
+            internal bool IsUnreadableMask => MaskTexture != null && !CanReadMask;
 
             public bool Equals(FixedParameters other)
             {
