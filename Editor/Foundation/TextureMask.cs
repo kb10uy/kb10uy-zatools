@@ -20,7 +20,7 @@ namespace KusakaFactory.Zatools.Foundation
         {
             if (texture != null && texture.isReadable)
             {
-                _pixels = texture.GetPixels32();
+                _pixels = texture.GetPixels32(0);
                 _width = texture.width;
                 _height = texture.height;
             }
@@ -50,7 +50,9 @@ namespace KusakaFactory.Zatools.Foundation
             // point sampling
             var canonicalU = u - Mathf.Floor(u);
             var canonicalV = v - Mathf.Floor(v);
-            var index = (int)(canonicalV * _width) + (int)(canonicalU * _width);
+            var pixelX = (int)(canonicalU * _width);
+            var pixelY = (int)(canonicalV * _height);
+            var index = pixelY * _width + pixelX;
             return _pixels[index];
         }
     }

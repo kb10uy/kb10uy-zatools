@@ -50,6 +50,8 @@
     "anhb.inspector.weight": "ウェイト",
     "anhb.inspector.mask-texture": "マスクテクスチャ",
     "anhb.inspector.mask-mode": "マスクのサンプリング方法",
+    "ahnb.report.unreadable-mask": "指定されたマスクの Read/Write が無効です",
+    "ahnb.report.unreadable-mask:description": "このマスクテクスチャを使用したい場合は、インポート設定から Read/Write を有効にしてください。",
     "asv.inspector.ignored-armature-help": "この Armature は Avatar Status Validator で無視されます。",
     "asv.report.suspicious-unmerged-armature": "Avatar Status Validator: MA Merge Armature が設定されていない可能性があります",
     "asv.report.suspicious-unmerged-armature:description": "意図されている場合は Zatools Ignored Armature を当該 Armature オブジェクトに追加してください。",

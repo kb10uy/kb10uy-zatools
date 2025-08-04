@@ -50,6 +50,8 @@
     "anhb.inspector.weight": "Weight",
     "anhb.inspector.mask-texture": "Mask Texture",
     "anhb.inspector.mask-mode": "Mask Sampling",
+    "ahnb.report.unreadable-mask": "Specified mask texture cannot be read",
+    "ahnb.report.unreadable-mask:description": "Enable Read/Write in import settings to use this mask texture properly.",
     "asv.inspector.ignored-armature-help": "This Armature will be ignored by Avatar Status Validator.",
     "asv.report.suspicious-unmerged-armature": "Avatar Status Validator: MA Merge Armature may be missing",
     "asv.report.suspicious-unmerged-armature:description": "If intended, please attach Zatools Ignored Armature.",
