@@ -10,10 +10,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
     internal static class Ahnb
     {
         /// <summary>
-        /// テスト用処理
+        /// メイン処理
         /// </summary>
-        /// <param name="modifyingMesh"></param>
-        /// <param name="maskTexture">マスクテクスチャ。isReadable でなければならない</param>
+        /// <param name="referencingRenderer">Mesh の参照元の SkinnedMeshRenderer</param>
+        /// <param name="modifyingMesh">対象の Mesh</param>
+        /// <param name="parameters">固定されたパラメーター</param>
+        /// <exception cref="InvalidOperationException"></exception>
         internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
         {
             // TODO: BoneWeight1 を使う

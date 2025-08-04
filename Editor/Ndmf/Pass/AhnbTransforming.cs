@@ -19,6 +19,16 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void ProcessFor(AhnbComponent bendComponent, SkinnedMeshRenderer skinnedMeshRenderer)
         {
+            var originalMesh = skinnedMeshRenderer.sharedMesh;
+            if (originalMesh == null) return;
+
+            var fixedParameters = Ahnb.FixedParameters.FixFromComponent(bendComponent);
+            var modifyingMesh = UnityObject.Instantiate(originalMesh);
+            Ahnb.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters);
+
+            skinnedMeshRenderer.sharedMesh = modifyingMesh;
+            ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);
+            UnityObject.DestroyImmediate(bendComponent);
         }
     }
 }
