@@ -67,6 +67,8 @@ namespace KusakaFactory.Zatools.Ndmf
             ComputeContext context
         )
         {
+            if (proxyed == null || proxyed.sharedMesh == null) return;
+
             var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
             duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
 
