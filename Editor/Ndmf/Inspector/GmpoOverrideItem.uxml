@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:TextField picking-mode="Ignore" label="gmpo.inspector.name" name="FieldName" binding-path="Name" class="zatools-inlined ndmf-tr" />
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <ui:EnumField type="KusakaFactory.Zatools.Runtime.MaterialPropertyOverrideType, org.kb10uy.zatools.runtime" binding-path="TargetType" name="FieldTargetType" style="flex-grow: 0; width: 110px; margin-right: 16px;" />
+            <ui:VisualElement style="flex-grow: 3; flex-shrink: 0; flex-direction: column;">
+                <ui:FloatField value="0" binding-path="FloatValue" name="FieldFloatValue" />
+                <ui:IntegerField value="0" name="FieldIntValue" binding-path="IntValue" />
+                <ui:Vector4Field binding-path="VectorValue" name="FieldVectorValue" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

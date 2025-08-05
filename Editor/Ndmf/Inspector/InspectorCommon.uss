@@ -2,6 +2,10 @@
     width: 200px;
 }
 
+.zatools-inlined .unity-base-field__label {
+    width: 128px;
+}
+
 .label-indent-1 .unity-base-field__label {
     padding-left: 12px;
 }
