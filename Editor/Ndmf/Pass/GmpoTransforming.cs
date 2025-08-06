@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using nadena.dev.ndmf;
+using nadena.dev.ndmf.animator;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Core;
 using UnityObject = UnityEngine.Object;
@@ -21,13 +22,14 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         {
             var compiledOverrides = new List<(Regex, ImmutableList<Gmpo.FixedOverride>)>();
 
+            var virtualControllerContext = context.Extension<VirtualControllerContext>();
             var components = context.AvatarRootObject.GetComponentsInChildren<GmpoComponent>();
             foreach (var component in components)
             {
                 var compiled = CompileFor(component);
                 if (compiled.Pattern != null) compiledOverrides.Add(compiled);
             }
-            UpdateMaterials(context.AvatarRootTransform, compiledOverrides);
+            UpdateMaterials(context.AvatarRootTransform, virtualControllerContext, compiledOverrides);
         }
 
         private (Regex Pattern, ImmutableList<Gmpo.FixedOverride> Overrides) CompileFor(GmpoComponent component)
@@ -50,84 +52,37 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             return (regex, overrides);
         }
 
-        private void UpdateMaterials(Transform root, IReadOnlyList<(Regex Pattern, ImmutableList<Gmpo.FixedOverride> Overrides)> compiledOverrides)
+        private void UpdateMaterials(
+            Transform root,
+            VirtualControllerContext virtualControllerContext,
+            IReadOnlyList<(Regex Pattern, ImmutableList<Gmpo.FixedOverride> Overrides)> compiledOverrides
+        )
         {
-            // TODO: アニメーションで変わるマテリアルも拾わなければならない
-            var overriddenMaterials = new Dictionary<Material, Material>();
+            var materialCache = new Gmpo.MaterialCache();
             var renderers = root.GetComponentsInChildren<Renderer>(true);
-            foreach (var renderer in renderers)
-            {
-                var sharedMaterials = new List<Material>();
-                renderer.GetSharedMaterials(sharedMaterials);
 
-                foreach (var material in sharedMaterials)
+            Gmpo.RegisterMaterialsFromRenderers(materialCache, renderers);
+
+            // TODO: アニメーションで変わるマテリアルも拾わなければならない
+            var reachableClips = virtualControllerContext
+                .GetAllControllers()
+                .SelectMany((vc) => vc.AllReachableNodes().Where((n) => n is VirtualClip))
+                .Cast<VirtualClip>();
+            Debug.LogError($"{reachableClips.Count()} clips reachable");
+            foreach (var clip in reachableClips)
+            {
+                var bindings = clip.GetObjectCurveBindings();
+                foreach (var binding in bindings)
                 {
-                    if (material == null) continue;
-                    if (overriddenMaterials.ContainsKey(material)) continue;
-                    overriddenMaterials.Add(material, null);
+                    Debug.LogError($"{clip.Name} : {binding.path}[{binding.propertyName}] / {binding.type.Name}");
                 }
             }
 
-            var originalMaterials = overriddenMaterials.Keys.ToImmutableList();
-            foreach (var original in originalMaterials)
-            {
-                var shaderName = original.shader.name;
-                var matchedOverrides = compiledOverrides.Where((p) => p.Pattern.IsMatch(shaderName));
-                if (!matchedOverrides.Any()) continue;
+            Gmpo.ApplyOverrides(materialCache, compiledOverrides);
 
-                Material overridden;
-                if ((overridden = overriddenMaterials[original]) == null)
-                {
-                    overriddenMaterials[original] = overridden = UnityObject.Instantiate(original);
-                }
+            Gmpo.ReplaceOverriddenMaterialsForRenderers(materialCache, renderers);
 
-                var floatNames = original.GetPropertyNames(MaterialPropertyType.Float);
-                var intNames = original.GetPropertyNames(MaterialPropertyType.Int);
-                var vectorNames = original.GetPropertyNames(MaterialPropertyType.Vector);
-                foreach (var fixedOverride in matchedOverrides.SelectMany((p) => p.Overrides))
-                {
-                    // TODO: Shader.PropertyToID を使う
-                    switch (fixedOverride.TargetType)
-                    {
-                        case MaterialPropertyOverrideType.Float:
-                            if (!floatNames.Contains(fixedOverride.Name)) continue;
-                            overridden.SetFloat(fixedOverride.Name, fixedOverride.FloatValue);
-                            Debug.LogError($"Override {fixedOverride.Name} applied ({fixedOverride.FloatValue}) for {overridden.name}");
-                            break;
-                        case MaterialPropertyOverrideType.Int:
-                            if (!intNames.Contains(fixedOverride.Name)) continue;
-                            overridden.SetInteger(fixedOverride.Name, fixedOverride.IntValue);
-                            break;
-                        case MaterialPropertyOverrideType.Vector:
-                            if (!vectorNames.Contains(fixedOverride.Name)) continue;
-                            overridden.SetVector(fixedOverride.Name, fixedOverride.VectorValue);
-                            break;
-                    }
-                }
-            }
-
-            foreach (var renderer in renderers)
-            {
-                var sharedMaterials = new List<Material>();
-                renderer.GetSharedMaterials(sharedMaterials);
-
-                for (var i = 0; i < sharedMaterials.Count; ++i)
-                {
-                    var originalMaterial = sharedMaterials[i];
-                    if (originalMaterial == null) continue;
-                    var updatedMaterial = overriddenMaterials[originalMaterial];
-                    if (updatedMaterial == null) continue;
-                    sharedMaterials[i] = updatedMaterial;
-                }
-
-                renderer.SetSharedMaterials(sharedMaterials);
-            }
-
-            foreach ((var original, var updated) in overriddenMaterials)
-            {
-                if (updated == null) continue;
-                ObjectRegistry.RegisterReplacedObject(original, updated);
-            }
+            foreach ((var original, var updated) in materialCache.EnumerateOverriddenMaterials()) ObjectRegistry.RegisterReplacedObject(original, updated);
         }
     }
 }
