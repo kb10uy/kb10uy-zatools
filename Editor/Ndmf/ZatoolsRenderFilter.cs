@@ -25,6 +25,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
         public ImmutableList<RenderGroup> GetTargetGroups(ComputeContext context) =>
             context.GetComponentsByType<TComponent>()
+                .Where((c) => context.ActiveInHierarchy(c.gameObject))
                 .Select((c) => (Renderer: c.GetComponent<SkinnedMeshRenderer>(), Component: c))
                 .Where((p) => p.Renderer != null)
                 .GroupBy((p) => p.Renderer)
