@@ -43,8 +43,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             for (var i = 0; i < normals.Count; ++i)
             {
-                if (!mask.Take(uvs[i].x, uvs[i].y)) continue;
-
                 // ボーン変形を受ける行列を計算
                 // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
                 var boneWeight = boneWeights[i];
@@ -58,7 +56,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
                 var originalNormal = Quaternion.LookRotation(normals[i]);
                 var directedNormal = Quaternion.LookRotation(inverseMatrix.MultiplyVector(parameters.WorldSpaceForward));
-                var bentNormal = Quaternion.Lerp(originalNormal, directedNormal, parameters.Weight);
+                var bentNormal = Quaternion.Lerp(originalNormal, directedNormal, parameters.Weight * mask.Take(uvs[i]));
                 normals[i] = bentNormal * Vector3.forward;
             }
 
