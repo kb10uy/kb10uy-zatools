@@ -20,8 +20,7 @@ namespace KusakaFactory.Zatools.Ndmf
             // Transforming before MA
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
-                .Run(new GmpoTransforming())
-                .Then.Run(new BariTransforming())
+                .Run(new BariTransforming())
                 .Then.Run(new AhnbTransforming()).PreviewingWith(new AhnbRenderFilter())
                 .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter())
                 .Then.Run(new NpeTransforming()).PreviewingWith(new NpeRenderFilter());
@@ -38,6 +37,14 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .Run(new PbfcttTransforming());
+
+            // Transforming after MA with VirtualControllerContext
+            InPhase(BuildPhase.Transforming)
+                .AfterPlugin("nadena.dev.modular-avatar")
+                .WithRequiredExtension(typeof(VirtualControllerContext), (seq) =>
+                {
+                    seq.Run(new GmpoTransforming());
+                });
         }
     }
 }
