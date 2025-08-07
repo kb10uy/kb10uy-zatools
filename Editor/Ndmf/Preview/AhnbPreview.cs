@@ -2,9 +2,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
+using nadena.dev.ndmf.runtime;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Core;
-using nadena.dev.ndmf.runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
@@ -34,6 +34,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
                 (c) => Ahnb.FixedParameters.FixFromComponent(avatarRoot, c),
                 (op, np) => op == np)
             );
+            // 
             foreach (var bone in original.bones) if (bone != null) context.ObserveTransformPosition(bone);
 
             foreach (var parameters in observedParameters) Ahnb.Process(proxyed, duplicatedMesh, parameters);
