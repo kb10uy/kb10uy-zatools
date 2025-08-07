@@ -33,23 +33,23 @@ namespace KusakaFactory.Zatools.Foundation
             _mode = mode;
         }
 
-        internal float Take(Vector2 uv)
+        internal bool Take(float u, float v)
         {
-            var sample = SampleByUv(uv);
+            var sample = SampleByUv(u, v);
             var luma1000 = 213 * sample.r + 715 * sample.g + 72 * sample.b;
             return _mode switch
             {
-                Mode.TakeWhite => luma1000 / 255000.0f,
-                Mode.TakeBlack => (255000 - luma1000) / 255000.0f,
+                Mode.TakeWhite => luma1000 >= 127500,
+                Mode.TakeBlack => luma1000 < 127500,
                 _ => throw new InvalidOperationException("unknown mode"),
             };
         }
 
-        private Color32 SampleByUv(Vector2 uv)
+        private Color32 SampleByUv(float u, float v)
         {
             // point sampling
-            var canonicalU = uv.x - Mathf.Floor(uv.x);
-            var canonicalV = uv.y - Mathf.Floor(uv.y);
+            var canonicalU = u - Mathf.Floor(u);
+            var canonicalV = v - Mathf.Floor(v);
             var pixelX = (int)(canonicalU * _width);
             var pixelY = (int)(canonicalV * _height);
             var index = pixelY * _width + pixelX;
