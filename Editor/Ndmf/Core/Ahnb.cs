@@ -74,9 +74,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal bool CanReadMask;
             internal NormalBendMaskMode MaskMode;
 
-            internal static FixedParameters FixFromComponent(AdHocNormalBending component)
+            internal static FixedParameters FixFromComponent(Transform defaultDirection, AdHocNormalBending component)
             {
-                var directionSource = component.Direction != null ? component.Direction : component.transform;
+                var directionSource = component.Direction != null ? defaultDirection : component.transform;
                 return new FixedParameters()
                 {
                     WorldSpaceForward = directionSource.forward,
