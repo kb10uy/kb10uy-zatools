@@ -29,6 +29,8 @@
     "eepi.report.placeholder-inserted:description": "Avatar Descriptor の Eye Look が無効な場合、特定条件で誤動作することが確認されています。ワークアラウンドとして無意味な値で Eye Look が有効化されています(VRChat 側に実際の Eye ボーンを操作されることはありません)。",
     "eepi.report.prefab-moved": "Enhanced EyePointer Installer: Eye Pointer のプレハブをアバタールートに移動しました",
     "eepi.report.prefab-moved:description": "Eye Pointer はアバタールート直下に配置されている必要があります。この処理は、Eye Pointer のプレハブをアニメーションから参照していない限り影響はありません。",
+    "eepi.report.aps-detected": "Enhanced EyePointer Installer: Avatar Pose System 用の処理を適用しました",
+    "eepi.report.aps-detected:description": "Avatar Pose System によって生成されるオブジェクトを検出したため、Eye Pointer と干渉する一部のコンポーネントを無効化しました。Avatar Pose System を導入していないアバターでこのメッセージが表示された場合はバグであるため報告してください。",
     "ahbsm.inspector.replace": "コピー先の BlendShape に上書きする",
     "ahbsm.inspector.definitions": "コピー定義",
     "ahbsm.inspector.from": "コピー元",
