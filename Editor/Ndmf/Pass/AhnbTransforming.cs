@@ -14,15 +14,22 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         protected override void Execute(BuildContext context)
         {
             var mixComponents = context.AvatarRootObject.GetComponentsInChildren<AhnbComponent>();
-            foreach (var mixComponent in mixComponents) ProcessFor(mixComponent, mixComponent.GetComponent<SkinnedMeshRenderer>());
+            foreach (var mixComponent in mixComponents)
+            {
+                ProcessFor(mixComponent, mixComponent.GetComponent<SkinnedMeshRenderer>(), context.AvatarRootTransform);
+            }
         }
 
-        private void ProcessFor(AhnbComponent bendComponent, SkinnedMeshRenderer skinnedMeshRenderer)
+        private void ProcessFor(AhnbComponent bendComponent, SkinnedMeshRenderer skinnedMeshRenderer, Transform avatarRoot)
         {
             var originalMesh = skinnedMeshRenderer.sharedMesh;
-            if (originalMesh == null) return;
+            if (originalMesh == null)
+            {
+                UnityObject.DestroyImmediate(bendComponent);
+                return;
+            }
 
-            var fixedParameters = Ahnb.FixedParameters.FixFromComponent(bendComponent);
+            var fixedParameters = Ahnb.FixedParameters.FixFromComponent(avatarRoot, bendComponent);
             if (fixedParameters.IsUnreadableMask)
             {
                 ErrorReport.ReportError(new ZatoolsNdmfError(ErrorSeverity.NonFatal, "ahnb.report.unreadable-mask", skinnedMeshRenderer));

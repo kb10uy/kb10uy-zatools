@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
 
@@ -41,29 +46,109 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 .Select((i) => bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity)
                 .ToList();
 
-            for (var i = 0; i < normals.Count; ++i)
+            // 移し替え
+            var nativeNormals = new NativeArray<float3>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeMaskValues = new NativeArray<float>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeBoneDeforms = new NativeArray<float4x4>(bones.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            for (var i = 0; i < modifyingMesh.vertexCount; ++i)
             {
-                if (!mask.Take(uvs[i].x, uvs[i].y)) continue;
+                nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
+                nativeMaskValues[i] = mask.Take(uvs[i]);
+                nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+            }
+            for (var i = 0; i < bones.Length; ++i)
+            {
+                var bd = currentBoneDeforms[i];
+                nativeBoneDeforms[i] = new float4x4(
+                    bd.m00, bd.m01, bd.m02, bd.m03,
+                    bd.m10, bd.m11, bd.m12, bd.m13,
+                    bd.m20, bd.m21, bd.m22, bd.m23,
+                    bd.m30, bd.m31, bd.m32, bd.m33
+                );
+            }
 
-                // ボーン変形を受ける行列を計算
-                // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
-                var boneWeight = boneWeights[i];
-                var inverseMatrix = ExtraMath.BlendMatrices(
-                    currentBoneDeforms,
-                    (boneWeight.boneIndex0, boneWeight.weight0),
-                    (boneWeight.boneIndex1, boneWeight.weight1),
-                    (boneWeight.boneIndex2, boneWeight.weight2),
-                    (boneWeight.boneIndex3, boneWeight.weight3)
-                ).inverse;
+            // 実行
+            var job = new BendNormalJob
+            {
+                Normals = nativeNormals,
+                MaskValues = nativeMaskValues,
+                BoneWeights = nativeBoneWeights,
+                BoneDeforms = nativeBoneDeforms,
+                WorldSpaceForward = new float3(parameters.WorldSpaceForward.x, parameters.WorldSpaceForward.y, parameters.WorldSpaceForward.z),
+                GlobalWeight = parameters.Weight,
+            };
+            var jobHandle = job.Schedule();
+            jobHandle.Complete();
 
-                var originalNormal = Quaternion.LookRotation(normals[i]);
-                var directedNormal = Quaternion.LookRotation(inverseMatrix.MultiplyVector(parameters.WorldSpaceForward));
-                var bentNormal = Quaternion.Lerp(originalNormal, directedNormal, parameters.Weight);
-                normals[i] = bentNormal * Vector3.forward;
+            // 書き戻し
+            for (var i = 0; i < modifyingMesh.vertexCount; ++i)
+            {
+                var nn = nativeNormals[i];
+                normals[i] = new Vector3(nn.x, nn.y, nn.z);
             }
 
             modifyingMesh.SetNormals(normals);
             modifyingMesh.RecalculateTangents();
+
+            nativeNormals.Dispose();
+            nativeMaskValues.Dispose();
+            nativeBoneWeights.Dispose();
+            nativeBoneDeforms.Dispose();
+        }
+
+
+        [BurstCompile]
+        internal struct BendNormalJob : IJob
+        {
+            internal NativeArray<float3> Normals;
+            [ReadOnly] internal NativeArray<float> MaskValues;
+            [ReadOnly] internal NativeArray<InlinedBoneWeight> BoneWeights;
+            [ReadOnly] internal NativeArray<float4x4> BoneDeforms;
+            [ReadOnly] internal float3 WorldSpaceForward;
+            [ReadOnly] internal float GlobalWeight;
+
+
+            public void Execute()
+            {
+                var up = new float3(0.0f, 1.0f, 0.0f);
+                var targetForward = new float4(WorldSpaceForward, 0.0f);
+                for (var i = 0; i < Normals.Length; ++i)
+                {
+                    var boneWeight = BoneWeights[i];
+                    var originalNormal = quaternion.LookRotation(Normals[i], up);
+
+                    // ボーン変形を受ける行列を計算
+                    // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
+                    var matrix = float4x4.zero;
+                    matrix += BoneDeforms[boneWeight.Indices.x] * boneWeight.Weights.x;
+                    matrix += BoneDeforms[boneWeight.Indices.y] * boneWeight.Weights.y;
+                    matrix += BoneDeforms[boneWeight.Indices.z] * boneWeight.Weights.z;
+                    matrix += BoneDeforms[boneWeight.Indices.w] * boneWeight.Weights.w;
+                    matrix = math.inverse(matrix);
+                    var directed = math.mul(matrix, targetForward);
+                    var directedNormal = quaternion.LookRotation(new float3(directed.x, directed.y, directed.z), up);
+
+                    var bentNormal = math.slerp(originalNormal, directedNormal, GlobalWeight * MaskValues[i]);
+                    Normals[i] = math.mul(bentNormal, new float3(0.0f, 0.0f, 1.0f));
+                }
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct InlinedBoneWeight
+        {
+            public int4 Indices;
+            public float4 Weights;
+
+            internal static InlinedBoneWeight FromBoneWeight(BoneWeight weight)
+            {
+                return new InlinedBoneWeight
+                {
+                    Indices = new int4(weight.boneIndex0, weight.boneIndex1, weight.boneIndex2, weight.boneIndex3),
+                    Weights = new float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3),
+                };
+            }
         }
 
         internal struct FixedParameters : IEquatable<FixedParameters>
@@ -74,9 +159,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal bool CanReadMask;
             internal NormalBendMaskMode MaskMode;
 
-            internal static FixedParameters FixFromComponent(AdHocNormalBending component)
+            internal static FixedParameters FixFromComponent(Transform defaultDirection, AdHocNormalBending component)
             {
-                var directionSource = component.Direction != null ? component.Direction : component.transform;
+                var directionSource = component.Direction != null ? defaultDirection : component.transform;
                 return new FixedParameters()
                 {
                     WorldSpaceForward = directionSource.forward,

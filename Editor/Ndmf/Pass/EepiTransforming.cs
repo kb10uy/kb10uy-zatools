@@ -369,6 +369,87 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
+    internal sealed class EepiTransformingAfterMA : Pass<EepiTransformingAfterMA>
+    {
+        public override string QualifiedName => nameof(EepiTransformingAfterMA);
+        public override string DisplayName => "Additional process for Enhanced Eye Pointer Installer";
+
+        protected override void Execute(BuildContext context)
+        {
+            var descriptor = context.VRChatAvatarDescriptor();
+            var ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye)) = FindApsProxyedEyeBones(context.AvatarRootTransform);
+            if (proxyedLeftEye == null || proxyedRightEye == null) return;
+
+            ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Information, "eepi.report.aps-detected"));
+            DisableApsRotationConstraint(proxyedLeftEye, proxyedRightEye);
+            MoveAimConstraint(originalLeftEye, proxyedLeftEye);
+            MoveAimConstraint(originalRightEye, proxyedRightEye);
+            FixEyeLookSettings(descriptor, proxyedLeftEye, proxyedRightEye);
+        }
+
+        private static ((Transform OriginalLeftEye, Transform OriginalRightEye), (Transform LeftEye, Transform RightEye)) FindApsProxyedEyeBones(Transform avatarRoot)
+        {
+            var animator = avatarRoot.GetComponent<Animator>();
+            var head = animator.GetBoneTransform(HumanBodyBones.Head);
+            var originalLeftEye = animator.GetBoneTransform(HumanBodyBones.LeftEye);
+            var originalRightEye = animator.GetBoneTransform(HumanBodyBones.RightEye);
+
+            // Head の兄弟要素として Head_Track/Head_Chop/Head_Const/Head/ がある
+            var proxyedHead = head.parent.Find($"{head.name}_Track/{head.name}_Chop/{head.name}_Const/{head.name}");
+            if (proxyedHead == null) return ((originalLeftEye, originalRightEye), (null, null));
+
+            var proxyedLeftEye = proxyedHead.Find(originalLeftEye.name);
+            var proxyedRightEye = proxyedHead.Find(originalRightEye.name);
+            return ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye));
+        }
+
+        private static void DisableApsRotationConstraint(Transform left, Transform right)
+        {
+            var leftRotationConstraint = left.GetComponent<VRCRotationConstraint>();
+            var rightRotationConstraint = right.GetComponent<VRCRotationConstraint>();
+            leftRotationConstraint.enabled = false;
+            leftRotationConstraint.IsActive = false;
+            leftRotationConstraint.GlobalWeight = 0.0f;
+            rightRotationConstraint.enabled = false;
+            rightRotationConstraint.IsActive = false;
+            rightRotationConstraint.GlobalWeight = 0.0f;
+        }
+
+        private static void MoveAimConstraint(Transform source, Transform dest)
+        {
+            var original = source.GetComponent<VRCAimConstraint>();
+            var copied = dest.gameObject.AddComponent<VRCAimConstraint>();
+            copied.enabled = false;
+            copied.Sources.Add(original.Sources[0]);
+            copied.AffectsRotationZ = false;
+            copied.Locked = true;
+            copied.IsActive = true;
+
+            UnityObject.DestroyImmediate(original);
+        }
+
+        private static void FixEyeLookSettings(VRCAvatarDescriptor descriptor, Transform leftEye, Transform rightEye)
+        {
+            descriptor.enableEyeLook = true;
+
+            var zeroedLooking = new CustomEyeLookSettings.EyeRotations
+            {
+                linked = true,
+                left = Quaternion.identity,
+                right = Quaternion.identity
+            };
+            var adjustedSettings = descriptor.customEyeLookSettings;
+            adjustedSettings.leftEye = leftEye;
+            adjustedSettings.rightEye = rightEye;
+            adjustedSettings.eyesLookingStraight = zeroedLooking;
+            adjustedSettings.eyesLookingUp = zeroedLooking;
+            adjustedSettings.eyesLookingDown = zeroedLooking;
+            adjustedSettings.eyesLookingLeft = zeroedLooking;
+            adjustedSettings.eyesLookingRight = zeroedLooking;
+            descriptor.customEyeLookSettings = adjustedSettings;
+        }
+    }
+
     [ParameterProviderFor(typeof(Installer))]
     internal sealed class EepiExtendedParameters : IParameterProvider
     {
