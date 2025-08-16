@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using Unity.Burst;
@@ -41,11 +40,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 _ => throw new InvalidOperationException("unknown mode"),
             });
 
-            // 現在の各ボーンの変換行列
-            var currentBoneDeforms = Enumerable.Range(0, bones.Length)
-                .Select((i) => bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity)
-                .ToList();
-
             // 移し替え
             var nativeNormals = new NativeArray<float3>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeMaskValues = new NativeArray<float>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -59,13 +53,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
             for (var i = 0; i < bones.Length; ++i)
             {
-                var bd = currentBoneDeforms[i];
-                nativeBoneDeforms[i] = new float4x4(
-                    bd.m00, bd.m01, bd.m02, bd.m03,
-                    bd.m10, bd.m11, bd.m12, bd.m13,
-                    bd.m20, bd.m21, bd.m22, bd.m23,
-                    bd.m30, bd.m31, bd.m32, bd.m33
-                );
+                var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
+                nativeBoneDeforms[i] = bd;
             }
 
             // 実行
@@ -78,17 +67,11 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 WorldSpaceForward = new float3(parameters.WorldSpaceForward.x, parameters.WorldSpaceForward.y, parameters.WorldSpaceForward.z),
                 GlobalWeight = parameters.Weight,
             };
-            var jobHandle = job.Schedule();
+            var jobHandle = job.Schedule(nativeNormals.Length, 4);
             jobHandle.Complete();
 
             // 書き戻し
-            for (var i = 0; i < modifyingMesh.vertexCount; ++i)
-            {
-                var nn = nativeNormals[i];
-                normals[i] = new Vector3(nn.x, nn.y, nn.z);
-            }
-
-            modifyingMesh.SetNormals(normals);
+            modifyingMesh.SetNormals(nativeNormals);
             modifyingMesh.RecalculateTangents();
 
             nativeNormals.Dispose();
@@ -99,7 +82,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
 
         [BurstCompile]
-        internal struct BendNormalJob : IJob
+        internal struct BendNormalJob : IJobParallelFor
         {
             internal NativeArray<float3> Normals;
             [ReadOnly] internal NativeArray<float> MaskValues;
@@ -109,29 +92,27 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             [ReadOnly] internal float GlobalWeight;
 
 
-            public void Execute()
+            public void Execute(int index)
             {
                 var up = new float3(0.0f, 1.0f, 0.0f);
                 var targetForward = new float4(WorldSpaceForward, 0.0f);
-                for (var i = 0; i < Normals.Length; ++i)
-                {
-                    var boneWeight = BoneWeights[i];
-                    var originalNormal = quaternion.LookRotation(Normals[i], up);
 
-                    // ボーン変形を受ける行列を計算
-                    // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
-                    var matrix = float4x4.zero;
-                    matrix += BoneDeforms[boneWeight.Indices.x] * boneWeight.Weights.x;
-                    matrix += BoneDeforms[boneWeight.Indices.y] * boneWeight.Weights.y;
-                    matrix += BoneDeforms[boneWeight.Indices.z] * boneWeight.Weights.z;
-                    matrix += BoneDeforms[boneWeight.Indices.w] * boneWeight.Weights.w;
-                    matrix = math.inverse(matrix);
-                    var directed = math.mul(matrix, targetForward);
-                    var directedNormal = quaternion.LookRotation(new float3(directed.x, directed.y, directed.z), up);
+                var boneWeight = BoneWeights[index];
+                var originalNormal = quaternion.LookRotation(Normals[index], up);
 
-                    var bentNormal = math.slerp(originalNormal, directedNormal, GlobalWeight * MaskValues[i]);
-                    Normals[i] = math.mul(bentNormal, new float3(0.0f, 0.0f, 1.0f));
-                }
+                // ボーン変形を受ける行列を計算
+                // BlendShape は線形にしか移動しないのでこの場合は無視してよいものとする
+                var matrix = float4x4.zero;
+                matrix += BoneDeforms[boneWeight.Indices.x] * boneWeight.Weights.x;
+                matrix += BoneDeforms[boneWeight.Indices.y] * boneWeight.Weights.y;
+                matrix += BoneDeforms[boneWeight.Indices.z] * boneWeight.Weights.z;
+                matrix += BoneDeforms[boneWeight.Indices.w] * boneWeight.Weights.w;
+                matrix = math.inverse(matrix);
+                var directed = math.mul(matrix, targetForward);
+                var directedNormal = quaternion.LookRotation(new float3(directed.x, directed.y, directed.z), up);
+
+                var bentNormal = math.slerp(originalNormal, directedNormal, GlobalWeight * MaskValues[index]);
+                Normals[index] = math.mul(bentNormal, new float3(0.0f, 0.0f, 1.0f));
             }
         }
 
@@ -176,7 +157,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             public bool Equals(FixedParameters other)
             {
-                return (WorldSpaceForward - other.WorldSpaceForward).sqrMagnitude < 0.0001f
+                return (WorldSpaceForward - other.WorldSpaceForward).magnitude < 0.0001f
                     && Mathf.Approximately(Weight, other.Weight)
                     && MaskTexture == other.MaskTexture
                     && CanReadMask == other.CanReadMask
