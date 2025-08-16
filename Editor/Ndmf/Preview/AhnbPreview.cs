@@ -34,7 +34,10 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
                 (c) => Ahnb.FixedParameters.FixFromComponent(avatarRoot, c),
                 (op, np) => op == np)
             );
-            foreach (var component in components) context.Observe(component.Direction, (t) => t.worldToLocalMatrix);
+            foreach (var component in components)
+            {
+                if (component.Direction != null) context.Observe(component.Direction, (t) => t.worldToLocalMatrix);
+            }
             foreach (var bone in original.bones) if (bone != null) context.Observe(bone, (t) => t.worldToLocalMatrix);
 
             foreach (var parameters in observedParameters) Ahnb.Process(proxyed, duplicatedMesh, parameters);
