@@ -142,7 +142,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             internal static FixedParameters FixFromComponent(Transform defaultDirection, AdHocNormalBending component)
             {
-                var directionSource = component.Direction != null ? defaultDirection : component.transform;
+                var directionSource = component.Direction != null ? component.Direction : defaultDirection;
                 return new FixedParameters()
                 {
                     WorldSpaceForward = directionSource.forward,
