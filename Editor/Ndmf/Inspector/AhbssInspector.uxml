@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:Label tabindex="-1" text="ahbss.inspector.targets" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold;" />
+        <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="TargetShapes" reorderable="true" virtualization-method="DynamicHeight" name="FieldTargetShapes" show-border="true" reorder-mode="Animated" style="margin-bottom: 4px;" />
+        <uie:ObjectField label="ahbss.inspector.basis" binding-path="Basis" type="UnityEngine.Transform, UnityEngine.CoreModule" name="FieldBasis" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" label="ahbss.inspector.left-suffix" name="FieldLeftSuffix" binding-path="LeftSuffix" class="ndmf-tr" />
+        <ui:TextField picking-mode="Ignore" label="ahbss.inspector.right-suffix" name="FieldLeftSuffix" binding-path="RightSuffix" class="ndmf-tr" />
+    </ui:VisualElement>
+</ui:UXML>
