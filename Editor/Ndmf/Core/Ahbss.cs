@@ -14,6 +14,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referenceRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
+            // BakeMesh は SMR の座標系で生成するので Basis は SMR からの相対とする
+            var relativeBasis = referenceRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix;
+
             // 現在の変形状態を固定して左右判定をする
             // BlendShape = 0 状態を取ったほうがいい気もするがまあ速そうだし……
             var smrRelativeDeformedMesh = new Mesh();
@@ -35,6 +38,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var rightTangents = new Vector3[vertexCount];
 
             var nameToIndex = Enumerable.Range(0, modifyingMesh.blendShapeCount).ToDictionary((i) => modifyingMesh.GetBlendShapeName(i));
+            var inverseBasis = relativeBasis.inverse;
             foreach (var targetShape in parameters.TargetShapes)
             {
                 if (!nameToIndex.TryGetValue(targetShape, out var shapeIndex)) continue;
@@ -47,8 +51,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 for (var i = 0; i < vertexCount; ++i)
                 {
                     // left-handed, forwarding
-                    var deformedVertex = smrRelativeVertices[i];
-                    var isRightSide = deformedVertex.x >= 0;
+                    var deformedVertexInBasis = inverseBasis.MultiplyPoint(smrRelativeVertices[i]);
+                    var isRightSide = deformedVertexInBasis.x >= 0;
                     leftVertices[i] = !isRightSide ? originalVertices[i] : Vector3.zero;
                     leftNormals[i] = !isRightSide ? originalNormals[i] : Vector3.zero;
                     leftTangents[i] = !isRightSide ? originalTangents[i] : Vector3.zero;
@@ -63,16 +67,15 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
-            internal Matrix4x4 Basis;
+            internal Transform Basis;
             internal ImmutableArray<string> TargetShapes;
 
-            internal static FixedParameters FixFromComponent(Transform defaultDirection, AdHocBlendShapeSplit component)
+            internal static FixedParameters FixFromComponent(Transform defaultBasis, AdHocBlendShapeSplit component)
             {
-                var basisSource = component.Basis != null ? component.Basis : defaultDirection;
+                var basisSource = component.Basis != null ? component.Basis : defaultBasis;
                 return new FixedParameters()
                 {
-                    // TODO: 正しい basis にする
-                    Basis = basisSource.localToWorldMatrix,
+                    Basis = basisSource,
                     TargetShapes = component.TargetShapes.ToImmutableArray(),
                 };
             }
