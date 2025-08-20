@@ -14,8 +14,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referenceRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
-            // BakeMesh は SMR の座標系で生成するので Basis は SMR からの相対とする
-            var relativeBasis = referenceRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix;
+            var addLeft = !string.IsNullOrWhiteSpace(parameters.LeftSuffix);
+            var addRight = !string.IsNullOrWhiteSpace(parameters.RightSuffix);
+            if (parameters.TargetShapes.IsEmpty || (!addLeft && !addRight)) return;
 
             // 現在の変形状態を固定して左右判定をする
             // BlendShape = 0 状態を取ったほうがいい気もするがまあ速そうだし……
@@ -37,13 +38,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var rightNormals = new Vector3[vertexCount];
             var rightTangents = new Vector3[vertexCount];
 
+            // BakeMesh は SMR の座標系で生成するので Basis は SMR からの相対とする
+            var inverseRelativeBasis = (referenceRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix).inverse;
             var nameToIndex = Enumerable.Range(0, modifyingMesh.blendShapeCount).ToDictionary((i) => modifyingMesh.GetBlendShapeName(i));
-            var inverseBasis = relativeBasis.inverse;
             foreach (var targetShape in parameters.TargetShapes)
             {
                 if (!nameToIndex.TryGetValue(targetShape, out var shapeIndex)) continue;
                 if (modifyingMesh.GetBlendShapeFrameCount(shapeIndex) != 1) continue;
-
 
                 modifyingMesh.GetBlendShapeFrameVertices(shapeIndex, 0, originalVertices, originalNormals, originalTangents);
                 originalWeight = modifyingMesh.GetBlendShapeFrameWeight(shapeIndex, 0);
@@ -51,7 +52,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 for (var i = 0; i < vertexCount; ++i)
                 {
                     // left-handed, forwarding
-                    var deformedVertexInBasis = inverseBasis.MultiplyPoint(smrRelativeVertices[i]);
+                    var deformedVertexInBasis = inverseRelativeBasis.MultiplyPoint(smrRelativeVertices[i]);
                     var isRightSide = deformedVertexInBasis.x >= 0;
                     leftVertices[i] = !isRightSide ? originalVertices[i] : Vector3.zero;
                     leftNormals[i] = !isRightSide ? originalNormals[i] : Vector3.zero;
@@ -60,8 +61,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     rightNormals[i] = isRightSide ? originalNormals[i] : Vector3.zero;
                     rightTangents[i] = isRightSide ? originalTangents[i] : Vector3.zero;
                 }
-                modifyingMesh.AddBlendShapeFrame($"{targetShape}_sL", originalWeight, leftVertices, leftNormals, leftTangents);
-                modifyingMesh.AddBlendShapeFrame($"{targetShape}_sR", originalWeight, rightVertices, rightNormals, rightTangents);
+
+                // Distinct() しているので この処理中に追加された BlendShape 同士で被ることはない
+                var leftName = $"{targetShape}{parameters.LeftSuffix}";
+                var rightName = $"{targetShape}{parameters.RightSuffix}";
+                if (addLeft && !nameToIndex.ContainsKey(leftName)) modifyingMesh.AddBlendShapeFrame(leftName, originalWeight, leftVertices, leftNormals, leftTangents);
+                if (addRight && !nameToIndex.ContainsKey(rightName)) modifyingMesh.AddBlendShapeFrame(rightName, originalWeight, rightVertices, rightNormals, rightTangents);
             }
         }
 
@@ -69,6 +74,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             internal Transform Basis;
             internal ImmutableArray<string> TargetShapes;
+            internal string LeftSuffix;
+            internal string RightSuffix;
 
             internal static FixedParameters FixFromComponent(Transform defaultBasis, AdHocBlendShapeSplit component)
             {
@@ -76,13 +83,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 return new FixedParameters()
                 {
                     Basis = basisSource,
-                    TargetShapes = component.TargetShapes.ToImmutableArray(),
+                    TargetShapes = component.TargetShapes.Distinct().ToImmutableArray(),
+                    LeftSuffix = component.LeftSuffix,
+                    RightSuffix = component.RightSuffix,
                 };
             }
 
             public bool Equals(FixedParameters other)
             {
-                return Basis == other.Basis && TargetShapes.SequenceEqual(other.TargetShapes);
+                return Basis.worldToLocalMatrix == other.Basis.worldToLocalMatrix &&
+                    TargetShapes.SequenceEqual(other.TargetShapes) &&
+                    LeftSuffix == other.LeftSuffix &&
+                    RightSuffix == other.RightSuffix;
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
