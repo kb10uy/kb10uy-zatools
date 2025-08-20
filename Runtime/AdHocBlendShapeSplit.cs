@@ -10,5 +10,7 @@ namespace KusakaFactory.Zatools.Runtime
     {
         public string[] TargetShapes = new string[] { };
         public Transform Basis = null;
+        public string LeftSuffix = "_sL";
+        public string RightSuffix = "_sR";
     }
 }
