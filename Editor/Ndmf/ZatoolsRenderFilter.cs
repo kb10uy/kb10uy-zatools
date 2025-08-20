@@ -15,9 +15,9 @@ namespace KusakaFactory.Zatools.Ndmf
     {
         private readonly TogglablePreviewNode _toggleNode;
 
-        protected ZatoolsRenderFilter(string name, string qualifiedName)
+        protected ZatoolsRenderFilter(string name, string qualifiedName, bool initialState = true)
         {
-            _toggleNode = TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}");
+            _toggleNode = TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}", initialState);
         }
 
         public IEnumerable<TogglablePreviewNode> GetPreviewControlNodes() => new[] { _toggleNode };
