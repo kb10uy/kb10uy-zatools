@@ -17,6 +17,10 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Resolving)
                 .Run(new AsvResolving());
 
+            // Generating
+            InPhase(BuildPhase.Generating)
+                .Run(new AhbssGenerating()).PreviewingWith(new AhbssRenderFilter());
+
             // Transforming before MA
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
