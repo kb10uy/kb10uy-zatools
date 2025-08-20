@@ -4,6 +4,7 @@ namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools Enhanced EyePointer Installer")]
     [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
+    [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/eye-pointer-installer/")]
     public sealed class EnhancedEyePointerInstaller : ZatoolsComponent
     {
         public bool VRCConstraint = false;

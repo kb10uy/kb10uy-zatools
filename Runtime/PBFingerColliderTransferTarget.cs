@@ -5,6 +5,7 @@ namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools PB Finger Collider Tarnsfer Target")]
     [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
+    [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/pb-finger-collider-transfer-target/")]
     public sealed class PBFingerColliderTransferTarget : ZatoolsComponent
     {
         public float Radius = 0.02f;
