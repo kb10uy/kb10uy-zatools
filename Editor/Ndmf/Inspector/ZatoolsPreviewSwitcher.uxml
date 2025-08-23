@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
         <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row; width: 200px; margin-right: 2px;">
-            <ui:Label tabindex="-1" text="NDMF Preview:" parse-escape-sequences="true" display-tooltip-when-elided="true" style="justify-content: flex-start; align-self: center; margin-left: 4px;" />
-            <ui:Label tabindex="-1" text="Enable" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelState" style="flex-grow: 1; align-self: center;" />
+            <ui:Label tabindex="-1" text="_.inspector.ndmf-preview" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="justify-content: flex-start; align-self: center; margin-left: 4px;" />
+            <ui:Label tabindex="-1" text="_.inspector.enabled" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelState" class="ndmf-tr" style="flex-grow: 1; align-self: center;" />
         </ui:VisualElement>
-        <ui:Button text="Toggle Preview" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSwitch" style="margin-right: 0; flex-grow: 1;" />
+        <ui:Button text="_.inspector.toggle-preview" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSwitch" class="ndmf-tr" style="margin-right: 0; flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>

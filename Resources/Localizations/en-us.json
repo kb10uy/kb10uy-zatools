@@ -1,4 +1,8 @@
 {
+    "_.inspector.ndmf-preview": "NDMF Preview:",
+    "_.inspector.enabled": "<color=#40ff40ff>Enabled</color>",
+    "_.inspector.disabled": "<color=#802020ff>Disabled</color>",
+    "_.inspector.toggle-preview": "Toggle Preview",
     "bari.report.non-canonical-scale": "Bone Array Rotation Influence: non-canonical armature scale",
     "bari.report.non-canonical-scale:description": "Inserted fake parent bones have been placed at unexpected position. This may be caused by non-canonical armature scale (like 100). Tweak Offset Distance to more small value if not working properly.",
     "bari.inspector.close-loop": "Bone Array is Close Loop",

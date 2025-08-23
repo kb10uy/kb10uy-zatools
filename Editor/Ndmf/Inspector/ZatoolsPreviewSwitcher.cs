@@ -1,11 +1,9 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Reflection;
 using UnityEngine.UIElements;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Localization;
-using System;
-using System.Reflection;
-using UnityEngine.PlayerLoop;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
@@ -45,7 +43,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var visualTree = ZatoolsResources.LoadVisualTreeByGuid("3f9faa4e18db6bf42aa8b36d312b2939");
             var element = visualTree.CloneTree();
-            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(element);
+            // 追加される CustomInspector 側で 適用されるのでここでは実行しない
+            // ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(element);
             Add(element);
 
             _state = element.Q<Label>("LabelState");
@@ -77,7 +76,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             }
 
             var state = _targetPreviewNode.IsEnabled.Value;
-            _state.text = state ? "Enabled" : "Disabled";
+            _state.text = state ? "_.inspector.enabled" : "_.inspector.disabled";
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(_state, false);
         }
 
         private void ToggleState()
