@@ -19,7 +19,8 @@ namespace KusakaFactory.Zatools.Ndmf
 
             // Generating
             InPhase(BuildPhase.Generating)
-                .Run(new AhbssGenerating()).PreviewingWith(new AhbssRenderFilter());
+                .Run(new UtmdGenerating()).PreviewingWith(new UtmdRenderFilter())
+                .Then.Run(new AhbssGenerating()).PreviewingWith(new AhbssRenderFilter());
 
             // Transforming before MA
             InPhase(BuildPhase.Transforming)
