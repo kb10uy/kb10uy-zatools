@@ -1,0 +1,19 @@
+#pragma kernel SampleColorsByUv
+
+// サンプリング元テクスチャ
+Texture2D SourceTexture;
+SamplerState samplerSourceTexture;
+
+// サンプリング対象 UV
+StructuredBuffer<float4> SamplingUvs;
+
+// 出力バッファ
+RWStructuredBuffer<float4> SampledColors;
+
+[numthreads(1,1,1)]
+void SampleColorsByUv(uint3 id : SV_DispatchThreadID)
+{
+    float4 samplingUv = SamplingUvs[id.x];
+    float4 color = SourceTexture.SampleLevel(samplerSourceTexture, samplingUv.xy, 0);
+    SampledColors[id.x] = color;
+}
