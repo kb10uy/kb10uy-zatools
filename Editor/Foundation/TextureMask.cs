@@ -1,5 +1,12 @@
 using System;
 using UnityEngine;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
+using UnityEditor.PackageManager.UI;
+using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.Rendering;
 
 namespace KusakaFactory.Zatools.Foundation
 {
@@ -54,6 +61,28 @@ namespace KusakaFactory.Zatools.Foundation
             var pixelY = (int)(canonicalV * _height);
             var index = pixelY * _width + pixelX;
             return _pixels[index];
+        }
+    }
+
+    internal static class NativeTextureSampler
+    {
+
+        internal static void SampleByComputeShader(Texture2D texture, ref NativeArray<float4> uvs, ref NativeArray<float4> colorsOutput)
+        {
+            var computeShader = ZatoolsResources.LoadComputeShaderByGuid("69529c6a64173b142a4966bbb00ea374");
+            var computeKernelId = computeShader.FindKernel("SampleColorsByUv");
+
+            using var uvBuffer = new ComputeBuffer(uvs.Length, 16);
+            using var colorBuffer = new ComputeBuffer(uvs.Length, 16);
+            uvBuffer.SetData(uvs);
+
+            computeShader.SetTexture(computeKernelId, "SourceTexture", texture);
+            computeShader.SetBuffer(computeKernelId, "SamplingUvs", uvBuffer);
+            computeShader.SetBuffer(computeKernelId, "SampledColors", colorBuffer);
+            computeShader.Dispatch(computeKernelId, uvs.Length, 1, 1);
+
+            var request = AsyncGPUReadback.RequestIntoNativeArray(ref colorsOutput, colorBuffer);
+            request.WaitForCompletion();
         }
     }
 }
