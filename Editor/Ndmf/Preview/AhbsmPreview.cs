@@ -10,9 +10,11 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class AhbsmRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeMix>
     {
-        internal AhbsmRenderFilter() : base("Ad-Hoc BlendShape Mix", "ad-hoc-blendshape-mix", false) { }
+        private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc BlendShape Mix", "ad-hoc-blendshape-mix", false);
 
         internal override ZatoolsRenderFilterNode<AdHocBlendShapeMix> CreateNode() => new AhbsmRenderFilterNode();
+        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
     internal sealed class AhbsmRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeMix>

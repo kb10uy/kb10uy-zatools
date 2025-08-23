@@ -8,7 +8,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(AdHocNormalBending))]
-    internal sealed class AhnbInspector : ZatoolInspector
+    internal sealed class AhnbInspector : ZatoolsInspector
     {
         private HelpBox _warningHelpBox;
 

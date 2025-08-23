@@ -8,6 +8,7 @@
             <ui:Label tabindex="-1" text="ahbsm.inspector.weight" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelWeight" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
         </ui:VisualElement>
         <ui:ListView name="FieldMixDefinitions" binding-path="MixDefinitions" virtualization-method="DynamicHeight" reorderable="true" show-add-remove-footer="true" show-bound-collection-size="false" reorder-mode="Animated" show-border="true" show-foldout-header="false" style="margin-top: 0; margin-left: 4px;" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhbsmRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
         <ui:Foldout text="ahbsm.inspector.manipulation" value="true" class="ndmf-tr">
             <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
                 <ui:Button text="ahbsm.inspector.save-json" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSaveToJson" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />

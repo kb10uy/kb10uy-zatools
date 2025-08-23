@@ -9,7 +9,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(BoneArrayRotationInfluence))]
-    internal sealed class BariInspector : ZatoolInspector
+    internal sealed class BariInspector : ZatoolsInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

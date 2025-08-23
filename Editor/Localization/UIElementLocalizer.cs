@@ -16,13 +16,13 @@ namespace KusakaFactory.Zatools.Localization
             _ndmfLocalizer = ndmfLocalizer;
         }
 
-        internal void ApplyLocalizationFor(VisualElement element)
+        internal void ApplyLocalizationFor(VisualElement element, bool registerCallback = true)
         {
-            TraverseAndLocalize(element);
+            TraverseAndLocalize(element, registerCallback);
             LanguagePrefs.ApplyFontPreferences(element);
         }
 
-        private void TraverseAndLocalize(VisualElement element)
+        private void TraverseAndLocalize(VisualElement element, bool registerCallback = true)
         {
             if (element.ClassListContains("ndmf-tr"))
             {
@@ -30,12 +30,12 @@ namespace KusakaFactory.Zatools.Localization
                 if (operationForType != null)
                 {
                     var updateElement = operationForType(element);
-                    LanguagePrefs.RegisterLanguageChangeCallback(element, (e) => updateElement());
+                    if (registerCallback) LanguagePrefs.RegisterLanguageChangeCallback(element, (e) => updateElement());
                     updateElement();
                 }
             }
 
-            foreach (var child in element.Children()) TraverseAndLocalize(child);
+            foreach (var child in element.Children()) TraverseAndLocalize(child, registerCallback);
         }
 
         private Func<VisualElement, Action> GetLocalizationOperationForType(Type elementType)

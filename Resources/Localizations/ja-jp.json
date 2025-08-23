@@ -1,4 +1,8 @@
 {
+    "_.inspector.ndmf-preview": "NDMF プレビュー:",
+    "_.inspector.enabled": "<color=#40ff40ff>有効</color>",
+    "_.inspector.disabled": "<color=#802020ff>無効</color>",
+    "_.inspector.toggle-preview": "プレビューを切り替える",
     "bari.report.non-canonical-scale": "Bone Array Rotation Influence: 非正規化スケールを検出しました",
     "bari.report.non-canonical-scale:description": "親ボーンの挿入位置が指定された Offset Distance から離れていることを検出しました。これには Armature のスケールが 1 ではないなど、複数の原因が考えられます。\nRotation Constraint の動作がおかしい場合、Offset Distance を更に小さい値～ゼロに設定してみてください。",
     "bari.inspector.close-loop": "ループ状のボーン列",

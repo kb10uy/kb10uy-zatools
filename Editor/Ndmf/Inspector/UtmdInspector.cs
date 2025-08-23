@@ -7,7 +7,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(UvTileMapDistribution))]
-    internal sealed class UtmdInspector : ZatoolInspector
+    internal sealed class UtmdInspector : ZatoolsInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

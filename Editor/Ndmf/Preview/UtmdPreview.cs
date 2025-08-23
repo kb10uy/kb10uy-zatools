@@ -9,9 +9,11 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class UtmdRenderFilter : ZatoolsRenderFilter<UvTileMapDistribution>
     {
-        internal UtmdRenderFilter() : base("UV Tile Map Distribution", "uv-tile-map-distribution") { }
+        private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("UV Tile Map Distribution", "uv-tile-map-distribution");
 
         internal override ZatoolsRenderFilterNode<UvTileMapDistribution> CreateNode() => new UtmdRenderFilterNode();
+        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
     internal sealed class UtmdRenderFilterNode : ZatoolsRenderFilterNode<UvTileMapDistribution>
