@@ -7,5 +7,6 @@
         <uie:ObjectField label="ahbss.inspector.basis" binding-path="Basis" type="UnityEngine.Transform, UnityEngine.CoreModule" name="FieldBasis" class="ndmf-tr" />
         <ui:TextField picking-mode="Ignore" label="ahbss.inspector.left-suffix" name="FieldLeftSuffix" binding-path="LeftSuffix" class="ndmf-tr" />
         <ui:TextField picking-mode="Ignore" label="ahbss.inspector.right-suffix" name="FieldLeftSuffix" binding-path="RightSuffix" class="ndmf-tr" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhbssRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -6,5 +6,6 @@
         <ui:EnumField label="utmd.inspector.target" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" name="FieldTarget" binding-path="Target" class="ndmf-tr" />
         <uie:ObjectField label="utmd.inspector.tile-map" name="FieldTileMap" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="TileMap" class="ndmf-tr" />
         <ui:EnumField label="utmd.inspector.distribution" type="KusakaFactory.Zatools.Runtime.TileDistribution, org.kb10uy.zatools.runtime" binding-path="Distribution" name="FieldDistribution" class="ndmf-tr" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.UtmdRenderFilter, org.kb10uy.zatools" aaaa="asdasda" style="margin-top: 4px;" />
     </ui:VisualElement>
 </ui:UXML>
