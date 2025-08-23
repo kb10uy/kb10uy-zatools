@@ -7,7 +7,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(PBFingerColliderTransferTarget))]
-    internal sealed class PbfcttInspector : ZatoolInspector
+    internal sealed class PbfcttInspector : ZatoolsInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {

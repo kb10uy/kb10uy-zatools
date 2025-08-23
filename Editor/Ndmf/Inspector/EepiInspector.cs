@@ -7,7 +7,7 @@ using KusakaFactory.Zatools.Runtime;
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
     [CustomEditor(typeof(EnhancedEyePointerInstaller))]
-    internal sealed class EepiInspector : ZatoolInspector
+    internal sealed class EepiInspector : ZatoolsInspector
     {
         protected override VisualElement CreateInspectorGUIImpl()
         {
