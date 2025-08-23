@@ -13,15 +13,8 @@ namespace KusakaFactory.Zatools.Ndmf
     internal abstract class ZatoolsRenderFilter<TComponent> : IRenderFilter
     where TComponent : ZatoolsMeshEditingComponent
     {
-        private readonly TogglablePreviewNode _toggleNode;
-
-        protected ZatoolsRenderFilter(string name, string qualifiedName, bool initialState = true)
-        {
-            _toggleNode = TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}", initialState);
-        }
-
-        public IEnumerable<TogglablePreviewNode> GetPreviewControlNodes() => new[] { _toggleNode };
-        public bool IsEnabled(ComputeContext context) => context.Observe(_toggleNode.IsEnabled);
+        public IEnumerable<TogglablePreviewNode> GetPreviewControlNodes() => new[] { PreviewNode };
+        public bool IsEnabled(ComputeContext context) => context.Observe(PreviewNode.IsEnabled);
 
         public ImmutableList<RenderGroup> GetTargetGroups(ComputeContext context) =>
             context.GetComponentsByType<TComponent>()
@@ -45,6 +38,12 @@ namespace KusakaFactory.Zatools.Ndmf
         }
 
         internal abstract ZatoolsRenderFilterNode<TComponent> CreateNode();
+        internal abstract TogglablePreviewNode PreviewNode { get; }
+
+        internal static TogglablePreviewNode CreateTogglablePreviewNode(string name, string qualifiedName, bool initialState = true)
+        {
+            return TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}", initialState);
+        }
     }
 
     internal abstract class ZatoolsRenderFilterNode<TComponent> : IRenderFilterNode

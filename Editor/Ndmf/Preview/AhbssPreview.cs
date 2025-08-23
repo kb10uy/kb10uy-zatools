@@ -10,9 +10,11 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class AhbssRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeSplit>
     {
-        internal AhbssRenderFilter() : base("Ad-Hoc BlendShape Split", "ad-hoc-blendshape-split", false) { }
+        private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc BlendShape Split", "ad-hoc-blendshape-split", false);
 
         internal override ZatoolsRenderFilterNode<AdHocBlendShapeSplit> CreateNode() => new AhbssRenderFilterNode();
+        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
     internal sealed class AhbssRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeSplit>

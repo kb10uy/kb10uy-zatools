@@ -7,9 +7,11 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class NpeRenderFilter : ZatoolsRenderFilter<NdmfPreviewExample>
     {
-        internal NpeRenderFilter() : base("NDMF Preview Example", "ndmf-preview-example") { }
+        private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("NDMF Preview Example", "ndmf-preview-example");
 
         internal override ZatoolsRenderFilterNode<NdmfPreviewExample> CreateNode() => new NpeRenderFilterNode();
+        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
     internal sealed class NpeRenderFilterNode : ZatoolsRenderFilterNode<NdmfPreviewExample>

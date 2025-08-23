@@ -10,9 +10,11 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 {
     internal sealed class AhnbRenderFilter : ZatoolsRenderFilter<AdHocNormalBending>
     {
-        internal AhnbRenderFilter() : base("Ad-Hoc Normal Bending", "ad-hoc-normal-bending") { }
+        private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc Normal Bending", "ad-hoc-normal-bending");
 
         internal override ZatoolsRenderFilterNode<AdHocNormalBending> CreateNode() => new AhnbRenderFilterNode();
+        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
     internal sealed class AhnbRenderFilterNode : ZatoolsRenderFilterNode<AdHocNormalBending>
