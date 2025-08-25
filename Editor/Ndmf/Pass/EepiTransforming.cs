@@ -376,6 +376,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         protected override void Execute(BuildContext context)
         {
+            var state = context.GetState(EepiState.Initializer);
+            if (!state.Installed) return;
             var descriptor = context.VRChatAvatarDescriptor();
             var ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye)) = FindApsProxyedEyeBones(context.AvatarRootTransform);
             if (proxyedLeftEye == null || proxyedRightEye == null) return;
