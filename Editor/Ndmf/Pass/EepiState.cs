@@ -9,9 +9,11 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     {
         private Installer _installer = null;
         private ModularAvatarMergeAnimator _mergeAnimator = null;
+        private bool _installed = false;
 
         public Installer Installer => _installer;
         public ModularAvatarMergeAnimator MergeAnimator => _mergeAnimator;
+        public bool Installed => _installed;
 
         private EepiState(BuildContext context)
         {
@@ -25,6 +27,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         {
             Object.DestroyImmediate(_installer);
             _installer = null;
+            _installed = true;
         }
     }
 }
