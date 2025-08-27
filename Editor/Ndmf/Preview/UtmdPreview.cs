@@ -30,7 +30,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         {
             // テクスチャ内容の変更も Observe 対象にする
             var observedParameters = components.Select((c) => context.Observe(c, Utmd.FixedParameters.FixFromComponent, (op, np) => op == np));
-            foreach (var c in components) context.Observe(c.TileMap, (tm) => (tm.width, tm.height, tm.imageContentsHash));
+            foreach (var c in components) if (c.TileMap != null) context.Observe(c.TileMap, (tm) => (tm.width, tm.height, tm.imageContentsHash));
 
             foreach (var parameters in observedParameters) if (parameters.TileMap != null) Utmd.Process(duplicatedMesh, parameters);
 
