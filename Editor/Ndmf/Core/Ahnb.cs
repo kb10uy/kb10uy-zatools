@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
@@ -113,7 +112,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             public void Execute(int index)
             {
-                // if (MaskValues[index] < CommonThreshold) return;
+                if (MaskValues[index] < CommonThreshold) return;
 
                 var up = new float3(0.0f, 1.0f, 0.0f);
                 var targetForward = new float4(WorldSpaceForward, 0.0f);
@@ -138,22 +137,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 // 影響を受けるボーンを抽出
                 var influence = boneWeight.Weights >= CommonThreshold;
                 InfluentBones[index] = math.select((int4)(-1), boneWeight.Indices, influence);
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct InlinedBoneWeight
-        {
-            public int4 Indices;
-            public float4 Weights;
-
-            internal static InlinedBoneWeight FromBoneWeight(BoneWeight weight)
-            {
-                return new InlinedBoneWeight
-                {
-                    Indices = new int4(weight.boneIndex0, weight.boneIndex1, weight.boneIndex2, weight.boneIndex3),
-                    Weights = new float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3),
-                };
             }
         }
 
