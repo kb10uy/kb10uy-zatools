@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -40,9 +41,18 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             {
                 if (component.Direction != null) context.Observe(component.Direction, (t) => t.worldToLocalMatrix);
             }
-            foreach (var bone in original.bones) if (bone != null) context.Observe(bone, (t) => t.worldToLocalMatrix);
 
-            foreach (var parameters in observedParameters) Ahnb.Process(proxyed, duplicatedMesh, parameters);
+            // プレビュー処理で影響を及ぼすボーンのリストを収集して追加で監視する
+            var influentBoneIndices = new HashSet<int>(original.bones.Length);
+            foreach (var parameters in observedParameters)
+            {
+                var influentIndices = Ahnb.Process(proxyed, duplicatedMesh, parameters);
+                influentBoneIndices.UnionWith(influentIndices);
+            }
+            foreach (var bi in influentBoneIndices)
+            {
+                if (original.bones[bi] != null) context.Observe(original.bones[bi], (t) => t.worldToLocalMatrix);
+            }
 
             return default;
         }

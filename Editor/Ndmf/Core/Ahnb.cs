@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
@@ -19,8 +18,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// <param name="referencingRenderer">Mesh の参照元の SkinnedMeshRenderer</param>
         /// <param name="modifyingMesh">対象の Mesh</param>
         /// <param name="parameters">固定されたパラメーター</param>
+        /// <returns>このマスクによって影響を受ける頂点にウェイトがかかっているボーンのインデックス(順不同)</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
+        internal static HashSet<int> Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
         {
             // TODO: BoneWeight1 を使う
             var normals = new List<Vector3>(modifyingMesh.vertexCount);
@@ -44,12 +44,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var nativeNormals = new NativeArray<float3>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeMaskValues = new NativeArray<float>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeInfluentBones = new NativeArray<int4>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneDeforms = new NativeArray<float4x4>(bones.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             for (var i = 0; i < modifyingMesh.vertexCount; ++i)
             {
                 nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
                 nativeMaskValues[i] = mask.Take(uvs[i]);
                 nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+                nativeInfluentBones[i] = -1;
             }
             for (var i = 0; i < bones.Length; ++i)
             {
@@ -61,11 +63,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var job = new BendNormalJob
             {
                 Normals = nativeNormals,
+                InfluentBones = nativeInfluentBones,
                 MaskValues = nativeMaskValues,
                 BoneWeights = nativeBoneWeights,
                 BoneDeforms = nativeBoneDeforms,
                 WorldSpaceForward = new float3(parameters.WorldSpaceForward.x, parameters.WorldSpaceForward.y, parameters.WorldSpaceForward.z),
                 GlobalWeight = parameters.Weight,
+                CommonThreshold = 0.01f,
             };
             var jobHandle = job.Schedule(nativeNormals.Length, 4);
             jobHandle.Complete();
@@ -74,26 +78,42 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             modifyingMesh.SetNormals(nativeNormals);
             modifyingMesh.RecalculateTangents();
 
+            var influentBones = new HashSet<int>();
+            foreach (var ib in nativeInfluentBones)
+            {
+                // Add が重いので弾く
+                if (ib.x != -1) influentBones.Add(ib.x);
+                if (ib.y != -1) influentBones.Add(ib.y);
+                if (ib.z != -1) influentBones.Add(ib.z);
+                if (ib.w != -1) influentBones.Add(ib.w);
+            }
+
+            // 破棄
             nativeNormals.Dispose();
             nativeMaskValues.Dispose();
             nativeBoneWeights.Dispose();
             nativeBoneDeforms.Dispose();
-        }
+            nativeInfluentBones.Dispose();
 
+            return influentBones;
+        }
 
         [BurstCompile]
         internal struct BendNormalJob : IJobParallelFor
         {
             internal NativeArray<float3> Normals;
+            internal NativeArray<int4> InfluentBones;
             [ReadOnly] internal NativeArray<float> MaskValues;
             [ReadOnly] internal NativeArray<InlinedBoneWeight> BoneWeights;
             [ReadOnly] internal NativeArray<float4x4> BoneDeforms;
             [ReadOnly] internal float3 WorldSpaceForward;
             [ReadOnly] internal float GlobalWeight;
-
+            [ReadOnly] internal float CommonThreshold;
 
             public void Execute(int index)
             {
+                if (MaskValues[index] < CommonThreshold) return;
+
                 var up = new float3(0.0f, 1.0f, 0.0f);
                 var targetForward = new float4(WorldSpaceForward, 0.0f);
 
@@ -113,22 +133,10 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
                 var bentNormal = math.slerp(originalNormal, directedNormal, GlobalWeight * MaskValues[index]);
                 Normals[index] = math.mul(bentNormal, new float3(0.0f, 0.0f, 1.0f));
-            }
-        }
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct InlinedBoneWeight
-        {
-            public int4 Indices;
-            public float4 Weights;
-
-            internal static InlinedBoneWeight FromBoneWeight(BoneWeight weight)
-            {
-                return new InlinedBoneWeight
-                {
-                    Indices = new int4(weight.boneIndex0, weight.boneIndex1, weight.boneIndex2, weight.boneIndex3),
-                    Weights = new float4(weight.weight0, weight.weight1, weight.weight2, weight.weight3),
-                };
+                // 影響を受けるボーンを抽出
+                var influence = boneWeight.Weights >= CommonThreshold;
+                InfluentBones[index] = math.select((int4)(-1), boneWeight.Indices, influence);
             }
         }
 
