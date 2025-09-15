@@ -14,8 +14,8 @@
         "url": "https://kb10uy.org"
     },
     "vpmDependencies": {
-        "com.vrchat.avatars": ">=3.7.0 <3.9.0",
-        "nadena.dev.ndmf": ">=1.8.3",
+        "com.vrchat.avatars": ">=3.7.0 <3.10.0",
+        "nadena.dev.ndmf": ">=1.9.0",
         "nadena.dev.modular-avatar": ">=1.13.0",
         "dev.hai-vr.animator-as-code.v1": ">=1.2.0"
     },
