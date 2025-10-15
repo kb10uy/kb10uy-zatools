@@ -151,44 +151,26 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
 
-            var fromButton = item.Q<Button>("FieldFromBlendShape");
-            var toButton = item.Q<Button>("FieldToBlendShape");
+            var fromField = item.Q<TextField>("FieldFromBlendShape");
+            var toField = item.Q<TextField>("FieldToBlendShape");
+            var openFromPanelButton = item.Q<Button>("ButtonOpenFromBlendShapePanel");
+            var openToPanelButton = item.Q<Button>("ButtonOpenToBlendShapePanel");
 
-            AddContextMenuToButton(fromButton);
-            AddContextMenuToButton(toButton);
-
-            fromButton.clicked += () => UnityEditor.PopupWindow.Show(fromButton.worldBound, new BlendShapeSelector(blendShapeNames, fromButton));
-            toButton.clicked += () => UnityEditor.PopupWindow.Show(toButton.worldBound, new BlendShapeSelector(blendShapeNames, toButton));
+            openFromPanelButton.clicked += () => UnityEditor.PopupWindow.Show(openFromPanelButton.worldBound, new BlendShapeSelector(blendShapeNames, fromField));
+            openToPanelButton.clicked += () => UnityEditor.PopupWindow.Show(openToPanelButton.worldBound, new BlendShapeSelector(blendShapeNames, toField));
 
             return item;
-        }
-
-        private static void AddContextMenuToButton(Button button)
-        {
-            button.AddManipulator(new ContextualMenuManipulator(evt =>
-            {
-                evt.menu.AppendAction("Copy", action =>
-                {
-                    GUIUtility.systemCopyBuffer = button.text;
-                });
-
-                evt.menu.AppendAction("Paste", action =>
-                {
-                    if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
-                        button.text = GUIUtility.systemCopyBuffer;
-                });
-            }));
         }
 
         internal sealed class BlendShapeSelector : PopupWindowContent
         {
             private IList<string> _names;
-            private Button _boundButton;
+            private TextField _boundField;
 
-            internal BlendShapeSelector(IList<string> names, Button boundButton)
+            internal BlendShapeSelector(IList<string> names, TextField boundButton)
             {
                 _names = names;
-                _boundButton = boundButton;
+                _boundField = boundButton;
             }
 
             public override void OnGUI(Rect rect)
@@ -219,7 +201,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 doubleClick.activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse, clickCount = 2 });
                 blendShapeNameList.AddManipulator(doubleClick);
                 // 初期選択
-                var initialSelect = _names.IndexOf(_boundButton.text);
+                var initialSelect = _names.IndexOf(_boundField.text);
                 if (initialSelect != -1) blendShapeNameList.SetSelection(initialSelect);
 
                 var searchQueryField = editorWindow.rootVisualElement.Q<TextField>("FieldSearchQuery");
@@ -236,7 +218,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 var selectedIndex = selectionIndices.DefaultIfEmpty(-1).First();
                 if (selectedIndex == -1) return;
                 var boundItems = listView.itemsSource as IList<string>;
-                _boundButton.text = boundItems[selectionIndices.First()];
+                _boundField.value = boundItems[selectionIndices.First()];
             }
 
             private void OnUpdateSearchQuery(ListView listView, string newQuery)
