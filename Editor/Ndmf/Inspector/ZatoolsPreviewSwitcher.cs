@@ -61,10 +61,16 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (previewNodeProperty == null) return;
             _targetPreviewNode = previewNodeProperty.GetValue(_targetFilterType, BindingFlags.Static, null, null, null) as TogglablePreviewNode;
             if (previewNodeProperty == null) return;
-
-            // PublishedValue を監視してもよいが、 OnChange のたびに event がリセットされるのでやらない
-
+            
+            _targetPreviewNode.IsEnabled.OnChange += OnPublishedValueChanged;
             UpdateStateLabel();
+        }
+
+        private void OnPublishedValueChanged(bool value)
+        {
+            // OnChange のたびに event がリセットされるので登録しなおす
+            UpdateStateLabel();
+            _targetPreviewNode.IsEnabled.OnChange += OnPublishedValueChanged;
         }
 
         private void UpdateStateLabel()
@@ -86,7 +92,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             var currentValue = _targetPreviewNode.IsEnabled.Value;
             _targetPreviewNode.IsEnabled.Value = !currentValue;
-            UpdateStateLabel();
+            // UpdateStateLabel();
         }
     }
 }
