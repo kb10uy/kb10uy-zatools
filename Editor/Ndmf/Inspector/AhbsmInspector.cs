@@ -223,8 +223,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             private void OnUpdateSearchQuery(ListView listView, string newQuery)
             {
-                var trimmedQuery = newQuery.Trim();
-                var filtered = trimmedQuery != "" ? _names.Where((n) => n.Contains(trimmedQuery)).ToList() : _names;
+                var trimmedQuery = newQuery.Trim().ToLowerInvariant();
+                var filtered = trimmedQuery != "" ? _names.Where((n) => n.ToLowerInvariant().Contains(trimmedQuery)).ToList() : _names;
                 listView.ClearSelection();
                 listView.itemsSource = (IList)filtered;
             }
