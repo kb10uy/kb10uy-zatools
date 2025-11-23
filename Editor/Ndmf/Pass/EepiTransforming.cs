@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEditor;
@@ -371,6 +372,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
     internal sealed class EepiTransformingAfterMA : Pass<EepiTransformingAfterMA>
     {
+        internal const string ApsVersionFor420StyleHeadProxy = "000000000400000000020000000000";
+
         public override string QualifiedName => nameof(EepiTransformingAfterMA);
         public override string DisplayName => "Additional process for Enhanced Eye Pointer Installer";
 
@@ -396,13 +399,40 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var originalLeftEye = animator.GetBoneTransform(HumanBodyBones.LeftEye);
             var originalRightEye = animator.GetBoneTransform(HumanBodyBones.RightEye);
 
-            // Head の兄弟要素として Head_Track/Head_Chop/Head_Const/Head/ がある
-            var proxyedHead = head.parent.Find($"{head.name}_Track/{head.name}_Chop/{head.name}_Const/{head.name}");
+            Transform proxyedHead;
+            if (DetectApsVersionNormalized().CompareTo(ApsVersionFor420StyleHeadProxy) >= 0)
+            {
+                // APS >=4.2.0: Head の子要素として Head_Const/Head/ がある
+                proxyedHead = head.Find($"{head.name}_Const/{head.name}");
+            }
+            else
+            {
+                // APS <4.2.0: Head の兄弟要素として Head_Track/Head_Chop/Head_Const/Head/ がある
+                proxyedHead = head.parent.Find($"{head.name}_Track/{head.name}_Chop/{head.name}_Const/{head.name}");
+            }
             if (proxyedHead == null) return ((originalLeftEye, originalRightEye), (null, null));
 
             var proxyedLeftEye = proxyedHead.Find(originalLeftEye.name);
             var proxyedRightEye = proxyedHead.Find(originalRightEye.name);
             return ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye));
+        }
+
+        private static string DetectApsVersionNormalized()
+        {
+            var apsPluginType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany((a) => a.GetTypes())
+                .FirstOrDefault((t) => t.FullName == "ZeroFactory.AvatarPoseSystem.NDMF.Editor.AvatarPoseSystemPlugin");
+            var apsPluginConstructor = apsPluginType?.GetConstructor(Type.EmptyTypes);
+            var apsPluginVersionField = apsPluginType?.GetField("Version", BindingFlags.NonPublic | BindingFlags.Instance);
+            var apsPluginInstance = apsPluginConstructor?.Invoke(null);
+            var versionString = apsPluginVersionField?.GetValue(apsPluginInstance) as string;
+            if (versionString == null) return "??????????";
+
+            var normalizedVersionNumbers = versionString
+                .Split('.')
+                .Take(3)
+                .Select((p) => int.TryParse(p, out var number) ? number.ToString("D10") : "??????????");
+            return string.Concat(normalizedVersionNumbers);
         }
 
         private static void DisableApsRotationConstraint(Transform left, Transform right)
