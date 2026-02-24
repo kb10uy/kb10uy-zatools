@@ -9,7 +9,8 @@ namespace KusakaFactory.Zatools.Runtime
     public class AdHocMeshSplit : ZatoolsMeshEditingComponent
     {
         public Texture2D Mask;
-        public NormalBendMaskMode Mode = NormalBendMaskMode.White;
+        public MeshSplitMaskMode Mode = MeshSplitMaskMode.White;
+        public Material FilteringMaterial;
         public Material SplitMaterial;
     }
 
