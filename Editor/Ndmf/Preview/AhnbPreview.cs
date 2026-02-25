@@ -18,7 +18,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhnbRenderFilterNode : ZatoolsRenderFilterNode<AdHocNormalBending>
+    internal sealed class AhnbRenderFilterNode : ZatoolsBasicRenderFilterNode<AdHocNormalBending>
     {
         public override RenderAspects WhatChanged => RenderAspects.Mesh;
 

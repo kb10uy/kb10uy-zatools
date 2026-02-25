@@ -48,9 +48,31 @@ namespace KusakaFactory.Zatools.Ndmf
 
     internal abstract class ZatoolsRenderFilterNode<TComponent> : IRenderFilterNode
     {
-        private Mesh _duplicatedMesh = null;
-
         public abstract RenderAspects WhatChanged { get; }
+
+        internal abstract ValueTask Initialize(
+            SkinnedMeshRenderer original,
+            SkinnedMeshRenderer proxyed,
+            TComponent[] components,
+            ComputeContext context
+        );
+        internal abstract void ZatoolsOnFrame(Renderer original, Renderer proxy);
+        internal abstract void ZatoolsDispose();
+
+        void IRenderFilterNode.OnFrame(Renderer original, Renderer proxy)
+        {
+            ZatoolsOnFrame(original, proxy);
+        }
+
+        void IDisposable.Dispose()
+        {
+            ZatoolsDispose();
+        }
+    }
+
+    internal abstract class ZatoolsBasicRenderFilterNode<TComponent> : ZatoolsRenderFilterNode<TComponent>
+    {
+        private Mesh _duplicatedMesh = null;
 
         internal abstract ValueTask ProcessEdit(
             SkinnedMeshRenderer original,
@@ -60,7 +82,7 @@ namespace KusakaFactory.Zatools.Ndmf
             ComputeContext context
         );
 
-        internal async ValueTask Initialize(
+        internal override async ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             TComponent[] components,
@@ -78,13 +100,13 @@ namespace KusakaFactory.Zatools.Ndmf
             proxyed.sharedMesh = duplicatedMesh;
         }
 
-        void IRenderFilterNode.OnFrame(Renderer original, Renderer proxy)
+        internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
         {
             if (_duplicatedMesh == null) return;
             if (proxy is SkinnedMeshRenderer proxyedSkinnedMeshRenderer) proxyedSkinnedMeshRenderer.sharedMesh = _duplicatedMesh;
         }
 
-        void IDisposable.Dispose()
+        internal override void ZatoolsDispose()
         {
             if (_duplicatedMesh == null) return;
 
