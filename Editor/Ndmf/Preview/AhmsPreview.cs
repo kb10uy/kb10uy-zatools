@@ -25,14 +25,14 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
-        internal override async ValueTask Initialize(
+        internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             AdHocMeshSplit[] components,
             ComputeContext context
         )
         {
-            if (proxyed == null || proxyed.sharedMesh == null) return;
+            if (proxyed == null || proxyed.sharedMesh == null) return default;
 
             var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
             duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
@@ -56,6 +56,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             _duplicatedMesh = duplicatedMesh;
             _reassignedMaterials = proxyed.sharedMaterials.ToList();
             proxyed.sharedMesh = duplicatedMesh;
+
+            return default;
         }
 
         internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
