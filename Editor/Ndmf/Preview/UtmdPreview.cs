@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class UtmdRenderFilterNode : ZatoolsRenderFilterNode<UvTileMapDistribution>
+    internal sealed class UtmdRenderFilterNode : ZatoolsBasicRenderFilterNode<UvTileMapDistribution>
     {
         public override RenderAspects WhatChanged => RenderAspects.Mesh;
 

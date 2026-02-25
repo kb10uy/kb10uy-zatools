@@ -14,7 +14,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class NpeRenderFilterNode : ZatoolsRenderFilterNode<NdmfPreviewExample>
+    internal sealed class NpeRenderFilterNode : ZatoolsBasicRenderFilterNode<NdmfPreviewExample>
     {
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
