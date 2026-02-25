@@ -2,6 +2,7 @@
     <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-bottom: 8px; margin-left: 4px;" />
+        <ui:HelpBox message-type="Warning" text="pbfctt.report.deprecated" name="MaskTextureWarning" class="ndmf-tr" />
         <uie:PropertyField name="FieldRadius" binding-path="Radius" label="pbfctt.inspector.radius" class="ndmf-tr" />
         <uie:PropertyField name="FieldLength" binding-path="Length" label="pbfctt.inspector.length" class="ndmf-tr" />
     </ui:VisualElement>
