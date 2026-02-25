@@ -22,6 +22,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             foreach ((var component, var index) in targetComponents)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "pbfctt.report.deprecated", component.name));
                 if (index >= MaxTargets)
                 {
                     ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "pbfctt.report.too-many-targets", component.name));
