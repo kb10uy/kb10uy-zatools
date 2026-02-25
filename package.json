@@ -1,7 +1,7 @@
 {
     "name": "org.kb10uy.zatools",
     "displayName": "Zatools: kb10uy's Various Tools",
-    "version": "3.3.4",
+    "version": "3.4.0",
     "unity": "2022.3",
     "description": "Various tools developed by kb10uy",
     "documentationUrl": "https://zatools.kb10uy.dev",
@@ -15,8 +15,8 @@
     },
     "vpmDependencies": {
         "com.vrchat.avatars": ">=3.7.0 <3.11.0",
-        "nadena.dev.ndmf": ">=1.9.0",
-        "nadena.dev.modular-avatar": ">=1.13.0",
+        "nadena.dev.ndmf": ">=1.10.0",
+        "nadena.dev.modular-avatar": ">=1.15.0",
         "dev.hai-vr.animator-as-code.v1": ">=1.2.0"
     },
     "dependencies": {
