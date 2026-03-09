@@ -23,7 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private Mesh _duplicatedMesh = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
+        public override RenderAspects WhatChanged => RenderAspects.Mesh;
 
         internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
