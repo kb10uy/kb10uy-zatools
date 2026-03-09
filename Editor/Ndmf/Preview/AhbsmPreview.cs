@@ -34,7 +34,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         {
             if (proxyed == null || proxyed.sharedMesh == null) return default;
 
-            // 直前の RenderFilterNode の処理が適用されている方から取る
             var baseMesh = proxyed.sharedMesh;
             var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(baseMesh);
 
