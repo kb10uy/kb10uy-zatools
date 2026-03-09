@@ -56,8 +56,25 @@ namespace KusakaFactory.Zatools.Ndmf
             TComponent[] components,
             ComputeContext context
         );
+
+        internal virtual ZatoolsRenderFilterNode<TComponent> ZatoolsRefresh(
+            IEnumerable<(Renderer, Renderer)> proxyPairs,
+            ComputeContext context,
+            RenderAspects nonzeroUpdatedAspects
+        ) => null;
         internal abstract void ZatoolsOnFrame(Renderer original, Renderer proxy);
         internal abstract void ZatoolsDispose();
+
+        Task<IRenderFilterNode> IRenderFilterNode.Refresh(
+            IEnumerable<(Renderer, Renderer)> proxyPairs,
+            ComputeContext context,
+            RenderAspects updatedAspects
+        )
+        {
+            if (updatedAspects == 0) return Task.FromResult<IRenderFilterNode>(null);
+            var refreshed = ZatoolsRefresh(proxyPairs, context, updatedAspects);
+            return Task.FromResult<IRenderFilterNode>(refreshed);
+        }
 
         void IRenderFilterNode.OnFrame(Renderer original, Renderer proxy)
         {
