@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using UnityEngine;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Core;
+using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
@@ -17,21 +19,25 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhbsmRenderFilterNode : ZatoolsBasicRenderFilterNode<AdHocBlendShapeMix>
+    internal sealed class AhbsmRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeMix>
     {
+        private Mesh _duplicatedMesh = null;
+
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
-        internal override ValueTask ProcessEdit(
+        internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
-            Mesh duplicatedMesh,
             AdHocBlendShapeMix[] components,
             ComputeContext context
         )
         {
+            if (proxyed == null || proxyed.sharedMesh == null) return default;
+
             // 直前の RenderFilterNode の処理が適用されている方から取る
-            var originalMesh = proxyed.sharedMesh;
-            var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(originalMesh);
+            var baseMesh = proxyed.sharedMesh;
+            var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(baseMesh);
+
             var observedDefinitions = components.Select((c) => (
                 context.Observe(
                     c,
@@ -40,20 +46,52 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
                 ),
                 c.Replace
             ));
+
+            var duplicatedMesh = UnityObject.Instantiate(baseMesh);
+            duplicatedMesh.name = $"{baseMesh.name} (Zatools modified)";
+
             foreach (var (definitions, replace) in observedDefinitions)
             {
                 var aggregatedDefinitions = Ahbsm.AggregateDefinitions(definitions, blendShapeIndices);
                 if (replace)
                 {
-                    Ahbsm.ProcessOverwrite(originalMesh, duplicatedMesh, aggregatedDefinitions);
+                    Ahbsm.ProcessOverwrite(baseMesh, duplicatedMesh, aggregatedDefinitions);
                 }
                 else
                 {
-                    Ahbsm.ProcessAppend(originalMesh, duplicatedMesh, aggregatedDefinitions);
+                    Ahbsm.ProcessAppend(baseMesh, duplicatedMesh, aggregatedDefinitions);
                 }
             }
 
+            _duplicatedMesh = duplicatedMesh;
+            proxyed.sharedMesh = duplicatedMesh;
+
             return default;
+        }
+
+        internal override ZatoolsRenderFilterNode<AdHocBlendShapeMix> ZatoolsRefresh(
+            IEnumerable<(Renderer, Renderer)> proxyPairs,
+            ComputeContext context,
+            RenderAspects nonzeroUpdatedAspects
+        )
+        {
+            // Renderer BlendShapes の値の変更など、上流で Mesh が変更されていない場合は現在のノードを再利用する
+            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
+            return null;
+        }
+
+        internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
+        {
+            if (_duplicatedMesh == null) return;
+            if (proxy is SkinnedMeshRenderer proxyed) proxyed.sharedMesh = _duplicatedMesh;
+        }
+
+        internal override void ZatoolsDispose()
+        {
+            if (_duplicatedMesh == null) return;
+
+            UnityObject.DestroyImmediate(_duplicatedMesh);
+            _duplicatedMesh = null;
         }
     }
 }
