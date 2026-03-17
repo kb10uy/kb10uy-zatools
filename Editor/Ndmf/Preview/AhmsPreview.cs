@@ -37,7 +37,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
             duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
 
-            // ProcessEdit --------
             var observedParameters = components.Select((c) => context.Observe(c, Ahms.FixedParameters.FixFromComponent, (op, np) => op == np));
             foreach (var c in components) if (c.Mask != null) context.Observe(c.Mask, (tm) => (tm.width, tm.height, tm.imageContentsHash));
 
@@ -47,17 +46,22 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
                 if (parameters.SplitMaterial == null) continue;
                 Ahms.Process(proxyed, duplicatedMesh, parameters);
             }
-            foreach (var m in proxyed.sharedMaterials)
-            {
-                Debug.LogWarning(m.name);
-            }
-            // ProcessEdit --------
 
             _duplicatedMesh = duplicatedMesh;
             _reassignedMaterials = proxyed.sharedMaterials.ToList();
             proxyed.sharedMesh = duplicatedMesh;
 
             return default;
+        }
+
+        internal override ZatoolsRenderFilterNode<AdHocMeshSplit> ZatoolsRefresh(
+            IEnumerable<(Renderer, Renderer)> proxyPairs,
+            ComputeContext context,
+            RenderAspects nonzeroUpdatedAspects
+        )
+        {
+            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
+            return null;
         }
 
         internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
