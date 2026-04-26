@@ -48,6 +48,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             foreach (var component in components)
             {
                 if (component.Direction != null) context.Observe(component.Direction, (t) => t.worldToLocalMatrix);
+                if (component.Mask != null) context.Observe(component.Mask, (tm) => (tm.width, tm.height, tm.imageContentsHash));
             }
 
             // プレビュー処理で影響を及ぼすボーンのリストを収集して追加で監視する
