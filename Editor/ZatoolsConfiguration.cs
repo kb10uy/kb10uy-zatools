@@ -27,10 +27,23 @@ namespace KusakaFactory.Zatools
             return true;
         }
 
+#if UNITY_EDITOR_WIN
+        [MenuItem(MENU_PREFIX + "Open Windows Terminal in project path")]
+        private static void OpenTerminalAtProjectPath()
+        {
+            var startInfo = new System.Diagnostics.ProcessStartInfo("wt.exe");
+            startInfo.ArgumentList.Add("-d");
+            startInfo.ArgumentList.Add(System.IO.Path.GetDirectoryName(Application.dataPath));
+            startInfo.UseShellExecute = false;
+            System.Diagnostics.Process.Start(startInfo);
+        }
+#endif
+
         #region Others
 
         private const string EDITOR_USER_SETTINGS_KEY = "ZatoolsConfigurationJson";
-        private const string MENU_PREFIX_ASV = "Tools/Zatools: kb10uy's Various Tools/Avatar Status Validator/";
+        private const string MENU_PREFIX = "Tools/Zatools: kb10uy's Various Tools/";
+        private const string MENU_PREFIX_ASV = MENU_PREFIX + "Avatar Status Validator/";
         private static ConfigurationObject _current = null;
         private static ConfigurationObject Current
         {
