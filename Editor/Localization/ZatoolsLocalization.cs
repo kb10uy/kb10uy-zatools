@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using UnityEditor;
 using nadena.dev.ndmf.localization;
+using UnityEngine;
 
 namespace KusakaFactory.Zatools.Localization
 {
@@ -15,9 +16,9 @@ namespace KusakaFactory.Zatools.Localization
             .Add("en-us")
             .Add("ja-jp");
 
-        internal static readonly ImmutableDictionary<string, string> StringTableGuids = ImmutableDictionary<string, string>.Empty
-            .Add("en-us", "7d0e5e80e15dbb54a8d70bb23a19949d")
-            .Add("ja-jp", "262c402765bc89847879905644d0d439");
+        internal static readonly ImmutableDictionary<string, string> LocalizationAssetGuids = ImmutableDictionary<string, string>.Empty
+            .Add("en-us", "42e06d554b5d0ed41adee8cd05f68b25")
+            .Add("ja-jp", "b67eaa55d7ce15a479bdad858d85dfe8");
 
         internal static event Action OnNdmfLanguageChanged;
 
@@ -29,30 +30,13 @@ namespace KusakaFactory.Zatools.Localization
 
         static ZatoolsLocalization()
         {
-            NdmfLocalizer = new Localizer(SupportedLanguages[0], () => SupportedLanguages.Select((l) =>
+            NdmfLocalizer = new Localizer(SupportedLanguages[0], () =>
             {
-                var stringTable = LoadStringTableForLanguage(l);
-                Func<string, string> fetcher = (key) => stringTable.GetValueOrDefault(key);
-                return (l, fetcher);
-            }).ToList());
+                var paths = LocalizationAssetGuids.Select((p) => AssetDatabase.GUIDToAssetPath(p.Value));
+                return paths.Select((p) => AssetDatabase.LoadAssetAtPath<LocalizationAsset>(p)).ToList();
+            });
             UILocalizer = new UIElementLocalizer(NdmfLocalizer);
             LanguagePrefs.RegisterLanguageChangeCallback(typeof(ZatoolsLocalization), (_) => OnNdmfLanguageChanged?.Invoke());
-        }
-
-        internal static ImmutableDictionary<string, string> LoadStringTableForLanguage(string languageCode)
-        {
-            if (StringTableCache.TryGetValue(languageCode, out var cached))
-            {
-                return cached;
-            }
-
-            var stringTableText = ZatoolsResources.LoadTextAssetByGuid(StringTableGuids[languageCode]);
-            var stringTable = stringTableText != null ?
-                JsonConvert.DeserializeObject<Dictionary<string, string>>(stringTableText) :
-                new Dictionary<string, string>();
-            var immutableTable = ImmutableDictionary.CreateRange(stringTable);
-            StringTableCache.Add(languageCode, immutableTable);
-            return immutableTable;
         }
 
         [MenuItem("Tools/Zatools: kb10uy's Various Tools/Debug/Reload Localizations")]
