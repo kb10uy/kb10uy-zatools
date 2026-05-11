@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:TextField label="edw.inspector.blink-blendshape-name" name="FieldBlinkBlendShapeName" binding-path="BlinkBlendShapeName" class="ndmf-tr" />
+        <ui:Slider label="edw.inspector.withdrawal-limit" high-value="0.05" name="FieldWithdrawalLimit" binding-path="WithdrawalLimit" low-value="0" show-input-field="true" class="ndmf-tr" />
+        <uie:ObjectField label="edw.inspector.basis" binding-path="Basis" type="UnityEngine.Transform, UnityEngine.CoreModule" name="FieldBasis" class="ndmf-tr" />
+        <ui:FloatField label="edw.inspector.threshold" value="42.2" name="FieldThreshold" binding-path="Threshold" class="ndmf-tr" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.EdwRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>
