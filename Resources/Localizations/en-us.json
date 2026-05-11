@@ -84,6 +84,7 @@
   "edw.inspector.basis": "Basis",
   "edw.inspector.threshold": "Threshold",
   "edw.inspector.centroid-push": "Push Distance of Centroid",
+  "edw.inspector.eyelash-cut": "Eyelash Cut Distance",
   "edw.inspector.advanced": "Advanced",
   "edx.save-text": "Save as Text File",
   "edx.base-asset": "Base Asset",

@@ -32,6 +32,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var uvs = modifyingMesh.uv;
             var boneWeights = modifyingMesh.boneWeights;
             var vertexCount = modifyingMesh.vertexCount;
+            var validTangents = tangents.Length == vertexCount;
+            var hasBoneWeights = boneWeights != null;
             var deltaVertices = new Vector3[vertexCount];
             var _deltaNormals = new Vector3[vertexCount];
             var _deltaTangents = new Vector3[vertexCount];
@@ -59,8 +61,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 .Select(t => t.Index)
                 .ToHashSet();
             if (blinkMovingIndices.Count == 0) return;
-            var blinkMaxZ = blinkMovingIndices.Select((i) => bakedVerticesInBasis[i]).Max((v) => v.z);
-            var blinkHullFilteredIndices = blinkMovingIndices.Where((i) => blinkMaxZ - bakedVerticesInBasis[i].z < parameters.WithdrawalLimit).ToImmutableArray();
+            var blinkMaxZ = blinkMovingIndices.Select((i) => bakedVerticesInBasis[i]).Max((v) => v.z) - parameters.EyelashCut;
+            var blinkHullFilteredIndices = blinkMovingIndices.Where((i) =>
+            {
+                var deltaZ = blinkMaxZ - bakedVerticesInBasis[i].z;
+                return deltaZ > 0.0f && deltaZ < parameters.WithdrawalLimit;
+            }).ToImmutableArray();
             var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(bakedVerticesInBasis, blinkHullFilteredIndices);
 
             var extendVertices = new List<Vector3>(2);
@@ -76,9 +82,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
                 extendVertices.Add(centroidPosition);
                 extendNormals.Add(leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
-                extendTangents.Add(leftConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
+                if (validTangents) extendTangents.Add(leftConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
                 extendUvs.Add(leftConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / leftConvexHull.Length);
-                if (boneWeights != null) extendBoneWeights.Add(boneWeights[leftConvexHull[0]]);
+                if (hasBoneWeights) extendBoneWeights.Add(boneWeights[leftConvexHull[0]]);
                 for (int i = 0; i < leftConvexHull.Length; i++)
                 {
                     int next = (i + 1) % leftConvexHull.Length;
@@ -92,9 +98,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
                 extendVertices.Add(centroidPosition);
                 extendNormals.Add(rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
-                extendTangents.Add(rightConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
+                if (validTangents) extendTangents.Add(rightConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
                 extendUvs.Add(rightConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / rightConvexHull.Length);
-                if (boneWeights != null) extendBoneWeights.Add(boneWeights[rightConvexHull[0]]);
+                if (hasBoneWeights) extendBoneWeights.Add(boneWeights[rightConvexHull[0]]);
                 for (int i = 0; i < rightConvexHull.Length; i++)
                 {
                     int next = (i + 1) % rightConvexHull.Length;
@@ -104,23 +110,23 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             Array.Resize(ref vertices, vertexCount + extendVertices.Count);
             Array.Resize(ref normals, vertexCount + extendVertices.Count);
-            Array.Resize(ref tangents, vertexCount + extendVertices.Count);
+            if (validTangents) Array.Resize(ref tangents, vertexCount + extendVertices.Count);
             Array.Resize(ref uvs, vertexCount + extendVertices.Count);
-            if (boneWeights != null) Array.Resize(ref boneWeights, vertexCount + extendVertices.Count);
+            if (hasBoneWeights) Array.Resize(ref boneWeights, vertexCount + extendVertices.Count);
             for (var i = 0; i < extendVertices.Count; ++i)
             {
                 vertices[vertexCount + i] = extendVertices[i];
                 normals[vertexCount + i] = extendNormals[i];
-                tangents[vertexCount + i] = extendTangents[i];
+                if (validTangents) tangents[vertexCount + i] = extendTangents[i];
                 uvs[vertexCount + i] = extendUvs[i];
-                if (boneWeights != null) boneWeights[vertexCount + i] = extendBoneWeights[i];
+                if (hasBoneWeights) boneWeights[vertexCount + i] = extendBoneWeights[i];
             }
 
             modifyingMesh.vertices = vertices;
             modifyingMesh.normals = normals;
-            modifyingMesh.tangents = tangents;
+            if (validTangents) modifyingMesh.tangents = tangents;
             modifyingMesh.uv = uvs;
-            if (boneWeights != null) modifyingMesh.boneWeights = boneWeights;
+            if (hasBoneWeights) modifyingMesh.boneWeights = boneWeights;
 
             var originalSubMeshCount = modifyingMesh.subMeshCount;
             var savedTriangles = new int[originalSubMeshCount][];
@@ -169,6 +175,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             internal string BlinkBlendShapeName;
             internal float Threshold;
+            internal float EyelashCut;
             internal float WithdrawalLimit;
             internal Transform Basis;
             internal float CentroidPush;
@@ -180,6 +187,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     BlinkBlendShapeName = component.BlinkBlendShapeName,
                     Threshold = component.Threshold,
+                    EyelashCut = component.EyelashCut,
                     WithdrawalLimit = component.WithdrawalLimit,
                     Basis = basisSource,
                     CentroidPush = component.CentroidPush,
@@ -191,6 +199,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 return Basis.worldToLocalMatrix == other.Basis.worldToLocalMatrix &&
                     BlinkBlendShapeName == other.BlinkBlendShapeName &&
                     Mathf.Approximately(Threshold, other.Threshold) &&
+                    Mathf.Approximately(EyelashCut, other.EyelashCut) &&
                     Mathf.Approximately(WithdrawalLimit, other.WithdrawalLimit) &&
                     Mathf.Approximately(CentroidPush, other.CentroidPush);
             }

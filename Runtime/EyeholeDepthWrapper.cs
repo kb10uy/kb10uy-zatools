@@ -14,6 +14,7 @@ namespace KusakaFactory.Zatools.Runtime
     {
         public string BlinkBlendShapeName = "vrc.blink";
         public float Threshold = 0.0001f;
+        public float EyelashCut = 0.002f;
         public float WithdrawalLimit = 0.025f;
         public Transform Basis = null;
         public float CentroidPush = 0.005f;

@@ -6,8 +6,9 @@
         <ui:Slider label="edw.inspector.withdrawal-limit" high-value="0.05" name="FieldWithdrawalLimit" binding-path="WithdrawalLimit" low-value="0" show-input-field="true" class="ndmf-tr" />
         <uie:ObjectField label="edw.inspector.basis" binding-path="Basis" type="UnityEngine.Transform, UnityEngine.CoreModule" name="FieldBasis" class="ndmf-tr" />
         <ui:Foldout text="edw.inspector.advanced" value="false" class="ndmf-tr">
+            <ui:Slider label="edw.inspector.centroid-push" high-value="0.05" name="FieldCentroidPush" binding-path="CentroidPush" show-input-field="true" class="ndmf-tr" />
+            <ui:Slider label="edw.inspector.eyelash-cut" high-value="0.02" name="FieldEyelashCut" binding-path="EyelashCut" show-input-field="true" class="ndmf-tr" />
             <ui:FloatField label="edw.inspector.threshold" value="42.2" name="FieldThreshold" binding-path="Threshold" class="ndmf-tr" />
-            <ui:FloatField label="edw.inspector.centroid-push" value="42.2" name="FieldCentroidPush" binding-path="CentroidPush" class="ndmf-tr" />
         </ui:Foldout>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.EdwRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
