@@ -43,17 +43,15 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 _deltaTangents
             );
 
-            // Basis ローカル座標系への変換行列
             var smrFromBasis = referencingRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix;
             var basisFromSmr = smrFromBasis.inverse;
 
-            // BakeMesh で現在の BlendShape 適用状態の頂点を取得し、Basis 座標系に変換する
-            var bakedMesh = new Mesh();
-            referencingRenderer.BakeMesh(bakedMesh);
-            var bakedVertices = new List<Vector3>(bakedMesh.vertexCount);
-            bakedMesh.GetVertices(bakedVertices);
-            UnityObject.DestroyImmediate(bakedMesh);
-            var bakedVerticesInBasis = bakedVertices.Select(v => basisFromSmr.MultiplyPoint(v)).ToImmutableArray();
+            var smrRelativeDeformedMesh = new Mesh();
+            referencingRenderer.BakeMesh(smrRelativeDeformedMesh);
+            var smrRelativeVertices = new List<Vector3>(smrRelativeDeformedMesh.vertexCount);
+            smrRelativeDeformedMesh.GetVertices(smrRelativeVertices);
+            UnityObject.DestroyImmediate(smrRelativeDeformedMesh);
+            var bakedVerticesInBasis = smrRelativeVertices.Select(v => basisFromSmr.MultiplyPoint(v)).ToImmutableArray();
 
             var blinkMovingIndices = deltaVertices
                 .Select((d, i) => (Delta: basisFromSmr.MultiplyVector(d), Index: i))
