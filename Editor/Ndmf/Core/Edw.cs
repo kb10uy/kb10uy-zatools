@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
+using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -42,17 +43,27 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 _deltaTangents
             );
 
-            var inverseRelativeBasis = (referencingRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix).inverse;
-            var verticesInBasis = vertices.Select(v => inverseRelativeBasis.MultiplyPoint(v)).ToImmutableArray();
+            // Basis ローカル座標系への変換行列
+            var smrFromBasis = referencingRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix;
+            var basisFromSmr = smrFromBasis.inverse;
+
+            // BakeMesh で現在の BlendShape 適用状態の頂点を取得し、Basis 座標系に変換する
+            var bakedMesh = new Mesh();
+            referencingRenderer.BakeMesh(bakedMesh);
+            var bakedVertices = new List<Vector3>(bakedMesh.vertexCount);
+            bakedMesh.GetVertices(bakedVertices);
+            UnityObject.DestroyImmediate(bakedMesh);
+            var bakedVerticesInBasis = bakedVertices.Select(v => basisFromSmr.MultiplyPoint(v)).ToImmutableArray();
+
             var blinkMovingIndices = deltaVertices
-                .Select((d, i) => (Delta: inverseRelativeBasis.MultiplyVector(d), Index: i))
+                .Select((d, i) => (Delta: basisFromSmr.MultiplyVector(d), Index: i))
                 .Where(t => t.Delta.sqrMagnitude > Mathf.Pow(parameters.Threshold, 2.0f))
                 .Select(t => t.Index)
                 .ToHashSet();
             if (blinkMovingIndices.Count == 0) return;
-            var blinkMaxZ = blinkMovingIndices.Select((i) => verticesInBasis[i]).Max((v) => v.z);
-            var blinkHullFilteredIndices = blinkMovingIndices.Where((i) => blinkMaxZ - verticesInBasis[i].z < parameters.WithdrawalLimit).ToImmutableArray();
-            var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(verticesInBasis, blinkHullFilteredIndices);
+            var blinkMaxZ = blinkMovingIndices.Select((i) => bakedVerticesInBasis[i]).Max((v) => v.z);
+            var blinkHullFilteredIndices = blinkMovingIndices.Where((i) => blinkMaxZ - bakedVerticesInBasis[i].z < parameters.WithdrawalLimit).ToImmutableArray();
+            var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(bakedVerticesInBasis, blinkHullFilteredIndices);
 
             var extendVertices = new List<Vector3>(2);
             var extendNormals = new List<Vector3>(2);
@@ -64,7 +75,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 var centroidIndex = vertices.Length + extendVertices.Count;
                 var centroidPosition = leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length;
-                centroidPosition += inverseRelativeBasis.MultiplyVector(parameters.Basis.forward * parameters.CentroidPush);
+                centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
                 extendVertices.Add(centroidPosition);
                 extendNormals.Add(leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
                 extendTangents.Add(leftConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
@@ -79,8 +90,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             if (rightConvexHull.Length >= 3)
             {
                 var centroidIndex = vertices.Length + extendVertices.Count;
-                var centroidPosition = rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length;
-                centroidPosition += inverseRelativeBasis.MultiplyVector(parameters.Basis.forward * parameters.CentroidPush);
+                var centroidPosition = rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / rightConvexHull.Length;
+                centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
                 extendVertices.Add(centroidPosition);
                 extendNormals.Add(rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
                 extendTangents.Add(rightConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
