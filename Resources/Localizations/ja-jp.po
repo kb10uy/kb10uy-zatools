@@ -1,0 +1,349 @@
+msgid ""
+msgstr ""
+"Language: ja-jp\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "_.inspector.ndmf-preview"
+msgstr "NDMF プレビュー:"
+
+msgid "_.inspector.enabled"
+msgstr "<color=#40ff40ff>有効</color>"
+
+msgid "_.inspector.disabled"
+msgstr "<color=#802020ff>無効</color>"
+
+msgid "_.inspector.toggle-preview"
+msgstr "プレビューを切り替える"
+
+msgid "bari.report.non-canonical-scale"
+msgstr "Bone Array Rotation Influence: 非正規化スケールを検出しました"
+
+msgid "bari.report.non-canonical-scale:description"
+msgstr ""
+"親ボーンの挿入位置が指定された Offset Distance から離れていることを検出しました。"
+"これには Armature のスケールが 1 ではないなど、複数の原因が考えられます。\n"
+"Rotation Constraint の動作がおかしい場合、Offset Distance を更に小さい値～ゼロに設定してみてください。"
+
+msgid "bari.inspector.close-loop"
+msgstr "ループ状のボーン列"
+
+msgid "bari.inspector.close-loop:tooltip"
+msgstr "ChainRoots の最初と最後を繋げるかどうか"
+
+msgid "bari.inspector.offset-distance"
+msgstr "オフセット距離"
+
+msgid "bari.inspector.offset-distance:tooltip"
+msgstr "親ボーンを生成する位置の Y 軸方向の距離"
+
+msgid "bari.inspector.sources"
+msgstr "ボーン列"
+
+msgid "bari.inspector.root"
+msgstr "ルートボーン"
+
+msgid "bari.inspector.root:tooltip"
+msgstr "ボーン鎖のルートにする Transform"
+
+msgid "bari.inspector.influence"
+msgstr "影響度"
+
+msgid "bari.inspector.influence:tooltip"
+msgstr "このボーン鎖の Rotation Constraint に設定するウェイト"
+
+msgid "bari.inspector.manipulation"
+msgstr "一括設定"
+
+msgid "bari.inspector.replace-bones"
+msgstr "子 GameObject から Sources を設定"
+
+msgid "bari.inspector.replace-bones:tooltip"
+msgstr "Sources をこの GameObject の直接の子のリストに設定する"
+
+msgid "bari.inspector.update-influence"
+msgstr "影響度を一括設定"
+
+msgid "bari.inspector.update-influence:tooltip"
+msgstr "左のスライダーの値で影響度を全て設定する"
+
+msgid "eepi.inspector.vrc-constraint"
+msgstr "VRC Constraint を使ってセットアップする"
+
+msgid "eepi.inspector.vrc-constraint:tooltip"
+msgstr "Unity の Aim Constraint ではなく VRC Aim Constraint を使用する。EyePointer v1.2 以降が必要です"
+
+msgid "eepi.inspector.dummy-bones"
+msgstr "ダミーボーンを挿入する"
+
+msgid "eepi.inspector.dummy-bones:tooltip"
+msgstr "標準の Eye ボーンの回転が (0, 0, 0) から離れている場合に補正する"
+
+msgid "eepi.inspector.fx-layer"
+msgstr "FX Layer をアバターに適応させる"
+
+msgid "eepi.inspector.fx-layer:tooltip"
+msgstr "EyePointer 標準で対応していないアーマチュア構成に適応させる。通常はオフで問題ありません"
+
+msgid "eepi.inspector.override-weight"
+msgstr "Global Weight を上書きする"
+
+msgid "eepi.inspector.initial-weight"
+msgstr "Global Weight の初期値"
+
+msgid "eepi.inspector.add-weight-control"
+msgstr "Global Weight の操作 Puppet を追加する"
+
+msgid "eepi.inspector.separate-head-root"
+msgstr "別のアバター頭部のルート(上級者向け)"
+
+msgid "eepi.report.placeholder-inserted"
+msgstr "Enhanced EyePointer Installer: Eye Look を空の値で有効化しました"
+
+msgid "eepi.report.placeholder-inserted:description"
+msgstr ""
+"Avatar Descriptor の Eye Look が無効な場合、特定条件で誤動作することが確認されています。"
+"ワークアラウンドとして無意味な値で Eye Look が有効化されています(VRChat 側に実際の Eye ボーンを操作されることはありません)。"
+
+msgid "eepi.report.prefab-moved"
+msgstr "Enhanced EyePointer Installer: Eye Pointer のプレハブをアバタールートに移動しました"
+
+msgid "eepi.report.prefab-moved:description"
+msgstr ""
+"Eye Pointer はアバタールート直下に配置されている必要があります。"
+"この処理は、Eye Pointer のプレハブをアニメーションから参照していない限り影響はありません。"
+
+msgid "eepi.report.aps-detected"
+msgstr "Enhanced EyePointer Installer: Avatar Pose System 用の処理を適用しました"
+
+msgid "eepi.report.aps-detected:description"
+msgstr ""
+"Avatar Pose System によって生成されるオブジェクトを検出したため、"
+"Eye Pointer と干渉する一部のコンポーネントを無効化しました。"
+"Avatar Pose System を導入していないアバターでこのメッセージが表示された場合はバグであるため報告してください。"
+
+msgid "ahbsm.inspector.replace"
+msgstr "コピー先の BlendShape に上書きする"
+
+msgid "ahbsm.inspector.definitions"
+msgstr "コピー定義"
+
+msgid "ahbsm.inspector.from"
+msgstr "コピー元"
+
+msgid "ahbsm.inspector.to"
+msgstr "コピー先"
+
+msgid "ahbsm.inspector.weight"
+msgstr "係数"
+
+msgid "ahbsm.inspector.manipulation"
+msgstr "その他の操作"
+
+msgid "ahbsm.inspector.save-json"
+msgstr "JSON に保存"
+
+msgid "ahbsm.inspector.load-json"
+msgstr "JSON から読み込み"
+
+msgid "ahbsm.inspector.from-regex"
+msgstr "コピー元の正規表現"
+
+msgid "ahbsm.inspector.to-regex"
+msgstr "コピー先の正規表現"
+
+msgid "ahbsm.inspector.append-regex"
+msgstr "コピー元を打ち消す定義をコピー先に追加"
+
+msgid "pbfctt.inspector.position"
+msgstr "位置"
+
+msgid "pbfctt.inspector.rotation"
+msgstr "回転"
+
+msgid "pbfctt.inspector.radius"
+msgstr "半径"
+
+msgid "pbfctt.inspector.length"
+msgstr "長さ"
+
+msgid "pbfctt.report.too-many-targets"
+msgstr "PB Finger Collider Transfer Target: アバター内の Target が多すぎます ({0})"
+
+msgid "pbfctt.report.too-many-targets:description"
+msgstr "Collider の位置を移動できるのは最大 6 個です(人差し指のコライダーは保持されます)。超えた分は無視されます。"
+
+msgid "pbfctt.report.deprecated"
+msgstr "MA Global Collider への移行を推奨します"
+
+msgid "pbfctt.report.deprecated:description"
+msgstr "MA 1.15 で追加された Global Collider コンポーネントが同等の機能を提供しています。"
+
+msgid "anhb.inspector.direction"
+msgstr "法線方向"
+
+msgid "anhb.inspector.weight"
+msgstr "ウェイト"
+
+msgid "anhb.inspector.mask-texture"
+msgstr "マスクテクスチャ"
+
+msgid "anhb.inspector.mask-mode"
+msgstr "マスクのサンプリング方法"
+
+msgid "ahnb.report.unreadable-mask"
+msgstr "指定されたマスクの Read/Write が無効です"
+
+msgid "ahnb.report.unreadable-mask:description"
+msgstr "このマスクテクスチャを使用したい場合は、インポート設定から Read/Write を有効にしてください。"
+
+msgid "ahbss.inspector.targets"
+msgstr "分割する BlendShape"
+
+msgid "ahbss.inspector.basis"
+msgstr "基底"
+
+msgid "ahbss.inspector.left-suffix"
+msgstr "サフィックス(左側)"
+
+msgid "ahbss.inspector.right-suffix"
+msgstr "サフィックス(右側)"
+
+msgid "utmd.inspector.source"
+msgstr "ソース UV チャンネル"
+
+msgid "utmd.inspector.target"
+msgstr "タイル結果 UV チャンネル"
+
+msgid "utmd.inspector.tile-map"
+msgstr "タイル情報テクスチャ"
+
+msgid "utmd.inspector.distribution"
+msgstr "タイル分配方法"
+
+msgid "ahms.inspector.mask-texture"
+msgstr "マスクテクスチャ"
+
+msgid "ahms.inspector.mask-mode"
+msgstr "マスクのサンプリング方法"
+
+msgid "ahms.inspector.filtering-material"
+msgstr "分割対象のマテリアル"
+
+msgid "ahms.inspector.split-material"
+msgstr "割り当てるマテリアル"
+
+msgid "ahms.report.unreadable-mask"
+msgstr "指定されたマスクの Read/Write が無効です"
+
+msgid "ahms.report.unreadable-mask:description"
+msgstr "このマスクテクスチャを使用したい場合は、インポート設定から Read/Write を有効にしてください。"
+
+msgid "asv.inspector.ignored-armature-help"
+msgstr "この Armature は Avatar Status Validator で無視されます。"
+
+msgid "asv.report.suspicious-unmerged-armature"
+msgstr "Avatar Status Validator: MA Merge Armature が設定されていない可能性があります"
+
+msgid "asv.report.suspicious-unmerged-armature:description"
+msgstr "意図されている場合は Zatools Ignored Armature を当該 Armature オブジェクトに追加してください。"
+
+msgid "asv.report.suspicious-unmerged-armature-warning"
+msgstr "Avatar Status Validator: MA Merge Armature が設定されていない可能性があります"
+
+msgid "asv.report.suspicious-unmerged-armature-warning:description"
+msgstr "標準的でない構成のアーマチュアが検出されました。問題が起きていなければこの警告は無視できます。"
+
+msgid "edw.inspector.blink-blendshape-name"
+msgstr "まばたき BlendShape 名"
+
+msgid "edw.inspector.withdrawal-limit"
+msgstr "凸包の深さ"
+
+msgid "edw.inspector.basis"
+msgstr "基底"
+
+msgid "edw.inspector.threshold"
+msgstr "閾値"
+
+msgid "edw.inspector.centroid-push"
+msgstr "中心点の押し出し距離"
+
+msgid "edw.inspector.eyelash-cut"
+msgstr "まつ毛を無視する距離"
+
+msgid "edw.inspector.advanced"
+msgstr "上級者向け設定"
+
+msgid "edx.save-text"
+msgstr "テキストファイルに保存"
+
+msgid "edx.base-asset"
+msgstr "基準アセット"
+
+msgid "edx.root-path"
+msgstr "基準パス"
+
+msgid "edx.query"
+msgstr "検索クエリ(オプション)"
+
+msgid "edx.mesh"
+msgstr "メッシュ"
+
+msgid "cmm.size"
+msgstr "テクスチャサイズ"
+
+msgid "cmm.format"
+msgstr "フォーマット"
+
+msgid "cmm.mip0"
+msgstr "ミップレベル 0"
+
+msgid "cmm.definitions"
+msgstr "ミップマップコピー元定義"
+
+msgid "cmm.mip-geq"
+msgstr "ミップレベル >= "
+
+msgid "cmm.source"
+msgstr "コピー元テクスチャ"
+
+msgid "cmm.bias"
+msgstr "バイアス"
+
+msgid "mbsi.drop-area"
+msgstr "AnimationClip アセットをここにドラッグ&ドロップで追加"
+
+msgid "mbsi.animations"
+msgstr "対象の AnimationClip"
+
+msgid "mbsi.modifications"
+msgstr "追加される設定値"
+
+msgid "mbsi.target-path"
+msgstr "収集対象の GameObject のパス"
+
+msgid "mbsi.filling-mode"
+msgstr "追加で設定する値"
+
+msgid "mbsi.filling-source"
+msgstr "BlendShape 値のコピー元"
+
+msgid "mbsi.overwrite"
+msgstr "元アセットを上書きする"
+
+msgid "mbsi.save-path"
+msgstr "保存先"
+
+msgid "mbsi.open"
+msgstr "開く..."
+
+msgid "mbsi.apply"
+msgstr "適用"
+
+msgid "mbsi.keys"
+msgstr "件"
+
+msgid "mbsi.keys-header"
+msgstr "追加される BlendShape"
