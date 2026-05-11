@@ -1,5 +1,10 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using nadena.dev.ndmf.runtime;
+using VRC.SDK3.Avatars.Components;
+#endif
+
 namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools Eyehole Depth Wrapper")]
@@ -12,5 +17,18 @@ namespace KusakaFactory.Zatools.Runtime
         public float WithdrawalLimit = 0.025f;
         public Transform Basis = null;
         public float CentroidPush = 0.005f;
+
+#if UNITY_EDITOR
+        private void Reset()
+        {
+            var descriptor = RuntimeUtil.FindAvatarInParents(transform)?.GetComponent<VRCAvatarDescriptor>();
+            if (descriptor == null || !descriptor.enableEyeLook) return;
+            var blinkMesh = descriptor.customEyeLookSettings.eyelidsSkinnedMesh;
+            var blinkBlendShapeIndex = descriptor.customEyeLookSettings.eyelidsBlendshapes[0];
+            if (blinkMesh == null || blinkBlendShapeIndex == -1) return;
+            var blinkName = blinkMesh.sharedMesh.GetBlendShapeName(blinkBlendShapeIndex);
+            BlinkBlendShapeName = blinkName;
+        }
+#endif
     }
 }

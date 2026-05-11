@@ -1,13 +1,16 @@
 {
     "name": "org.kb10uy.zatools.runtime",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "nadena.dev.ndmf.runtime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "VRCSDKBase.dll"
+        "VRCSDKBase.dll",
+        "VRCSDK3A.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
