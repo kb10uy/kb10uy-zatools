@@ -8,8 +8,9 @@ namespace KusakaFactory.Zatools.Runtime
     public sealed class EyeholeDepthWrapper : ZatoolsMeshEditingComponent
     {
         public string BlinkBlendShapeName = "vrc.blink";
-        public float Threshold = 0.001f;
-        public float WithdrawalLimit = 0.03f;
+        public float Threshold = 0.0001f;
+        public float WithdrawalLimit = 0.025f;
         public Transform Basis = null;
+        public float CentroidPush = 0.005f;
     }
 }

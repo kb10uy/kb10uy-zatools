@@ -83,6 +83,8 @@
   "edw.inspector.withdrawal-limit": "凸包の深さ",
   "edw.inspector.basis": "基底",
   "edw.inspector.threshold": "閾値",
+  "edw.inspector.centroid-push": "中心点の押し出し距離",
+  "edw.inspector.advanced": "上級者向け設定",
   "edx.save-text": "テキストファイルに保存",
   "edx.base-asset": "基準アセット",
   "edx.root-path": "基準パス",

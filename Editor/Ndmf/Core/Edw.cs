@@ -49,6 +49,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 .Where(t => t.Delta.sqrMagnitude > Mathf.Pow(parameters.Threshold, 2.0f))
                 .Select(t => t.Index)
                 .ToHashSet();
+            if (blinkMovingIndices.Count == 0) return;
             var blinkMaxZ = blinkMovingIndices.Select((i) => verticesInBasis[i]).Max((v) => v.z);
             var blinkHullFilteredIndices = blinkMovingIndices.Where((i) => blinkMaxZ - verticesInBasis[i].z < parameters.WithdrawalLimit).ToImmutableArray();
             var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(verticesInBasis, blinkHullFilteredIndices);
@@ -62,7 +63,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             if (leftConvexHull.Length >= 3)
             {
                 var centroidIndex = vertices.Length + extendVertices.Count;
-                extendVertices.Add(leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length);
+                var centroidPosition = leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length;
+                centroidPosition += inverseRelativeBasis.MultiplyVector(parameters.Basis.forward * parameters.CentroidPush);
+                extendVertices.Add(centroidPosition);
                 extendNormals.Add(leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
                 extendTangents.Add(leftConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
                 extendUvs.Add(leftConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / leftConvexHull.Length);
@@ -76,7 +79,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             if (rightConvexHull.Length >= 3)
             {
                 var centroidIndex = vertices.Length + extendVertices.Count;
-                extendVertices.Add(rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / rightConvexHull.Length);
+                var centroidPosition = rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length;
+                centroidPosition += inverseRelativeBasis.MultiplyVector(parameters.Basis.forward * parameters.CentroidPush);
+                extendVertices.Add(centroidPosition);
                 extendNormals.Add(rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
                 extendTangents.Add(rightConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
                 extendUvs.Add(rightConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / rightConvexHull.Length);
@@ -157,6 +162,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal float Threshold;
             internal float WithdrawalLimit;
             internal Transform Basis;
+            internal float CentroidPush;
 
             internal static FixedParameters FixFromComponent(Transform defaultBasis, EyeholeDepthWrapper component)
             {
@@ -167,6 +173,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     Threshold = component.Threshold,
                     WithdrawalLimit = component.WithdrawalLimit,
                     Basis = basisSource,
+                    CentroidPush = component.CentroidPush,
                 };
             }
 
@@ -175,7 +182,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 return Basis.worldToLocalMatrix == other.Basis.worldToLocalMatrix &&
                     BlinkBlendShapeName == other.BlinkBlendShapeName &&
                     Mathf.Approximately(Threshold, other.Threshold) &&
-                    Mathf.Approximately(WithdrawalLimit, other.WithdrawalLimit);
+                    Mathf.Approximately(WithdrawalLimit, other.WithdrawalLimit) &&
+                    Mathf.Approximately(CentroidPush, other.CentroidPush);
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
