@@ -9,7 +9,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class CdwGenerating : Pass<CdwGenerating>
     {
-        internal static readonly string WrapperMaterialGuid = "c9f88a305477a2f4ea542f4d5700daaf";
+        internal static readonly string WrapperMaterialGuid = "c40c829946d3b494d807a73fd79af5c5";
 
         public override string QualifiedName => nameof(CdwGenerating);
         public override string DisplayName => "Generate convex depth wrapper";
@@ -61,6 +61,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             destinationRenderer.bones = component.SourceRenderer.bones;
             destinationRenderer.updateWhenOffscreen = component.SourceRenderer.updateWhenOffscreen;
             destinationRenderer.sharedMaterials = new[] { wrapperMaterial };
+            destinationRenderer.localBounds = component.SourceRenderer.localBounds;
 
             UnityObject.DestroyImmediate(component);
         }
