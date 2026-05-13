@@ -25,17 +25,29 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
-            var blendShapeIndex = modifyingMesh.GetBlendShapeIndex(parameters.BlinkBlendShapeName);
-            if (blendShapeIndex == -1 || parameters.Threshold < 0.0f || parameters.WithdrawalLimit < 0.0f) return;
+            // フェーズ 1: ドームを張る対象となる頂点を選択し convex hull を構築する。
+            var hullSelection = SelectHullVertices(referencingRenderer, modifyingMesh, parameters);
+            if (!hullSelection.HasValue) return;
 
-            var vertices = modifyingMesh.vertices;
-            var normals = modifyingMesh.normals;
-            var tangents = modifyingMesh.tangents;
-            var uvs = modifyingMesh.uv;
-            var boneWeights = modifyingMesh.boneWeights;
+            // フェーズ 2: hull に対応するドームメッシュを生成し、対象 Mesh / Renderer に書き戻す。
+            GenerateAndAppendDomeMesh(referencingRenderer, modifyingMesh, parameters, hullSelection.Value, wrapperMaterial);
+        }
+
+        /// <summary>
+        /// blink blendshape で動く頂点群から左右の convex hull を選び出す。
+        /// 後段のメッシュ生成フェーズで必要な補助情報も合わせて返す。
+        /// </summary>
+        /// <returns>hull が構築できた場合は選択結果を、そうでない場合は null を返す。</returns>
+        private static HullSelectionResult? SelectHullVertices(
+            SkinnedMeshRenderer referencingRenderer,
+            Mesh modifyingMesh,
+            FixedParameters parameters
+        )
+        {
+            var blendShapeIndex = modifyingMesh.GetBlendShapeIndex(parameters.BlinkBlendShapeName);
+            if (blendShapeIndex == -1 || parameters.Threshold < 0.0f || parameters.WithdrawalLimit < 0.0f) return null;
+
             var vertexCount = modifyingMesh.vertexCount;
-            var validTangents = tangents.Length == vertexCount;
-            var hasBoneWeights = boneWeights != null;
             var deltaVertices = new Vector3[vertexCount];
             var _deltaNormals = new Vector3[vertexCount];
             var _deltaTangents = new Vector3[vertexCount];
@@ -68,7 +80,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 .Where(t => t.Delta.sqrMagnitude > Mathf.Pow(parameters.Threshold, 2.0f))
                 .Select(t => t.Index)
                 .ToHashSet();
-            if (blinkMovingIndices.Count == 0) return;
+            if (blinkMovingIndices.Count == 0) return null;
             var blinkMaxZ = blinkMovingIndices.Select((i) => bakedVerticesInBasis[i]).Max((v) => v.z) - parameters.EyelashCut;
 
             // Basis forward 向きの面に属する頂点だけを採用するためのフィルタ集合を構築する。
@@ -85,6 +97,37 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(bakedVerticesInBasis, blinkHullFilteredIndices);
 
             var centroidPushVector = smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
+            return new HullSelectionResult(
+                leftConvexHull,
+                rightConvexHull,
+                bakedVerticesInSmr,
+                allTriangles,
+                centroidNormalSmr,
+                centroidPushVector
+            );
+        }
+
+        /// <summary>
+        /// 選択された hull に対して IDomeMeshGenerator でドームメッシュを生成し、
+        /// modifyingMesh と referencingRenderer の sharedMaterials に書き戻す。
+        /// </summary>
+        private static void GenerateAndAppendDomeMesh(
+            SkinnedMeshRenderer referencingRenderer,
+            Mesh modifyingMesh,
+            FixedParameters parameters,
+            HullSelectionResult hullSelection,
+            Material wrapperMaterial
+        )
+        {
+            var vertices = modifyingMesh.vertices;
+            var normals = modifyingMesh.normals;
+            var tangents = modifyingMesh.tangents;
+            var uvs = modifyingMesh.uv;
+            var boneWeights = modifyingMesh.boneWeights;
+            var vertexCount = modifyingMesh.vertexCount;
+            var validTangents = tangents.Length == vertexCount;
+            var hasBoneWeights = boneWeights != null;
+
             IDomeMeshGenerator generator = parameters.GeneratorKind switch
             {
                 DomeGeneratorKind.Fan => new FanDomeMeshGenerator(),
@@ -96,18 +139,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 normals,
                 boneWeights,
                 hasBoneWeights,
-                allTriangles,
-                bakedVerticesInSmr,
-                centroidNormalSmr,
-                centroidPushVector,
+                hullSelection.AllTriangles,
+                hullSelection.BakedVerticesInSmr,
+                hullSelection.CentroidNormalSmr,
+                hullSelection.CentroidPushVector,
                 parameters.Subdivisions,
                 parameters.TangentScale,
                 vertexCount,
                 generator
             );
             var accumulator = new DomeAccumulator();
-            AppendDome(leftConvexHull, context, accumulator);
-            AppendDome(rightConvexHull, context, accumulator);
+            AppendDome(hullSelection.LeftHull, context, accumulator);
+            AppendDome(hullSelection.RightHull, context, accumulator);
 
             Array.Resize(ref vertices, vertexCount + accumulator.Vertices.Count);
             Array.Resize(ref normals, vertexCount + accumulator.Vertices.Count);
@@ -311,6 +354,36 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var leftHullVertexIndices = leftHullIndices.Select(li => leftMapping[li]).ToImmutableArray();
             var rightHullVertexIndices = rightHullIndices.Select(ri => rightMapping[ri]).ToImmutableArray();
             return (leftHullVertexIndices, rightHullVertexIndices);
+        }
+
+        /// <summary>
+        /// SelectHullVertices による頂点選択結果。後段のメッシュ生成フェーズへ渡す。
+        /// </summary>
+        private readonly struct HullSelectionResult
+        {
+            public ImmutableArray<int> LeftHull { get; }
+            public ImmutableArray<int> RightHull { get; }
+            public ImmutableArray<Vector3> BakedVerticesInSmr { get; }
+            public int[] AllTriangles { get; }
+            public Vector3 CentroidNormalSmr { get; }
+            public Vector3 CentroidPushVector { get; }
+
+            public HullSelectionResult(
+                ImmutableArray<int> leftHull,
+                ImmutableArray<int> rightHull,
+                ImmutableArray<Vector3> bakedVerticesInSmr,
+                int[] allTriangles,
+                Vector3 centroidNormalSmr,
+                Vector3 centroidPushVector
+            )
+            {
+                LeftHull = leftHull;
+                RightHull = rightHull;
+                BakedVerticesInSmr = bakedVerticesInSmr;
+                AllTriangles = allTriangles;
+                CentroidNormalSmr = centroidNormalSmr;
+                CentroidPushVector = centroidPushVector;
+            }
         }
 
         /// <summary>
