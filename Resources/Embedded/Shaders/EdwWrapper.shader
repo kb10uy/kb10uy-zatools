@@ -3,7 +3,7 @@ Shader "KusakaFactory/Zatools/EdwWrapper"
     Properties {}
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="AlphaTest+49" }
+        Tags { "RenderType"="Opaque" "Queue"="AlphaTest+49" "VRCFallback"="Hidden" }
         LOD 100
 
         // Writing depth in ForwardBase pass causes typical RQ problem.
