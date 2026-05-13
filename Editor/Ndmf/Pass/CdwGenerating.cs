@@ -19,49 +19,32 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var components = context.AvatarRootObject.GetComponentsInChildren<CdwComponent>();
             foreach (var component in components)
             {
-                ProcessFor(component, component.GetComponent<SkinnedMeshRenderer>(), context);
+                ProcessFor(component, component.GetComponent<SkinnedMeshRenderer>(), context.AvatarRootTransform);
             }
         }
 
-        private void ProcessFor(CdwComponent component, SkinnedMeshRenderer destinationRenderer, BuildContext context)
+        private void ProcessFor(CdwComponent component, SkinnedMeshRenderer skinnedMeshRenderer, Transform avatarRoot)
         {
-            if (destinationRenderer == null || component.SourceRenderer == null)
+            var originalMesh = skinnedMeshRenderer.sharedMesh;
+            if (originalMesh == null)
             {
                 UnityObject.DestroyImmediate(component);
                 return;
             }
 
-            if (component.SourceRenderer.sharedMesh == null)
-            {
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
+            var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
+            var modifyingMesh = UnityObject.Instantiate(originalMesh);
+            Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters);
 
-            var wrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
-            if (wrapperMaterial == null)
-            {
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
+            skinnedMeshRenderer.sharedMesh = modifyingMesh;
+            ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);
 
-            var generatedMesh = Cdw.GenerateConvexHullMesh(component.SourceRenderer);
-            if (generatedMesh == null)
-            {
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
-
-            using (context.OpenSerializationScope())
-            {
-                context.AssetSaver.SaveAsset(generatedMesh);
-            }
-
-            destinationRenderer.sharedMesh = generatedMesh;
-            destinationRenderer.rootBone = component.SourceRenderer.rootBone;
-            destinationRenderer.bones = component.SourceRenderer.bones;
-            destinationRenderer.updateWhenOffscreen = component.SourceRenderer.updateWhenOffscreen;
-            destinationRenderer.sharedMaterials = new[] { wrapperMaterial };
-            destinationRenderer.localBounds = component.SourceRenderer.localBounds;
+            var assigningMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
+            var originalMaterials = skinnedMeshRenderer.sharedMaterials;
+            var newMaterials = new Material[originalMaterials.Length + 1];
+            originalMaterials.CopyTo(newMaterials, 0);
+            newMaterials[originalMaterials.Length] = assigningMaterial;
+            skinnedMeshRenderer.sharedMaterials = newMaterials;
 
             UnityObject.DestroyImmediate(component);
         }
