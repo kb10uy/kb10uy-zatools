@@ -18,7 +18,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// <param name="parameters">固定されたパラメーター</param>
         /// <param name="wrapperMaterial">割り当てるマテリアル</param>
         /// <exception cref="ArgumentException">頂点数が一致しない場合</exception>
-        internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
+        internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
@@ -38,6 +38,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             modifyingMesh.subMeshCount = originalSubMeshCount + 1;
             for (int i = 0; i < originalSubMeshCount; i++) modifyingMesh.SetTriangles(savedTriangles[i], i);
             modifyingMesh.SetTriangles(hullTriangles.ToArray(), originalSubMeshCount);
+
+            var originalMaterials = referencingRenderer.sharedMaterials;
+            var newMaterials = new Material[originalMaterials.Length + 1];
+            originalMaterials.CopyTo(newMaterials, 0);
+            newMaterials[originalMaterials.Length] = wrapperMaterial;
+            referencingRenderer.sharedMaterials = newMaterials;
         }
 
         internal struct FixedParameters : IEquatable<FixedParameters>

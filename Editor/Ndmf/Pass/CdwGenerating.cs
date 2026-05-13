@@ -32,19 +32,13 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
+            var assigningMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
             var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
             var modifyingMesh = UnityObject.Instantiate(originalMesh);
-            Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters);
+            Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial);
 
             skinnedMeshRenderer.sharedMesh = modifyingMesh;
             ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);
-
-            var assigningMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
-            var originalMaterials = skinnedMeshRenderer.sharedMaterials;
-            var newMaterials = new Material[originalMaterials.Length + 1];
-            originalMaterials.CopyTo(newMaterials, 0);
-            newMaterials[originalMaterials.Length] = assigningMaterial;
-            skinnedMeshRenderer.sharedMaterials = newMaterials;
 
             UnityObject.DestroyImmediate(component);
         }

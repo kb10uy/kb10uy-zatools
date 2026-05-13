@@ -23,7 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf
                 .Then.Run(new AhmsGenerating()).PreviewingWith(new AhmsRenderFilter())
                 .Then.Run(new AhbssGenerating()).PreviewingWith(new AhbssRenderFilter())
                 .Then.Run(new EdwGenerating()).PreviewingWith(new EdwRenderFilter())
-                .Then.Run(new CdwGenerating());
+                .Then.Run(new CdwGenerating()).PreviewingWith(new CdwRenderFilter());
 
             // Transforming before MA
             InPhase(BuildPhase.Transforming)
