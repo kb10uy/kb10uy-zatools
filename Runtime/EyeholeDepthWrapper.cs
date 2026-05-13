@@ -12,12 +12,21 @@ namespace KusakaFactory.Zatools.Runtime
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/eyehole-depth-wrapper/")]
     public sealed class EyeholeDepthWrapper : ZatoolsMeshEditingComponent
     {
+        public Transform Basis = null;
+
+        #region Selection
         public string BlinkBlendShapeName = "vrc.blink";
         public float Threshold = 0.0001f;
         public float EyelashCut = 0.002f;
         public float WithdrawalLimit = 0.025f;
-        public Transform Basis = null;
+        #endregion
+
+        #region Generation
+        public DomeGeneratorKind GeneratorKind = DomeGeneratorKind.Hermite;
         public float CentroidPush = 0.005f;
+        public int Subdivisions = 4;
+        public float TangentScale = 0.5f;
+        #endregion
 
 #if UNITY_EDITOR
         private void Reset()
@@ -31,5 +40,11 @@ namespace KusakaFactory.Zatools.Runtime
             BlinkBlendShapeName = blinkName;
         }
 #endif
+    }
+
+    public enum DomeGeneratorKind
+    {
+        Hermite = 0,
+        Fan = 1,
     }
 }

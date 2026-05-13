@@ -3,12 +3,9 @@ Shader "KusakaFactory/Zatools/EdwWrapper"
     Properties {}
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="AlphaTest+49" "VRCFallback"="Hidden" }
+        Tags { "RenderType"="Opaque" "Queue"="AlphaTest+49" }
         LOD 100
 
-        // Writing depth in ForwardBase pass causes typical RQ problem.
-        // As EyeholeDepthWrapper's concern is only about _CameraDepthTexture, we can simply omit ForwardBase pass.
-        /*
         Pass
         {
             Tags { "LightMode"="ForwardBase" }
@@ -44,7 +41,6 @@ Shader "KusakaFactory/Zatools/EdwWrapper"
             }
             ENDCG
         }
-        */
 
         Pass
         {
