@@ -22,7 +22,10 @@ namespace KusakaFactory.Zatools.Ndmf
                 .Select((c) => (Renderer: c.GetComponent<SkinnedMeshRenderer>(), Component: c))
                 .Where((p) => p.Renderer != null)
                 .GroupBy((p) => p.Renderer)
-                .Select((g) => RenderGroup.For(g.Key).WithData(g.Select((p) => p.Component).ToArray()))
+                .Select((g) => RenderGroup.For(g.Key).WithData(
+                    g.Select((p) => p.Component).ToArray(),
+                    (a, b) => a.SequenceEqual(b)
+                ))
                 .ToImmutableList();
 
         public async Task<IRenderFilterNode> Instantiate(RenderGroup group, IEnumerable<(Renderer, Renderer)> proxyPairs, ComputeContext context)
