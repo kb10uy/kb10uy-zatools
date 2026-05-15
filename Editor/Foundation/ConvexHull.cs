@@ -15,33 +15,33 @@ namespace KusakaFactory.Zatools.Foundation
         /// <returns>凸包を形成する点のインデックスリスト。巡回順序。</returns>
         public static ImmutableArray<int> ComputeAndrews(IReadOnlyList<Vector2> points)
         {
-            int n = points.Count;
+            var n = points.Count;
             if (n < 3)
             {
                 var result = new List<int>(n);
-                for (int i = 0; i < n; i++) result.Add(i);
+                for (var i = 0; i < n; i++) result.Add(i);
                 return result.ToImmutableArray();
             }
 
             var sorted = new List<int>(n);
-            for (int i = 0; i < n; i++) sorted.Add(i);
+            for (var i = 0; i < n; i++) sorted.Add(i);
             sorted.Sort((a, b) =>
             {
-                int cmp = points[a].x.CompareTo(points[b].x);
+                var cmp = points[a].x.CompareTo(points[b].x);
                 return cmp != 0 ? cmp : points[a].y.CompareTo(points[b].y);
             });
 
             var hull = new List<int>(n + 1);
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 while (hull.Count >= 2 && Cross(points[hull[hull.Count - 2]], points[hull[hull.Count - 1]], points[sorted[i]]) <= 0f)
                     hull.RemoveAt(hull.Count - 1);
                 hull.Add(sorted[i]);
             }
 
-            int lowerCount = hull.Count + 1;
-            for (int i = n - 2; i >= 0; i--)
+            var lowerCount = hull.Count + 1;
+            for (var i = n - 2; i >= 0; i--)
             {
                 while (hull.Count >= lowerCount && Cross(points[hull[hull.Count - 2]], points[hull[hull.Count - 1]], points[sorted[i]]) <= 0f)
                     hull.RemoveAt(hull.Count - 1);
@@ -52,23 +52,17 @@ namespace KusakaFactory.Zatools.Foundation
             return hull.ToImmutableArray();
         }
 
-        private static float Cross(Vector2 o, Vector2 a, Vector2 b)
-        {
-            return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
-        }
+        private static float Cross(Vector2 o, Vector2 a, Vector2 b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
 
         /// <summary>
         /// 3D QuickHull で凸包を計算し、三角形インデックス (3つで1面) を返す。
         /// </summary>
         public static ImmutableArray<int> ComputeQuickHull3D(IReadOnlyList<Vector3> points)
         {
-            int n = points.Count;
-            if (n < 4) return ImmutableArray<int>.Empty;
+            var pointsCount = points.Count;
+            if (pointsCount < 4) return ImmutableArray<int>.Empty;
 
-            if (!TryBuildInitialSimplex(points, out var simplex))
-            {
-                return ImmutableArray<int>.Empty;
-            }
+            if (!TryBuildInitialSimplex(points, out var simplex)) return ImmutableArray<int>.Empty;
 
             var interiorPoint = (points[simplex.A] + points[simplex.B] + points[simplex.C] + points[simplex.D]) * 0.25f;
             var faces = new List<Face>(8)
@@ -80,7 +74,7 @@ namespace KusakaFactory.Zatools.Foundation
             };
 
             var used = new HashSet<int> { simplex.A, simplex.B, simplex.C, simplex.D };
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < pointsCount; i++)
             {
                 if (used.Contains(i)) continue;
                 AssignPointToFace(i, points, faces);
@@ -88,33 +82,23 @@ namespace KusakaFactory.Zatools.Foundation
 
             while (true)
             {
-                if (!TryGetEyePoint(faces, points, out _, out int eyePoint)) break;
+                if (!TryGetEyePoint(faces, points, out _, out var eyePoint)) break;
 
                 var visible = CollectVisibleFaces(faces, eyePoint, points);
-
                 var orphanPoints = new HashSet<int>();
                 foreach (var face in visible)
                 {
-                    foreach (var p in face.Outside)
-                    {
-                        if (p != eyePoint) orphanPoints.Add(p);
-                    }
+                    foreach (var p in face.Outside) if (p != eyePoint) orphanPoints.Add(p);
                 }
 
                 var horizon = BuildHorizon(visible);
                 faces.RemoveAll(f => visible.Contains(f));
 
                 var newFaces = new List<Face>(horizon.Count);
-                foreach (var edge in horizon)
-                {
-                    newFaces.Add(CreateFace(edge.From, edge.To, eyePoint, interiorPoint, points));
-                }
+                foreach (var edge in horizon) newFaces.Add(CreateFace(edge.From, edge.To, eyePoint, interiorPoint, points));
                 faces.AddRange(newFaces);
 
-                foreach (var p in orphanPoints)
-                {
-                    AssignPointToFace(p, points, newFaces);
-                }
+                foreach (var p in orphanPoints) AssignPointToFace(p, points, newFaces);
             }
 
             var triangles = new List<int>(faces.Count * 3);
@@ -129,7 +113,7 @@ namespace KusakaFactory.Zatools.Foundation
 
         private static void AssignPointToFace(int pointIndex, IReadOnlyList<Vector3> points, IReadOnlyList<Face> faces)
         {
-            float bestDistance = Epsilon;
+            var bestDistance = Epsilon;
             Face bestFace = null;
             foreach (var face in faces)
             {
@@ -148,14 +132,14 @@ namespace KusakaFactory.Zatools.Foundation
         {
             face = null;
             point = -1;
-            float best = Epsilon;
+            var best = Epsilon;
 
             foreach (var f in faces)
             {
-                for (int i = 0; i < f.Outside.Count; i++)
+                for (var i = 0; i < f.Outside.Count; i++)
                 {
-                    int p = f.Outside[i];
-                    float distance = SignedDistance(f, points[p], points);
+                    var p = f.Outside[i];
+                    var distance = SignedDistance(f, points[p], points);
                     if (distance > best)
                     {
                         best = distance;
@@ -171,21 +155,13 @@ namespace KusakaFactory.Zatools.Foundation
         private static HashSet<Face> CollectVisibleFaces(IReadOnlyList<Face> faces, int eyePoint, IReadOnlyList<Vector3> points)
         {
             var visible = new HashSet<Face>();
-            foreach (var face in faces)
-            {
-                if (SignedDistance(face, points[eyePoint], points) > Epsilon)
-                {
-                    visible.Add(face);
-                }
-            }
-
+            foreach (var face in faces) if (SignedDistance(face, points[eyePoint], points) > Epsilon) visible.Add(face);
             return visible;
         }
 
         private static List<Edge> BuildHorizon(HashSet<Face> visible)
         {
             var edgeMap = new Dictionary<(int From, int To), Edge>();
-
             foreach (var face in visible)
             {
                 AddOrRemoveEdge(edgeMap, face.A, face.B);
@@ -211,16 +187,8 @@ namespace KusakaFactory.Zatools.Foundation
         private static Face CreateFace(int a, int b, int c, Vector3 interiorPoint, IReadOnlyList<Vector3> points)
         {
             var face = new Face(a, b, c);
-            EnsureFaceOrientation(face, interiorPoint, points);
+            if (SignedDistance(face, interiorPoint, points) > 0f) (face.B, face.C) = (face.C, face.B);
             return face;
-        }
-
-        private static void EnsureFaceOrientation(Face face, Vector3 interiorPoint, IReadOnlyList<Vector3> points)
-        {
-            if (SignedDistance(face, interiorPoint, points) > 0f)
-            {
-                (face.B, face.C) = (face.C, face.B);
-            }
         }
 
         private static float SignedDistance(Face face, Vector3 point, IReadOnlyList<Vector3> points)
@@ -229,7 +197,7 @@ namespace KusakaFactory.Zatools.Foundation
             var b = points[face.B];
             var c = points[face.C];
             var normal = Vector3.Cross(b - a, c - a);
-            float magnitude = normal.magnitude;
+            var magnitude = normal.magnitude;
             if (magnitude <= Epsilon) return 0f;
             return Vector3.Dot(normal / magnitude, point - a);
         }
@@ -238,21 +206,21 @@ namespace KusakaFactory.Zatools.Foundation
         {
             simplex = default;
 
-            int minX = 0;
-            int maxX = 0;
-            for (int i = 1; i < points.Count; i++)
+            var minX = 0;
+            var maxX = 0;
+            for (var i = 1; i < points.Count; i++)
             {
                 if (points[i].x < points[minX].x) minX = i;
                 if (points[i].x > points[maxX].x) maxX = i;
             }
             if (minX == maxX) return false;
 
-            int farLine = -1;
-            float maxLineDist = 0f;
-            for (int i = 0; i < points.Count; i++)
+            var farLine = -1;
+            var maxLineDist = 0f;
+            for (var i = 0; i < points.Count; i++)
             {
                 if (i == minX || i == maxX) continue;
-                float d = DistanceFromLine(points[i], points[minX], points[maxX]);
+                var d = DistanceFromLine(points[i], points[minX], points[maxX]);
                 if (d > maxLineDist)
                 {
                     maxLineDist = d;
@@ -261,12 +229,12 @@ namespace KusakaFactory.Zatools.Foundation
             }
             if (farLine < 0 || maxLineDist <= Epsilon) return false;
 
-            int farPlane = -1;
-            float maxPlaneDist = 0f;
-            for (int i = 0; i < points.Count; i++)
+            var farPlane = -1;
+            var maxPlaneDist = 0f;
+            for (var i = 0; i < points.Count; i++)
             {
                 if (i == minX || i == maxX || i == farLine) continue;
-                float d = Mathf.Abs(SignedDistanceToPlane(points[i], points[minX], points[maxX], points[farLine]));
+                var d = Mathf.Abs(SignedDistanceToPlane(points[i], points[minX], points[maxX], points[farLine]));
                 if (d > maxPlaneDist)
                 {
                     maxPlaneDist = d;
@@ -282,16 +250,12 @@ namespace KusakaFactory.Zatools.Foundation
         private static float DistanceFromLine(Vector3 p, Vector3 a, Vector3 b)
         {
             var ab = b - a;
-            float den = ab.magnitude;
+            var den = ab.magnitude;
             if (den <= Epsilon) return 0f;
             return Vector3.Cross(ab, p - a).magnitude / den;
         }
 
-        private static float SignedDistanceToPlane(Vector3 p, Vector3 a, Vector3 b, Vector3 c)
-        {
-            var normal = Vector3.Cross(b - a, c - a).normalized;
-            return Vector3.Dot(normal, p - a);
-        }
+        private static float SignedDistanceToPlane(Vector3 p, Vector3 a, Vector3 b, Vector3 c) => Vector3.Dot(Vector3.Cross(b - a, c - a).normalized, p - a);
 
         private readonly struct InitialSimplex
         {
