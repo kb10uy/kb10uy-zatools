@@ -22,6 +22,7 @@
     "dependencies": {
         "com.unity.burst": "1.8.0",
         "com.unity.mathematics": "1.2.0",
+        "com.unity.collections": "2.1.0",
         "com.unity.nuget.newtonsoft-json": "3.0.0"
     }
 }
