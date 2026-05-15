@@ -12,7 +12,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// <summary>
         /// メイン処理
         /// </summary>
-        /// <param name="referenceRenderer">Mesh の参照元の SkinnedMeshRenderer</param>
+        /// <param name="referencingRenderer">Mesh の参照元の SkinnedMeshRenderer</param>
         /// <param name="modifyingMesh">対象の Mesh</param>
         /// <param name="parameters">固定されたパラメーター</param>
         /// <param name="wrapperMaterial">割り当てるマテリアル</param>
