@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using UnityEngine;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
-using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -22,13 +21,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
-            var bakedMesh = new Mesh();
-            referencingRenderer.BakeMesh(bakedMesh);
-            var bakedVertices = bakedMesh.vertices;
-            if (bakedVertices == null || bakedVertices.Length < 4) return;
-            UnityObject.DestroyImmediate(bakedMesh);
+            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(modifyingMesh, referencingRenderer);
 
-            ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(bakedVertices);
+            ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
             if (hullTriangles.Length < 12) return;
 
             var vertices = modifyingMesh.vertices;
@@ -54,7 +49,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     newIndex = vertexCount + extendVertices.Count;
                     vertexMap.Add(originalIndex, newIndex);
-                    extendVertices.Add(vertices[originalIndex]);
+                    extendVertices.Add(blendShapeAppliedVertices[originalIndex]);
                     extendNormals.Add(normals[originalIndex]);
                     if (validTangents) extendTangents.Add(tangents[originalIndex]);
                     if (hasBoneWeights) extendBoneWeights.Add(boneWeights[originalIndex]);

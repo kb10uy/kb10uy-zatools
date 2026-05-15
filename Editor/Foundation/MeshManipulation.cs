@@ -41,9 +41,9 @@ namespace KusakaFactory.Zatools.Foundation
                 for (var blendShapeIndex = 0; blendShapeIndex < blendShapeCount; blendShapeIndex++)
                 {
                     // TODO: Support multi-frame BlendShapes
-                    if (mesh.GetBlendShapeFrameCount(blendShapeIndex) != 0) continue;
+                    if (mesh.GetBlendShapeFrameCount(blendShapeIndex) != 1) continue;
 
-                    var weight = renderer.GetBlendShapeWeight(blendShapeIndex) / renderer.GetBlendShapeWeight(0);
+                    var weight = renderer.GetBlendShapeWeight(blendShapeIndex) / mesh.GetBlendShapeFrameWeight(blendShapeIndex, 0);
                     if (Mathf.Abs(weight) < epsilon) continue;
 
                     mesh.GetBlendShapeFrameVertices(blendShapeIndex, 0, deltaVertices, _deltaNormals, _deltaTangents);
@@ -57,11 +57,11 @@ namespace KusakaFactory.Zatools.Foundation
 
                     var applyJob = new ApplyBlendShapeDeltaBatchJob
                     {
+                        Result = resultNative,
                         DeltaVertices = deltaBatchNative,
                         Weights = weightsNative,
                         VertexCount = vertexCount,
                         ActiveBlendShapeCount = activeBlendShapeCount,
-                        Result = resultNative,
                     };
                     applyJob.Schedule(vertexCount, VerticesPerBatch).Complete();
                     activeBlendShapeCount = 0;
