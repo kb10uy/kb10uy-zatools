@@ -5,6 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEditor;
+using UnityEditor.Animations;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -14,7 +15,6 @@ using nadena.dev.ndmf.animator;
 using nadena.dev.ndmf.runtime;
 using nadena.dev.ndmf.vrchat;
 using nadena.dev.modular_avatar.core;
-using AnimatorAsCode.V1;
 using UnityObject = UnityEngine.Object;
 using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
@@ -23,7 +23,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class EepiTransforming : Pass<EepiTransforming>
     {
-        internal const string GlobalWeightParameterName = "SEP/GlobalWeight";
+        internal readonly static string ToggleParameterName = "SEP/Toggle";
+        internal readonly static string GlobalWeightParameterName = "SEP/GlobalWeight";
 
         public override string QualifiedName => nameof(EepiTransforming);
         public override string DisplayName => "Substitute eye bones and add constraints to them";
@@ -270,69 +271,118 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void GenerateGlobalWeightOverride(BuildContext context, Installer installer, Component leftAim, Component rightAim)
         {
-            var aac = AacV1.Create(new AacConfiguration
-            {
-                SystemName = "EnhancedEyePointerInstaller",
-                AnimatorRoot = context.AvatarRootObject.transform,
-                DefaultValueRoot = context.AvatarRootObject.transform,
-                AssetKey = GUID.Generate().ToString(),
-                AssetContainer = context.AssetContainer,
-                ContainerMode = AacConfiguration.Container.OnlyWhenPersistenceRequired,
-                DefaultsProvider = new AacDefaultsProvider(false),
-            });
-            var fxController = aac.NewAnimatorController();
-            var layer = fxController.NewLayer("GlobalWeightOverride").WithWeight(0.0f);
-            var sepToggle = layer.BoolParameter("SEP/Toggle");
-            var sepGlobalWeight = layer.FloatParameter("SEP/GlobalWeight");
+            var virtualControllerContext = context.Extension<VirtualControllerContext>();
+            var fxController = VirtualAnimatorController.Create(
+                virtualControllerContext.CloneContext,
+                "EnhancedEyePointerInstaller"
+            );
+
+            // Controller Parameters
+            fxController.Parameters = fxController.Parameters
+                .SetItem("SEP/Toggle", new AnimatorControllerParameter
+                {
+                    name = "SEP/Toggle",
+                    type = AnimatorControllerParameterType.Bool,
+                    defaultBool = false,
+                })
+                .SetItem("SEP/GlobalWeight", new AnimatorControllerParameter
+                {
+                    name = GlobalWeightParameterName,
+                    type = AnimatorControllerParameterType.Float,
+                    defaultFloat = installer.InitialGlobalWeight,
+                });
+
+            // Layer
+            // NDMF normalize pass forces the first layer's default weight to 1.0,
+            // so keep a no-op first layer and put our controllable layer second.
+            _ = fxController.AddLayer(new LayerPriority(0), "Base");
+            var controlLayer = fxController.AddLayer(new LayerPriority(1), "SEP_GlobalWeightOverride");
+            controlLayer.DefaultWeight = 0.0f;
+            var controlLayerStateMachine = controlLayer.StateMachine;
 
             // Weight Animation
-            var weightProperty = installer.VRCConstraint ? "GlobalWeight" : "m_Weight";
-            var controlAnimation = aac.NewClip("GlobalWeightControl").Animating((ec) =>
-            {
-                var left = ec.BindingFromComponent(leftAim, weightProperty);
-                var right = ec.BindingFromComponent(rightAim, weightProperty);
-                var curve = new AnimationCurve(
-                    new Keyframe { time = 0.0f, value = 0.0f },
-                    new Keyframe { time = 100.0f, value = 1.0f }
-                );
-                AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
-                AnimationUtility.SetEditorCurve(ec.Clip, left, curve);
-                AnimationUtility.SetEditorCurve(ec.Clip, right, curve);
-            });
+            var weightPropertyName = installer.VRCConstraint ? "GlobalWeight" : "m_Weight";
+            var controlAnimation = VirtualClip.Create("Zatools-EEPI-GlobalWeightControl");
+            var curve = new AnimationCurve(
+                new Keyframe { time = 0.0f, value = 0.0f },
+                new Keyframe { time = 100.0f, value = 1.0f }
+            );
+            AnimationUtility.SetKeyLeftTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyRightTangentMode(curve, 0, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyRightTangentMode(curve, 1, AnimationUtility.TangentMode.Linear);
+            controlAnimation.SetFloatCurve(EditorCurveBinding.FloatCurve(
+                RuntimeUtil.RelativePath(context.AvatarRootObject, leftAim.gameObject),
+                leftAim.GetType(),
+                weightPropertyName
+            ), curve);
+            controlAnimation.SetFloatCurve(EditorCurveBinding.FloatCurve(
+                RuntimeUtil.RelativePath(context.AvatarRootObject, rightAim.gameObject),
+                rightAim.GetType(),
+                weightPropertyName
+            ), curve);
+
+            // State
+            var disabledState = controlLayerStateMachine.AddState("Disabled", controlAnimation);
+            disabledState.TimeParameter = GlobalWeightParameterName;
+            var enabledState = controlLayerStateMachine.AddState("Enabled", controlAnimation);
+            enabledState.TimeParameter = GlobalWeightParameterName;
+            controlLayerStateMachine.DefaultState = disabledState;
 
             // Transition
-            var disabled = layer.NewState("Disabled").WithAnimation(controlAnimation).WithMotionTime(sepGlobalWeight);
-            var enabled = layer.NewState("Enabled").WithAnimation(controlAnimation).WithMotionTime(sepGlobalWeight);
-            disabled.TransitionsTo(enabled).When(sepToggle.IsTrue());
-            enabled.TransitionsTo(disabled).When(sepToggle.IsFalse());
+            var toEnabledTransition = VirtualStateTransition.Create();
+            toEnabledTransition.SetDestination(enabledState);
+            toEnabledTransition.ExitTime = null;
+            toEnabledTransition.Duration = 0.0f;
+            toEnabledTransition.Conditions = toEnabledTransition.Conditions.Add(new AnimatorCondition
+            {
+                mode = AnimatorConditionMode.If,
+                parameter = "SEP/Toggle",
+            });
+            disabledState.Transitions = disabledState.Transitions.Add(toEnabledTransition);
+
+            var toDisabledTransition = VirtualStateTransition.Create();
+            toDisabledTransition.SetDestination(disabledState);
+            toDisabledTransition.ExitTime = null;
+            toDisabledTransition.Duration = 0.0f;
+            toDisabledTransition.Conditions = toDisabledTransition.Conditions.Add(new AnimatorCondition
+            {
+                mode = AnimatorConditionMode.IfNot,
+                parameter = "SEP/Toggle",
+            });
+            enabledState.Transitions = enabledState.Transitions.Add(toDisabledTransition);
 
             // AnimatorLayerControl StateBehaviour
-            var disableLayer = disabled.CreateNewBehaviour<VRCAnimatorLayerControl>();
-            disableLayer.playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX;
-            disableLayer.layer = 0;
-            disableLayer.goalWeight = 0.0f;
-            disableLayer.blendDuration = 0.1f;
-            var enableLayer = enabled.CreateNewBehaviour<VRCAnimatorLayerControl>();
-            enableLayer.playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX;
-            enableLayer.layer = 0;
-            enableLayer.goalWeight = 1.0f;
-            enableLayer.blendDuration = 0.1f;
+            var disableLayer = new VRCAnimatorLayerControl
+            {
+                playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX,
+                layer = controlLayer.VirtualLayerIndex,
+                goalWeight = 0.0f,
+                blendDuration = 0.1f,
+            };
+            disabledState.Behaviours = disabledState.Behaviours.Add(disableLayer);
 
-            // MergeAnimator
+            var enableLayer = new VRCAnimatorLayerControl
+            {
+                playable = VRC.SDKBase.VRC_AnimatorLayerControl.BlendableLayer.FX,
+                layer = controlLayer.VirtualLayerIndex,
+                goalWeight = 1.0f,
+                blendDuration = 0.1f,
+            };
+            enabledState.Behaviours = enabledState.Behaviours.Add(enableLayer);
+
+            // MA Merge Animator
             var globalWeightControl = new GameObject("GlobalWeightControl");
             globalWeightControl.transform.parent = installer.transform;
             var mergeAnimator = globalWeightControl.AddComponent<ModularAvatarMergeAnimator>();
-            mergeAnimator.animator = fxController.AnimatorController;
+            virtualControllerContext.Controllers[mergeAnimator] = fxController;
             mergeAnimator.layerPriority = 1000; // EyePointer のそれより後ならなんでもいい
             mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             mergeAnimator.deleteAttachedAnimator = false;
             mergeAnimator.matchAvatarWriteDefaults = true;
             mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
 
-            // Parameter
+            // MA Parameters
             var parameters = globalWeightControl.AddComponent<ModularAvatarParameters>();
             var globalWeightConfig = new ParameterConfig
             {
