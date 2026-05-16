@@ -16,8 +16,7 @@
     "vpmDependencies": {
         "com.vrchat.avatars": ">=3.7.0 <3.11.0",
         "nadena.dev.ndmf": ">=1.13.0",
-        "nadena.dev.modular-avatar": ">=1.15.0",
-        "dev.hai-vr.animator-as-code.v1": ">=1.2.0"
+        "nadena.dev.modular-avatar": ">=1.15.0"
     },
     "dependencies": {
         "com.unity.burst": "1.8.0",
