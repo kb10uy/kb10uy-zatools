@@ -1,6 +1,6 @@
 {
     "name": "org.kb10uy.zatools",
-    "rootNamespace": "",
+    "rootNamespace": "KusakaFactory.Zatools",
     "references": [
         "Unity.Burst",
         "Unity.Mathematics",
