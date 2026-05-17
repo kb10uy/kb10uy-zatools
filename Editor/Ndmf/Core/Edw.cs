@@ -4,8 +4,10 @@ using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 using KusakaFactory.Zatools.Foundation;
+using KusakaFactory.Zatools.Foundation.Mesh;
 using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
+using Mesh = UnityEngine.Mesh;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -23,17 +25,29 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
-            var blendShapeIndex = modifyingMesh.GetBlendShapeIndex(parameters.BlinkBlendShapeName);
-            if (blendShapeIndex == -1 || parameters.Threshold < 0.0f || parameters.WithdrawalLimit < 0.0f) return;
+            // フェーズ 1: ドームを張る対象となる頂点を選択し convex hull を構築する。
+            var hullSelection = SelectHullVertices(referencingRenderer, modifyingMesh, parameters);
+            if (!hullSelection.HasValue) return;
 
-            var vertices = modifyingMesh.vertices;
-            var normals = modifyingMesh.normals;
-            var tangents = modifyingMesh.tangents;
-            var uvs = modifyingMesh.uv;
-            var boneWeights = modifyingMesh.boneWeights;
+            // フェーズ 2: hull に対応するドームメッシュを生成し、対象 Mesh / Renderer に書き戻す。
+            GenerateAndAppendDomeMesh(referencingRenderer, modifyingMesh, parameters, hullSelection.Value, wrapperMaterial);
+        }
+
+        /// <summary>
+        /// blink blendshape で動く頂点群から左右の convex hull を選び出す。
+        /// 後段のメッシュ生成フェーズで必要な補助情報も合わせて返す。
+        /// </summary>
+        /// <returns>hull が構築できた場合は選択結果を、そうでない場合は null を返す。</returns>
+        private static HullSelectionResult? SelectHullVertices(
+            SkinnedMeshRenderer referencingRenderer,
+            Mesh modifyingMesh,
+            FixedParameters parameters
+        )
+        {
+            var blendShapeIndex = modifyingMesh.GetBlendShapeIndex(parameters.BlinkBlendShapeName);
+            if (blendShapeIndex == -1 || parameters.Threshold < 0.0f || parameters.WithdrawalLimit < 0.0f) return null;
+
             var vertexCount = modifyingMesh.vertexCount;
-            var validTangents = tangents.Length == vertexCount;
-            var hasBoneWeights = boneWeights != null;
             var deltaVertices = new Vector3[vertexCount];
             var _deltaNormals = new Vector3[vertexCount];
             var _deltaTangents = new Vector3[vertexCount];
@@ -53,73 +67,104 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var smrRelativeVertices = new List<Vector3>(smrRelativeDeformedMesh.vertexCount);
             smrRelativeDeformedMesh.GetVertices(smrRelativeVertices);
             UnityObject.DestroyImmediate(smrRelativeDeformedMesh);
+            var bakedVerticesInSmr = smrRelativeVertices.ToImmutableArray();
             var bakedVerticesInBasis = smrRelativeVertices.Select(v => basisFromSmr.MultiplyPoint(v)).ToImmutableArray();
+
+            // 外周隣接の面法線計算のため、全 submesh の三角形を結合した配列を構築する。
+            var allTrianglesList = new List<int>();
+            for (var sm = 0; sm < modifyingMesh.subMeshCount; ++sm) allTrianglesList.AddRange(modifyingMesh.GetTriangles(sm));
+            var allTriangles = allTrianglesList.ToArray();
 
             var blinkMovingIndices = deltaVertices
                 .Select((d, i) => (Delta: basisFromSmr.MultiplyVector(d), Index: i))
                 .Where(t => t.Delta.sqrMagnitude > Mathf.Pow(parameters.Threshold, 2.0f))
                 .Select(t => t.Index)
                 .ToHashSet();
-            if (blinkMovingIndices.Count == 0) return;
+            if (blinkMovingIndices.Count == 0) return null;
             var blinkMaxZ = blinkMovingIndices.Select((i) => bakedVerticesInBasis[i]).Max((v) => v.z) - parameters.EyelashCut;
+
+            // Basis forward 向きの面に属する頂点だけを採用するためのフィルタ集合を構築する。
+            // 裏向き(まつ毛裏など)の頂点は hull に含めない。
+            var centroidNormalSmr = smrFromBasis.MultiplyVector(Vector3.forward).normalized;
+            var frontFacingVertexIndices = ComputeFrontFacingVertexSet(allTriangles, bakedVerticesInSmr, centroidNormalSmr);
+
             var blinkHullFilteredIndices = blinkMovingIndices.Where((i) =>
             {
+                if (!frontFacingVertexIndices.Contains(i)) return false;
                 var deltaZ = blinkMaxZ - bakedVerticesInBasis[i].z;
                 return deltaZ > 0.0f && deltaZ < parameters.WithdrawalLimit;
             }).ToImmutableArray();
             var (leftConvexHull, rightConvexHull) = ComputeConvexHulls(bakedVerticesInBasis, blinkHullFilteredIndices);
 
-            var extendVertices = new List<Vector3>(2);
-            var extendNormals = new List<Vector3>(2);
-            var extendTangents = new List<Vector2>(2);
-            var extendUvs = new List<Vector2>(2);
-            var extendBoneWeights = new List<BoneWeight>(2);
-            var triangles = new List<int>();
-            if (leftConvexHull.Length >= 3)
-            {
-                var centroidIndex = vertices.Length + extendVertices.Count;
-                var centroidPosition = leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / leftConvexHull.Length;
-                centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
-                extendVertices.Add(centroidPosition);
-                extendNormals.Add(leftConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
-                if (validTangents) extendTangents.Add(leftConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
-                extendUvs.Add(leftConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / leftConvexHull.Length);
-                if (hasBoneWeights) extendBoneWeights.Add(boneWeights[leftConvexHull[0]]);
-                for (int i = 0; i < leftConvexHull.Length; i++)
-                {
-                    int next = (i + 1) % leftConvexHull.Length;
-                    triangles.AddRange(ImmutableArray.Create(centroidIndex, leftConvexHull[i], leftConvexHull[next]));
-                }
-            }
-            if (rightConvexHull.Length >= 3)
-            {
-                var centroidIndex = vertices.Length + extendVertices.Count;
-                var centroidPosition = rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + vertices[i]) / rightConvexHull.Length;
-                centroidPosition += smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
-                extendVertices.Add(centroidPosition);
-                extendNormals.Add(rightConvexHull.Aggregate(Vector3.zero, (s, i) => s + normals[i]).normalized);
-                if (validTangents) extendTangents.Add(rightConvexHull.Aggregate(Vector4.zero, (s, i) => s + tangents[i]).normalized);
-                extendUvs.Add(rightConvexHull.Aggregate(Vector2.zero, (s, i) => s + uvs[i]) / rightConvexHull.Length);
-                if (hasBoneWeights) extendBoneWeights.Add(boneWeights[rightConvexHull[0]]);
-                for (int i = 0; i < rightConvexHull.Length; i++)
-                {
-                    int next = (i + 1) % rightConvexHull.Length;
-                    triangles.AddRange(ImmutableArray.Create(centroidIndex, rightConvexHull[i], rightConvexHull[next]));
-                }
-            }
+            var centroidPushVector = smrFromBasis.MultiplyVector(Vector3.forward) * parameters.CentroidPush;
+            return new HullSelectionResult(
+                leftConvexHull,
+                rightConvexHull,
+                bakedVerticesInSmr,
+                allTriangles,
+                centroidNormalSmr,
+                centroidPushVector
+            );
+        }
 
-            Array.Resize(ref vertices, vertexCount + extendVertices.Count);
-            Array.Resize(ref normals, vertexCount + extendVertices.Count);
-            if (validTangents) Array.Resize(ref tangents, vertexCount + extendVertices.Count);
-            Array.Resize(ref uvs, vertexCount + extendVertices.Count);
-            if (hasBoneWeights) Array.Resize(ref boneWeights, vertexCount + extendVertices.Count);
-            for (var i = 0; i < extendVertices.Count; ++i)
+        /// <summary>
+        /// 選択された hull に対して IDomeMeshGenerator でドームメッシュを生成し、
+        /// modifyingMesh と referencingRenderer の sharedMaterials に書き戻す。
+        /// </summary>
+        private static void GenerateAndAppendDomeMesh(
+            SkinnedMeshRenderer referencingRenderer,
+            Mesh modifyingMesh,
+            FixedParameters parameters,
+            HullSelectionResult hullSelection,
+            Material wrapperMaterial
+        )
+        {
+            var vertices = modifyingMesh.vertices;
+            var normals = modifyingMesh.normals;
+            var tangents = modifyingMesh.tangents;
+            var uvs = modifyingMesh.uv;
+            var boneWeights = modifyingMesh.boneWeights;
+            var vertexCount = modifyingMesh.vertexCount;
+            var validTangents = tangents.Length == vertexCount;
+            var hasBoneWeights = boneWeights != null;
+
+            IDomeMeshGenerator generator = parameters.GeneratorKind switch
             {
-                vertices[vertexCount + i] = extendVertices[i];
-                normals[vertexCount + i] = extendNormals[i];
-                if (validTangents) tangents[vertexCount + i] = extendTangents[i];
-                uvs[vertexCount + i] = extendUvs[i];
-                if (hasBoneWeights) boneWeights[vertexCount + i] = extendBoneWeights[i];
+                DomeGeneratorKind.Fan => new FanDomeMeshGenerator(),
+                DomeGeneratorKind.Hermite => new HermiteDomeMeshGenerator(),
+                _ => new HermiteDomeMeshGenerator(),
+            };
+            var context = new DomeBuildContext(
+                vertices,
+                normals,
+                boneWeights,
+                hasBoneWeights,
+                hullSelection.AllTriangles,
+                hullSelection.BakedVerticesInSmr,
+                hullSelection.CentroidNormalSmr,
+                hullSelection.CentroidPushVector,
+                parameters.Subdivisions,
+                parameters.TangentScale,
+                vertexCount,
+                generator
+            );
+            var accumulator = new DomeAccumulator();
+            AppendDome(hullSelection.LeftHull, context, accumulator);
+            AppendDome(hullSelection.RightHull, context, accumulator);
+
+            Array.Resize(ref vertices, vertexCount + accumulator.Vertices.Count);
+            Array.Resize(ref normals, vertexCount + accumulator.Vertices.Count);
+            if (validTangents) Array.Resize(ref tangents, vertexCount + accumulator.Vertices.Count);
+            Array.Resize(ref uvs, vertexCount + accumulator.Vertices.Count);
+            if (hasBoneWeights) Array.Resize(ref boneWeights, vertexCount + accumulator.Vertices.Count);
+            for (var i = 0; i < accumulator.Vertices.Count; ++i)
+            {
+                vertices[vertexCount + i] = accumulator.Vertices[i];
+                normals[vertexCount + i] = accumulator.Normals[i];
+                // ShadowCaster専用のため tangent / uv は don't care: ゼロ埋め
+                if (validTangents) tangents[vertexCount + i] = Vector4.zero;
+                uvs[vertexCount + i] = Vector2.zero;
+                if (hasBoneWeights) boneWeights[vertexCount + i] = accumulator.BoneWeights[i];
             }
 
             modifyingMesh.vertices = vertices;
@@ -133,7 +178,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             for (int i = 0; i < originalSubMeshCount; i++) savedTriangles[i] = modifyingMesh.GetTriangles(i);
             modifyingMesh.subMeshCount = originalSubMeshCount + 1;
             for (int i = 0; i < originalSubMeshCount; i++) modifyingMesh.SetTriangles(savedTriangles[i], i);
-            modifyingMesh.SetTriangles(triangles, originalSubMeshCount);
+            modifyingMesh.SetTriangles(accumulator.Triangles, originalSubMeshCount);
             modifyingMesh.RecalculateBounds();
 
             var originalMaterials = referencingRenderer.sharedMaterials;
@@ -141,6 +186,146 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             originalMaterials.CopyTo(newMaterials, 0);
             newMaterials[originalMaterials.Length] = wrapperMaterial;
             referencingRenderer.sharedMaterials = newMaterials;
+        }
+
+        /// <summary>
+        /// 与えられた convex hull に対して指定された IDomeMeshGenerator でドーム状メッシュを生成し、
+        /// アキュムレータにジオメトリを追記する。
+        /// </summary>
+        private static void AppendDome(ImmutableArray<int> hull, DomeBuildContext context, DomeAccumulator accumulator)
+        {
+            if (hull.Length < 3) return;
+
+            var outerPositions = hull.Select(i => context.Vertices[i]).ToImmutableArray();
+            var outerNormals = ComputeFrontFacingNormals(
+                hull,
+                context.AllTriangles,
+                context.BakedVerticesInSmr,
+                context.CentroidNormalSmr,
+                context.Normals
+            );
+            var outerBoneWeights = context.HasBoneWeights
+                ? hull.Select(i => context.BoneWeights[i]).ToImmutableArray()
+                : ImmutableArray<BoneWeight>.Empty;
+
+            var centroidPosition = outerPositions.Aggregate(Vector3.zero, (s, p) => s + p) / outerPositions.Length;
+            centroidPosition += context.CentroidPushVector;
+            var centroidBoneWeight = context.HasBoneWeights ? context.BoneWeights[hull[0]] : default;
+
+            var input = new DomeMeshInput(
+                outerPositions,
+                outerNormals,
+                outerBoneWeights,
+                centroidPosition,
+                context.CentroidNormalSmr,
+                centroidBoneWeight,
+                context.Subdivisions,
+                context.TangentScale
+            );
+            var result = context.Generator.Generate(input);
+            if (result.Positions.Length == 0) return;
+
+            var indexOffset = context.BaseVertexCount + accumulator.Vertices.Count;
+            for (var i = 0; i < result.Positions.Length; ++i)
+            {
+                accumulator.Vertices.Add(result.Positions[i]);
+                accumulator.Normals.Add(result.Normals[i]);
+                if (context.HasBoneWeights) accumulator.BoneWeights.Add(result.BoneWeights[i]);
+            }
+            foreach (var triangleIndex in result.Triangles) accumulator.Triangles.Add(triangleIndex + indexOffset);
+        }
+
+        /// <summary>
+        /// Basis forward 方向を向いた隣接三角形を 1 つ以上持つ頂点のインデックス集合を返す。
+        /// 裏向き(まつ毛裏など)の頂点を hull 計算から除外するために使用する。
+        /// </summary>
+        /// <param name="allTriangles">メッシュ全 submesh を結合した三角形インデックス配列。</param>
+        /// <param name="bakedVerticesInSmr">ベイク済み変形メッシュの頂点位置(SMR空間)。</param>
+        /// <param name="basisForwardInSmr">Basis の forward 方向を SMR 空間に変換したベクトル。</param>
+        private static HashSet<int> ComputeFrontFacingVertexSet(
+            int[] allTriangles,
+            ImmutableArray<Vector3> bakedVerticesInSmr,
+            Vector3 basisForwardInSmr
+        )
+        {
+            var frontFacingSet = new HashSet<int>();
+            for (var t = 0; t < allTriangles.Length; t += 3)
+            {
+                var a = allTriangles[t];
+                var b = allTriangles[t + 1];
+                var c = allTriangles[t + 2];
+                var pa = bakedVerticesInSmr[a];
+                var pb = bakedVerticesInSmr[b];
+                var pc = bakedVerticesInSmr[c];
+                var crossVec = Vector3.Cross(pb - pa, pc - pa);
+                var area = crossVec.magnitude;
+                if (area < 1e-10f) continue;
+                var faceNormal = crossVec / area;
+                if (Vector3.Dot(faceNormal, basisForwardInSmr) <= 0.0f) continue;
+
+                frontFacingSet.Add(a);
+                frontFacingSet.Add(b);
+                frontFacingSet.Add(c);
+            }
+            return frontFacingSet;
+        }
+
+        /// <summary>
+        /// 外周頂点ごとに Basis forward 方向を向いた隣接三角形のみを採用して面法線の面積重み付き平均を計算する。
+        /// 該当する三角形が見つからなかった頂点については fallbackNormals を採用する。
+        /// </summary>
+        /// <param name="hull">外周頂点インデックス列。</param>
+        /// <param name="allTriangles">メッシュ全 submesh を結合した三角形インデックス配列(3個ずつで1三角形)。</param>
+        /// <param name="bakedVerticesInSmr">ベイク済み変形メッシュの頂点位置(SMR空間)。</param>
+        /// <param name="basisForwardInSmr">Basis の forward 方向を SMR 空間に変換したベクトル。</param>
+        /// <param name="fallbackNormals">前向き隣接面が見つからなかった頂点のためのフォールバック法線配列(メッシュ頂点法線)。</param>
+        private static ImmutableArray<Vector3> ComputeFrontFacingNormals(
+            ImmutableArray<int> hull,
+            int[] allTriangles,
+            ImmutableArray<Vector3> bakedVerticesInSmr,
+            Vector3 basisForwardInSmr,
+            Vector3[] fallbackNormals
+        )
+        {
+            var hullIndexLookup = new Dictionary<int, int>(hull.Length);
+            for (var i = 0; i < hull.Length; ++i) hullIndexLookup[hull[i]] = i;
+
+            var accumulators = new Vector3[hull.Length];
+            for (var t = 0; t < allTriangles.Length; t += 3)
+            {
+                var a = allTriangles[t];
+                var b = allTriangles[t + 1];
+                var c = allTriangles[t + 2];
+
+                var hasA = hullIndexLookup.TryGetValue(a, out var idxA);
+                var hasB = hullIndexLookup.TryGetValue(b, out var idxB);
+                var hasC = hullIndexLookup.TryGetValue(c, out var idxC);
+                if (!hasA && !hasB && !hasC) continue;
+
+                var pa = bakedVerticesInSmr[a];
+                var pb = bakedVerticesInSmr[b];
+                var pc = bakedVerticesInSmr[c];
+                var crossVec = Vector3.Cross(pb - pa, pc - pa); // 長さ = 面積 × 2
+                var area = crossVec.magnitude;
+                if (area < 1e-10f) continue;
+                var faceNormal = crossVec / area;
+
+                // Basis forward 向きの面のみ採用(まつ毛側の内向き面は dot < 0 で自然に除外)
+                if (Vector3.Dot(faceNormal, basisForwardInSmr) <= 0.0f) continue;
+
+                // crossVec をそのまま積算することで面積重み付き平均になる
+                if (hasA) accumulators[idxA] += crossVec;
+                if (hasB) accumulators[idxB] += crossVec;
+                if (hasC) accumulators[idxC] += crossVec;
+            }
+
+            var result = ImmutableArray.CreateBuilder<Vector3>(hull.Length);
+            for (var i = 0; i < hull.Length; ++i)
+            {
+                var acc = accumulators[i];
+                result.Add(acc.sqrMagnitude < 1e-12f ? fallbackNormals[hull[i]] : acc.normalized);
+            }
+            return result.MoveToImmutable();
         }
 
         private static (ImmutableArray<int> Left, ImmutableArray<int> Right) ComputeConvexHulls(ImmutableArray<Vector3> vertices, ImmutableArray<int> movingIndices)
@@ -171,6 +356,95 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return (leftHullVertexIndices, rightHullVertexIndices);
         }
 
+        /// <summary>
+        /// SelectHullVertices による頂点選択結果。後段のメッシュ生成フェーズへ渡す。
+        /// </summary>
+        private readonly struct HullSelectionResult
+        {
+            public ImmutableArray<int> LeftHull { get; }
+            public ImmutableArray<int> RightHull { get; }
+            public ImmutableArray<Vector3> BakedVerticesInSmr { get; }
+            public int[] AllTriangles { get; }
+            public Vector3 CentroidNormalSmr { get; }
+            public Vector3 CentroidPushVector { get; }
+
+            public HullSelectionResult(
+                ImmutableArray<int> leftHull,
+                ImmutableArray<int> rightHull,
+                ImmutableArray<Vector3> bakedVerticesInSmr,
+                int[] allTriangles,
+                Vector3 centroidNormalSmr,
+                Vector3 centroidPushVector
+            )
+            {
+                LeftHull = leftHull;
+                RightHull = rightHull;
+                BakedVerticesInSmr = bakedVerticesInSmr;
+                AllTriangles = allTriangles;
+                CentroidNormalSmr = centroidNormalSmr;
+                CentroidPushVector = centroidPushVector;
+            }
+        }
+
+        /// <summary>
+        /// AppendDome へ渡すドーム生成コンテキスト。左右の hull で共通する入力をまとめる。
+        /// </summary>
+        private readonly struct DomeBuildContext
+        {
+            public Vector3[] Vertices { get; }
+            public Vector3[] Normals { get; }
+            public BoneWeight[] BoneWeights { get; }
+            public bool HasBoneWeights { get; }
+            public int[] AllTriangles { get; }
+            public ImmutableArray<Vector3> BakedVerticesInSmr { get; }
+            public Vector3 CentroidNormalSmr { get; }
+            public Vector3 CentroidPushVector { get; }
+            public int Subdivisions { get; }
+            public float TangentScale { get; }
+            public int BaseVertexCount { get; }
+            public IDomeMeshGenerator Generator { get; }
+
+            public DomeBuildContext(
+                Vector3[] vertices,
+                Vector3[] normals,
+                BoneWeight[] boneWeights,
+                bool hasBoneWeights,
+                int[] allTriangles,
+                ImmutableArray<Vector3> bakedVerticesInSmr,
+                Vector3 centroidNormalSmr,
+                Vector3 centroidPushVector,
+                int subdivisions,
+                float tangentScale,
+                int baseVertexCount,
+                IDomeMeshGenerator generator
+            )
+            {
+                Vertices = vertices;
+                Normals = normals;
+                BoneWeights = boneWeights;
+                HasBoneWeights = hasBoneWeights;
+                AllTriangles = allTriangles;
+                BakedVerticesInSmr = bakedVerticesInSmr;
+                CentroidNormalSmr = centroidNormalSmr;
+                CentroidPushVector = centroidPushVector;
+                Subdivisions = subdivisions;
+                TangentScale = tangentScale;
+                BaseVertexCount = baseVertexCount;
+                Generator = generator;
+            }
+        }
+
+        /// <summary>
+        /// AppendDome から追記される新規ジオメトリの蓄積先。
+        /// </summary>
+        private sealed class DomeAccumulator
+        {
+            public List<Vector3> Vertices { get; } = new List<Vector3>();
+            public List<Vector3> Normals { get; } = new List<Vector3>();
+            public List<BoneWeight> BoneWeights { get; } = new List<BoneWeight>();
+            public List<int> Triangles { get; } = new List<int>();
+        }
+
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
             internal string BlinkBlendShapeName;
@@ -179,6 +453,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal float WithdrawalLimit;
             internal Transform Basis;
             internal float CentroidPush;
+            internal int Subdivisions;
+            internal float TangentScale;
+            internal DomeGeneratorKind GeneratorKind;
 
             internal static FixedParameters FixFromComponent(Transform defaultBasis, EyeholeDepthWrapper component)
             {
@@ -191,6 +468,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     WithdrawalLimit = component.WithdrawalLimit,
                     Basis = basisSource,
                     CentroidPush = component.CentroidPush,
+                    Subdivisions = Mathf.Max(1, component.Subdivisions),
+                    TangentScale = component.TangentScale,
+                    GeneratorKind = component.GeneratorKind,
                 };
             }
 
@@ -201,7 +481,10 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     Mathf.Approximately(Threshold, other.Threshold) &&
                     Mathf.Approximately(EyelashCut, other.EyelashCut) &&
                     Mathf.Approximately(WithdrawalLimit, other.WithdrawalLimit) &&
-                    Mathf.Approximately(CentroidPush, other.CentroidPush);
+                    Mathf.Approximately(CentroidPush, other.CentroidPush) &&
+                    Subdivisions == other.Subdivisions &&
+                    Mathf.Approximately(TangentScale, other.TangentScale) &&
+                    GeneratorKind == other.GeneratorKind;
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);

@@ -39,7 +39,7 @@ Shader "KusakaFactory/Zatools/EdwPreview"
                 float hatch1 = step(0.5, frac((pixel.x + pixel.y) / 8.0));
                 float hatch2 = step(0.5, frac((pixel.x - pixel.y) / 8.0));
                 float h = min(hatch1, hatch2);
-                clip(hatch1 - hatch2);
+                // clip(hatch1 - hatch2);
                 return float4(0, 0, 1.0, 1.0);
             }
             ENDCG
