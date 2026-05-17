@@ -274,6 +274,12 @@ msgstr "Eyelash Cut Distance"
 msgid "edw.inspector.advanced"
 msgstr "Advanced"
 
+msgid "cdw.inspector.material-override"
+msgstr "Material to Assign"
+
+msgid "cdw.inspector.advanced"
+msgstr "Advanced Settings"
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 

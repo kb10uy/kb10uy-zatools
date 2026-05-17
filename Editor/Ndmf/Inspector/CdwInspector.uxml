@@ -2,6 +2,9 @@
     <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:Foldout text="cdw.inspector.advanced" value="false" class="ndmf-tr">
+            <uie:ObjectField label="cdw.inspector.material-override" name="FieldMaterialOverride" type="UnityEngine.Material, UnityEngine.CoreModule" binding-path="MaterialOverride" class="ndmf-tr" />
+        </ui:Foldout>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.CdwRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
 </ui:UXML>

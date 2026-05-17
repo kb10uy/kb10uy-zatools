@@ -8,5 +8,6 @@ namespace KusakaFactory.Zatools.Runtime
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public sealed class ConvexDepthWrapper : ZatoolsMeshEditingComponent
     {
+        public Material MaterialOverride = null;
     }
 }

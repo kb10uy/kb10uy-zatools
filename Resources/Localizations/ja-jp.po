@@ -276,6 +276,12 @@ msgstr "まつ毛を無視する距離"
 msgid "edw.inspector.advanced"
 msgstr "上級者向け設定"
 
+msgid "cdw.inspector.material-override"
+msgstr "割り当てるマテリアル"
+
+msgid "cdw.inspector.advanced"
+msgstr "上級者向け設定"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 
