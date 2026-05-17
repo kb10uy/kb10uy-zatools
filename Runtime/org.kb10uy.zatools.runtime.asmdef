@@ -1,6 +1,6 @@
 {
     "name": "org.kb10uy.zatools.runtime",
-    "rootNamespace": "",
+    "rootNamespace": "KusakaFactory.Zatools.Runtime",
     "references": [
         "nadena.dev.ndmf.runtime"
     ],
