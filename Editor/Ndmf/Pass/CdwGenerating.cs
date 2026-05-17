@@ -32,7 +32,9 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
-            var assigningMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
+            var assigningMaterial = component.MaterialOverride != null ?
+                component.MaterialOverride :
+                AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
             var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
             var modifyingMesh = UnityObject.Instantiate(originalMesh);
             Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial);
