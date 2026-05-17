@@ -1,7 +1,9 @@
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using VRC.SDK3.Avatars.ScriptableObjects;
 using nadena.dev.modular_avatar.core;
+using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.EditorExtension
 {
@@ -54,6 +56,46 @@ namespace KusakaFactory.Zatools.EditorExtension
         private static bool AddDepthWrapperMaterialSwapCheck()
         {
             return Selection.gameObjects.Length == 1;
+        }
+
+        [MenuItem(GOA_MENU_PREFIX + "(Advanced) Inverted Convex Depth Wrapper Setup with Toggle", false, 30)]
+        private static void InvertedConvexDepthWrapperSetupWithToggle()
+        {
+            if (Selection.gameObjects.Length != 1) return;
+            var target = Selection.activeGameObject;
+            if (target.GetComponent<SkinnedMeshRenderer>() == null) return;
+
+            var wrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
+            var disabledWrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(DisabledWrapperMaterialGuid));
+
+            Undo.RecordObject(target, "Setup Inverted Convex Depth Wrapper");
+            var cdw = target.AddComponent<ConvexDepthWrapper>();
+            cdw.MaterialOverride = disabledWrapperMaterial;
+            if (!EditorUtility.IsPersistent(target)) PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+
+            var toggleObject = new GameObject("DepthWrapperToggle");
+            toggleObject.transform.parent = target.transform;
+            toggleObject.AddComponent<ModularAvatarMenuInstaller>();
+            var menuItem = toggleObject.AddComponent<ModularAvatarMenuItem>();
+            menuItem.Control = new VRCExpressionsMenu.Control { type = VRCExpressionsMenu.Control.ControlType.Toggle };
+            menuItem.isSaved = false;
+            menuItem.automaticValue = true;
+            menuItem.label = "Fix Depth";
+            var materialSwap = toggleObject.AddComponent<ModularAvatarMaterialSwap>();
+            materialSwap.Swaps.Add(new MatSwap
+            {
+                From = disabledWrapperMaterial,
+                To = wrapperMaterial,
+            });
+            PrefabUtility.RecordPrefabInstancePropertyModifications(toggleObject);
+        }
+
+        [MenuItem(GOA_MENU_PREFIX + "(Advanced) Inverted Convex Depth Wrapper Setup with Toggle", true, 30)]
+        private static bool InvertedConvexDepthWrapperSetupWithToggleCheck()
+        {
+            if (Selection.gameObjects.Length != 1) return false;
+            var target = Selection.activeGameObject;
+            return target.GetComponent<SkinnedMeshRenderer>() != null;
         }
     }
 }
