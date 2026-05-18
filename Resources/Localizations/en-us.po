@@ -274,6 +274,9 @@ msgstr "Eyelash Cut Distance"
 msgid "edw.inspector.advanced"
 msgstr "Advanced"
 
+msgid "cdw.inspector.source"
+msgstr "Target Renderer"
+
 msgid "cdw.inspector.material-override"
 msgstr "Material to Assign"
 
