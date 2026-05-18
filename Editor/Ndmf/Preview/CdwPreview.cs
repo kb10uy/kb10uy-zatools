@@ -25,6 +25,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
         private Mesh _duplicatedMesh = null;
         private List<Material> _reassignedMaterials = null;
+        private bool _separateMesh = false;
+        private SkinnedMeshRenderer _separateSource = null;
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
@@ -35,23 +37,36 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ComputeContext context
         )
         {
-            if (proxyed == null || proxyed.sharedMesh == null) return default;
-
-            var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
-            duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
-
-            var observedParameters = components.Select((c) => context.Observe(
-                c,
-                Cdw.FixedParameters.FixFromComponent,
-                (op, np) => op == np
-            ));
-
             var wrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperPreviewMaterialGuid));
-            foreach (var parameters in observedParameters) Cdw.Process(proxyed, duplicatedMesh, parameters, wrapperMaterial);
+            // ConvexDepthWrapper has DisallowMultipleComponent, a renderer will have at most one.
+            var observedParameter = context.Observe(components[0], Cdw.FixedParameters.FixFromComponent, (op, np) => op == np);
 
-            _duplicatedMesh = duplicatedMesh;
-            _reassignedMaterials = proxyed.sharedMaterials.ToList();
-            proxyed.sharedMesh = duplicatedMesh;
+            _separateMesh = observedParameter.SeparateSmr;
+            _separateSource = observedParameter.SourceMeshRenderer;
+
+            if (_separateMesh)
+            {
+                if (proxyed == null || proxyed.sharedMesh != null) return default;
+
+                var generatedMesh = new Mesh { name = $"Convex Depth Wrapper for Preview" };
+                Cdw.ProcessSeparate(proxyed, generatedMesh, observedParameter, wrapperMaterial);
+
+                _duplicatedMesh = generatedMesh;
+                _reassignedMaterials = proxyed.sharedMaterials.ToList();
+                proxyed.sharedMesh = generatedMesh;
+            }
+            else
+            {
+                if (proxyed == null || proxyed.sharedMesh == null) return default;
+
+                var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
+                duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
+                Cdw.Process(proxyed, duplicatedMesh, observedParameter, wrapperMaterial);
+
+                _duplicatedMesh = duplicatedMesh;
+                _reassignedMaterials = proxyed.sharedMaterials.ToList();
+                proxyed.sharedMesh = duplicatedMesh;
+            }
 
             return default;
         }
@@ -73,6 +88,14 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             {
                 proxyedSkinnedMeshRenderer.sharedMesh = _duplicatedMesh;
                 proxyedSkinnedMeshRenderer.sharedMaterials = _reassignedMaterials.ToArray();
+
+                if (_separateMesh)
+                {
+                    proxyedSkinnedMeshRenderer.bones = _separateSource.bones;
+                    proxyedSkinnedMeshRenderer.rootBone = _separateSource.rootBone;
+                    proxyedSkinnedMeshRenderer.probeAnchor = _separateSource.probeAnchor;
+                    proxyedSkinnedMeshRenderer.localBounds = _separateSource.localBounds;
+                }
             }
         }
 
