@@ -93,21 +93,81 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             referencingRenderer.sharedMaterials = newMaterials;
         }
 
+        internal static void ProcessSeparate(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
+        {
+            if (!parameters.SeparateSmr || parameters.SourceMeshRenderer == null || parameters.SourceMeshRenderer.sharedMesh == null) return;
+
+            var sourceMesh = parameters.SourceMeshRenderer.sharedMesh;
+            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(sourceMesh, parameters.SourceMeshRenderer);
+
+            ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
+            if (hullTriangles.Length < 12) return;
+
+            var sourceNormals = sourceMesh.normals;
+            var sourceTangents = sourceMesh.tangents;
+            var sourceBoneWeights = sourceMesh.boneWeights;
+            var sourceVertexCount = sourceMesh.vertexCount;
+            var validSourceTangents = sourceTangents.Length == sourceVertexCount;
+            var sourceHasBoneWeights = sourceBoneWeights != null && sourceBoneWeights.Length == sourceVertexCount;
+
+            var vertexMap = new Dictionary<int, int>();
+            var generatedVertices = new List<Vector3>();
+            var generatedNormals = new List<Vector3>();
+            var generatedUvs = new List<Vector2>();
+            var generatedTangents = validSourceTangents ? new List<Vector4>() : null;
+            var generatedBoneWeights = sourceHasBoneWeights ? new List<BoneWeight>() : null;
+            var generatedTriangles = new int[hullTriangles.Length];
+
+            for (int i = 0; i < hullTriangles.Length; i++)
+            {
+                var originalIndex = hullTriangles[i];
+                if (!vertexMap.TryGetValue(originalIndex, out var newIndex))
+                {
+                    newIndex = generatedVertices.Count;
+                    vertexMap.Add(originalIndex, newIndex);
+                    generatedVertices.Add(blendShapeAppliedVertices[originalIndex]);
+                    generatedNormals.Add(sourceNormals[originalIndex]);
+                    generatedUvs.Add(Vector2.zero);
+                    if (validSourceTangents) generatedTangents.Add(sourceTangents[originalIndex]);
+                    if (sourceHasBoneWeights) generatedBoneWeights.Add(sourceBoneWeights[originalIndex]);
+                }
+                generatedTriangles[i] = newIndex;
+            }
+
+            modifyingMesh.SetVertices(generatedVertices);
+            modifyingMesh.SetNormals(generatedNormals);
+            modifyingMesh.SetUVs(0, generatedUvs);
+            if (validSourceTangents) modifyingMesh.SetTangents(generatedTangents);
+            if (sourceHasBoneWeights) modifyingMesh.boneWeights = generatedBoneWeights.ToArray();
+            modifyingMesh.SetTriangles(generatedTriangles, 0);
+            modifyingMesh.bindposes = sourceMesh.bindposes;
+            modifyingMesh.RecalculateBounds();
+
+            referencingRenderer.sharedMaterials = new Material[] { wrapperMaterial };
+        }
+
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
+            internal bool SeparateSmr;
+            internal SkinnedMeshRenderer SourceMeshRenderer;
+
             internal static FixedParameters FixFromComponent(ConvexDepthWrapper component)
             {
-                return new FixedParameters();
+                return new FixedParameters
+                {
+                    SeparateSmr = component.SourceMeshRenderer != null,
+                    SourceMeshRenderer = component.SourceMeshRenderer,
+                };
             }
 
             public bool Equals(FixedParameters other)
             {
-                return true;
+                return SeparateSmr == other.SeparateSmr && SourceMeshRenderer == other.SourceMeshRenderer;
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
 
-            public override int GetHashCode() => 0.GetHashCode();
+            public override int GetHashCode() => (SeparateSmr, SourceMeshRenderer).GetHashCode();
 
             public static bool operator ==(FixedParameters lhs, FixedParameters rhs) => lhs.Equals(rhs);
 

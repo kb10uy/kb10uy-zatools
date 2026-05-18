@@ -25,22 +25,37 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void ProcessFor(CdwComponent component, SkinnedMeshRenderer skinnedMeshRenderer, Transform avatarRoot)
         {
-            var originalMesh = skinnedMeshRenderer.sharedMesh;
-            if (originalMesh == null)
-            {
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
-
+            var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
             var assigningMaterial = component.MaterialOverride != null ?
                 component.MaterialOverride :
                 AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
-            var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
-            var modifyingMesh = UnityObject.Instantiate(originalMesh);
-            Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial);
 
-            skinnedMeshRenderer.sharedMesh = modifyingMesh;
-            ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);
+            if (fixedParameters.SeparateSmr)
+            {
+                var generatedMesh = new Mesh { name = $"Convex Depth Wrapper for {fixedParameters.SourceMeshRenderer.name}" };
+                Cdw.ProcessSeparate(skinnedMeshRenderer, generatedMesh, fixedParameters, assigningMaterial);
+
+                skinnedMeshRenderer.sharedMesh = generatedMesh;
+                skinnedMeshRenderer.bones = fixedParameters.SourceMeshRenderer.bones;
+                skinnedMeshRenderer.rootBone = fixedParameters.SourceMeshRenderer.rootBone;
+                skinnedMeshRenderer.probeAnchor = fixedParameters.SourceMeshRenderer.probeAnchor;
+                skinnedMeshRenderer.localBounds = fixedParameters.SourceMeshRenderer.localBounds;
+            }
+            else
+            {
+                var originalMesh = skinnedMeshRenderer.sharedMesh;
+                if (originalMesh == null)
+                {
+                    UnityObject.DestroyImmediate(component);
+                    return;
+                }
+
+                var modifyingMesh = UnityObject.Instantiate(originalMesh);
+                Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial);
+
+                skinnedMeshRenderer.sharedMesh = modifyingMesh;
+                ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);
+            }
 
             UnityObject.DestroyImmediate(component);
         }
