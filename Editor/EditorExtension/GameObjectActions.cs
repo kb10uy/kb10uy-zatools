@@ -42,13 +42,13 @@ namespace KusakaFactory.Zatools.EditorExtension
             if (Selection.gameObjects.Length != 1) return;
             var target = Selection.activeGameObject;
 
-            Undo.RecordObject(target, "Add MA Material Swap for Depth Wrapper");
             var materialSwap = target.AddComponent<ModularAvatarMaterialSwap>();
             materialSwap.Swaps.Add(new MatSwap
             {
                 From = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid)),
                 To = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(DisabledWrapperMaterialGuid)),
             });
+            Undo.RegisterCreatedObjectUndo(materialSwap, "Setup Inverted Convex Depth Wrapper");
             if (!EditorUtility.IsPersistent(target)) PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
 
@@ -68,9 +68,10 @@ namespace KusakaFactory.Zatools.EditorExtension
             var wrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));
             var disabledWrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(DisabledWrapperMaterialGuid));
 
-            Undo.RecordObject(target, "Setup Inverted Convex Depth Wrapper");
             var cdw = target.AddComponent<ConvexDepthWrapper>();
+            if (cdw == null) return;
             cdw.MaterialOverride = disabledWrapperMaterial;
+            Undo.RegisterCreatedObjectUndo(cdw, "Setup Inverted Convex Depth Wrapper");
             if (!EditorUtility.IsPersistent(target)) PrefabUtility.RecordPrefabInstancePropertyModifications(target);
 
             var toggleObject = new GameObject("DepthWrapperToggle");
@@ -87,6 +88,7 @@ namespace KusakaFactory.Zatools.EditorExtension
                 From = disabledWrapperMaterial,
                 To = wrapperMaterial,
             });
+            Undo.RegisterCreatedObjectUndo(toggleObject, "Setup Inverted Convex Depth Wrapper");
             PrefabUtility.RecordPrefabInstancePropertyModifications(toggleObject);
         }
 
