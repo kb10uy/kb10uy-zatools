@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Localization
 {
-    [InitializeOnLoad]
     internal static class ZatoolsLocalization
     {
         internal static readonly ImmutableList<string> SupportedLanguages = ImmutableList<string>.Empty
