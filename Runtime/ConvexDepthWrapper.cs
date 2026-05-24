@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace KusakaFactory.Zatools.Runtime
@@ -11,5 +12,13 @@ namespace KusakaFactory.Zatools.Runtime
     {
         public Material MaterialOverride = null;
         public SkinnedMeshRenderer SourceMeshRenderer = null;
+        public ConvexDepthWrapperBlendShapeOverride[] Overrides = new ConvexDepthWrapperBlendShapeOverride[] { };
+    }
+
+    [Serializable]
+    public sealed class ConvexDepthWrapperBlendShapeOverride
+    {
+        public string Name = "";
+        public float Value = 0.0f;
     }
 }

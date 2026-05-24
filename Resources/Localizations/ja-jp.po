@@ -282,6 +282,9 @@ msgstr "生成対象"
 msgid "cdw.inspector.material-override"
 msgstr "割り当てるマテリアル"
 
+msgid "cdw.inspector.overrides"
+msgstr "BlendShape オーバーライド"
+
 msgid "cdw.inspector.advanced"
 msgstr "上級者向け設定"
 
