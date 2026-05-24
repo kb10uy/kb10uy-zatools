@@ -5,6 +5,8 @@
         <uie:ObjectField label="cdw.inspector.source" name="FieldSourceMeshRenderer" binding-path="SourceMeshRenderer" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
         <ui:Foldout text="cdw.inspector.advanced" value="false" class="ndmf-tr">
             <uie:ObjectField label="cdw.inspector.material-override" name="FieldMaterialOverride" type="UnityEngine.Material, UnityEngine.CoreModule" binding-path="MaterialOverride" class="ndmf-tr" />
+            <ui:Label tabindex="-1" text="cdw.inspector.overrides" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelOverrides" class="ndmf-tr" style="font-size: 12.5px; margin-left: 4px; -unity-font-style: bold; margin-top: 8px;" />
+            <ui:ListView name="FieldOverrides" binding-path="Overrides" virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-add-remove-footer="true" show-bound-collection-size="false" reorder-mode="Animated" />
         </ui:Foldout>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.CdwRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>

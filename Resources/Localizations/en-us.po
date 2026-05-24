@@ -280,6 +280,9 @@ msgstr "Target Renderer"
 msgid "cdw.inspector.material-override"
 msgstr "Material to Assign"
 
+msgid "cdw.inspector.overrides"
+msgstr "BlendShape Overrides"
+
 msgid "cdw.inspector.advanced"
 msgstr "Advanced Settings"
 
