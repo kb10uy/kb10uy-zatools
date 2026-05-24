@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -11,7 +14,7 @@ namespace KusakaFactory.Zatools.Foundation
         private static readonly int MaxBlendShapesPerBatch = 8;
         private static readonly int VerticesPerBatch = 128;
 
-        internal static Vector3[] ComputeBlendShapeAppliedVertices(Mesh mesh, SkinnedMeshRenderer renderer, float epsilon = 1e-4f)
+        internal static Vector3[] ComputeBlendShapeAppliedVertices(Mesh mesh, SkinnedMeshRenderer renderer, ImmutableArray<(string Name, float Value)> overrides, float epsilon = 1e-4f)
         {
             if (mesh == null) throw new ArgumentNullException(nameof(mesh));
             if (renderer == null) throw new ArgumentNullException(nameof(renderer));
@@ -27,26 +30,37 @@ namespace KusakaFactory.Zatools.Foundation
                 throw new ArgumentException("different mesh vertex count", nameof(renderer));
             }
 
+            // TODO: Support multi-frame BlendShapes
+            var blendShapeCount = mesh.blendShapeCount;
+            var applyingWeights = new List<(int, float)>();
+            for (var i = 0; i < blendShapeCount; ++i)
+            {
+                if (mesh.GetBlendShapeFrameCount(i) != 1) continue;
+                var weight = renderer.GetBlendShapeWeight(i) / mesh.GetBlendShapeFrameWeight(i, 0);
+                if (Mathf.Abs(weight) < epsilon) continue;
+                applyingWeights.Add((i, weight));
+            }
+            foreach (var (name, value) in overrides)
+            {
+                var i = mesh.GetBlendShapeIndex(name);
+                if (i == -1) continue;
+                if (mesh.GetBlendShapeFrameCount(i) != 1) continue;
+                if (Mathf.Abs(value) < epsilon) continue;
+                applyingWeights.Add((i, value));
+            }
+
             var deltaVertices = new Vector3[vertexCount];
             var _deltaNormals = new Vector3[vertexCount];
             var _deltaTangents = new Vector3[vertexCount];
-
             var resultNative = new NativeArray<Vector3>(result, Allocator.TempJob);
             var deltaBatchNative = new NativeArray<Vector3>(vertexCount * MaxBlendShapesPerBatch, Allocator.TempJob);
             var weightsNative = new NativeArray<float>(MaxBlendShapesPerBatch, Allocator.TempJob);
             try
             {
                 var activeBlendShapeCount = 0;
-                var blendShapeCount = mesh.blendShapeCount;
-                for (var blendShapeIndex = 0; blendShapeIndex < blendShapeCount; blendShapeIndex++)
+                foreach (var (index, weight) in applyingWeights)
                 {
-                    // TODO: Support multi-frame BlendShapes
-                    if (mesh.GetBlendShapeFrameCount(blendShapeIndex) != 1) continue;
-
-                    var weight = renderer.GetBlendShapeWeight(blendShapeIndex) / mesh.GetBlendShapeFrameWeight(blendShapeIndex, 0);
-                    if (Mathf.Abs(weight) < epsilon) continue;
-
-                    mesh.GetBlendShapeFrameVertices(blendShapeIndex, 0, deltaVertices, _deltaNormals, _deltaTangents);
+                    mesh.GetBlendShapeFrameVertices(index, 0, deltaVertices, _deltaNormals, _deltaTangents);
 
                     var nativeSpan = deltaBatchNative.AsSpan().Slice(activeBlendShapeCount * vertexCount, vertexCount);
                     deltaVertices.CopyTo(nativeSpan);

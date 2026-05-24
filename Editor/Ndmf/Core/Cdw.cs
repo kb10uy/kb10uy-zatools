@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using UnityEngine;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
+using System.Linq;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -21,7 +22,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
-            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(modifyingMesh, referencingRenderer);
+            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(modifyingMesh, referencingRenderer, parameters.Overrides);
 
             ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
             if (hullTriangles.Length < 12) return;
@@ -98,7 +99,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             if (!parameters.SeparateSmr || parameters.SourceMeshRenderer == null || parameters.SourceMeshRenderer.sharedMesh == null) return;
 
             var sourceMesh = parameters.SourceMeshRenderer.sharedMesh;
-            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(sourceMesh, parameters.SourceMeshRenderer);
+            var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(sourceMesh, parameters.SourceMeshRenderer, parameters.Overrides);
 
             ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
             if (hullTriangles.Length < 12) return;
@@ -150,24 +151,31 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             internal bool SeparateSmr;
             internal SkinnedMeshRenderer SourceMeshRenderer;
+            internal ImmutableArray<(string Name, float Value)> Overrides;
 
             internal static FixedParameters FixFromComponent(ConvexDepthWrapper component)
             {
+                var overrides = component.Overrides
+                    .Select((o) => (o.Name, o.Value))
+                    .ToImmutableArray();
                 return new FixedParameters
                 {
                     SeparateSmr = component.SourceMeshRenderer != null,
                     SourceMeshRenderer = component.SourceMeshRenderer,
+                    Overrides = overrides,
                 };
             }
 
             public bool Equals(FixedParameters other)
             {
-                return SeparateSmr == other.SeparateSmr && SourceMeshRenderer == other.SourceMeshRenderer;
+                return SeparateSmr == other.SeparateSmr &&
+                    SourceMeshRenderer == other.SourceMeshRenderer &&
+                    Overrides.SequenceEqual(other.Overrides);
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
 
-            public override int GetHashCode() => (SeparateSmr, SourceMeshRenderer).GetHashCode();
+            public override int GetHashCode() => (SeparateSmr, SourceMeshRenderer, Overrides).GetHashCode();
 
             public static bool operator ==(FixedParameters lhs, FixedParameters rhs) => lhs.Equals(rhs);
 
