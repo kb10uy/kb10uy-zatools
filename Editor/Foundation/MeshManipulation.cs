@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -32,13 +31,13 @@ namespace KusakaFactory.Zatools.Foundation
 
             // TODO: Support multi-frame BlendShapes
             var blendShapeCount = mesh.blendShapeCount;
-            var applyingWeights = new List<(int, float)>();
+            var applyingWeights = new SortedDictionary<int, float>();
             for (var i = 0; i < blendShapeCount; ++i)
             {
                 if (mesh.GetBlendShapeFrameCount(i) != 1) continue;
                 var weight = renderer.GetBlendShapeWeight(i) / mesh.GetBlendShapeFrameWeight(i, 0);
                 if (Mathf.Abs(weight) < epsilon) continue;
-                applyingWeights.Add((i, weight));
+                applyingWeights.Add(i, weight);
             }
             foreach (var (name, value) in overrides)
             {
@@ -46,7 +45,7 @@ namespace KusakaFactory.Zatools.Foundation
                 if (i == -1) continue;
                 if (mesh.GetBlendShapeFrameCount(i) != 1) continue;
                 if (Mathf.Abs(value) < epsilon) continue;
-                applyingWeights.Add((i, value));
+                applyingWeights.Add(i, value);
             }
 
             var deltaVertices = new Vector3[vertexCount];
