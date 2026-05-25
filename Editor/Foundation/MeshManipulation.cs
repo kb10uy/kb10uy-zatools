@@ -44,6 +44,13 @@ namespace KusakaFactory.Zatools.Foundation
                 var i = mesh.GetBlendShapeIndex(name);
                 if (i == -1) continue;
                 if (mesh.GetBlendShapeFrameCount(i) != 1) continue;
+
+                if (applyingWeights.ContainsKey(i))
+                {
+                    applyingWeights[i] = value;
+                    continue;
+                }
+
                 if (Mathf.Abs(value) < epsilon) continue;
                 applyingWeights.Add(i, value);
             }
