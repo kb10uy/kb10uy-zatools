@@ -77,6 +77,12 @@ msgstr "Unity の Aim Constraint ではなく VRC Aim Constraint を使用する
 msgid "eepi.inspector.dummy-bones"
 msgstr "ダミーボーンを挿入する"
 
+msgid "eepi.inspector.target-axis"
+msgstr "ターゲットの配置軸を修正する"
+
+msgid "eepi.inspector.target-axis:tooltip"
+msgstr "LowerArm から Hand への方向をもとにターゲットの配置を修正します"
+
 msgid "eepi.inspector.dummy-bones:tooltip"
 msgstr "標準の Eye ボーンの回転が (0, 0, 0) から離れている場合に補正する"
 

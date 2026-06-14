@@ -80,6 +80,12 @@ msgstr "Insert Dummy Bones"
 msgid "eepi.inspector.dummy-bones:tooltip"
 msgstr "Insert dummy eye bones between head and default eye bones."
 
+msgid "eepi.inspector.target-axis"
+msgstr "Fix Target Axis"
+
+msgid "eepi.inspector.target-axis:tooltip"
+msgstr "Fixes gaze target transform based on direction from LowerArm to Hand."
+
 msgid "eepi.inspector.fx-layer"
 msgstr "Adapt bundled FX Layer"
 
