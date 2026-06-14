@@ -48,6 +48,12 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 (constrainedLeftEye, lookAdjustLeft) = SubstituteEyeBone(constrainedLeftEye);
                 (constrainedRightEye, lookAdjustRight) = SubstituteEyeBone(constrainedRightEye);
             }
+            if (state.Installer.FixTargetAxis)
+            {
+                ReplaceHandTargetAnchor(context.AvatarRootObject, HumanBodyBones.LeftHand, state.Installer.transform.Find("WorldAnchor/TargetHand_L"));
+                ReplaceHandTargetAnchor(context.AvatarRootObject, HumanBodyBones.RightHand, state.Installer.transform.Find("WorldAnchor/TargetHand_R"));
+                ReplaceHeadTargetAnchor(context.AvatarRootObject, state.Installer.transform.Find("WorldAnchor/TargetHead"));
+            }
 
             // Aim Constraint の設定
             var target = LocateEyePointerTarget(state.Installer);
@@ -148,6 +154,38 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             dummyEye.transform.localRotation = Quaternion.identity;
             originalEye.transform.SetParent(dummyEye.transform, true);
             return (dummyEye.transform, Quaternion.Inverse(originalEye.localRotation));
+        }
+
+        private static void ReplaceHandTargetAnchor(GameObject avatarRoot, HumanBodyBones handBone, Transform targetAnchor)
+        {
+            var animator = avatarRoot.GetComponent<Animator>();
+            var hand = animator.GetBoneTransform(handBone);
+            var handParent = hand.parent;
+            var armDirectionInHandSpace = hand.InverseTransformDirection(handParent.TransformDirection(hand.localPosition));
+            var proxyRotation = Quaternion.FromToRotation(Vector3.up, armDirectionInHandSpace.normalized);
+
+            var anchorProxy = new GameObject("TargetAnchorProxy");
+            anchorProxy.transform.SetParent(hand, false);
+            anchorProxy.transform.localRotation = proxyRotation;
+
+            var anchorBoneProxy = targetAnchor.GetComponent<ModularAvatarBoneProxy>();
+            anchorBoneProxy.target = anchorProxy.transform;
+        }
+
+        private static void ReplaceHeadTargetAnchor(GameObject avatarRoot, Transform targetAnchor)
+        {
+            var animator = avatarRoot.GetComponent<Animator>();
+            var head = animator.GetBoneTransform(HumanBodyBones.Head);
+            var forwardInHeadSpace = head.InverseTransformDirection(avatarRoot.transform.forward);
+            var upwardInHeadSpace = head.InverseTransformDirection(avatarRoot.transform.up);
+            var proxyRotation = Quaternion.LookRotation(forwardInHeadSpace, upwardInHeadSpace);
+
+            var anchorProxy = new GameObject("TargetAnchorProxy");
+            anchorProxy.transform.SetParent(head, false);
+            anchorProxy.transform.localRotation = proxyRotation;
+
+            var anchorBoneProxy = targetAnchor.GetComponent<ModularAvatarBoneProxy>();
+            anchorBoneProxy.target = anchorProxy.transform;
         }
 
         private static GameObject LocateEyePointerTarget(Installer installer)
