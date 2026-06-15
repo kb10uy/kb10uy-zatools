@@ -160,30 +160,6 @@ msgstr "Regex for From"
 msgid "ahbsm.inspector.append-regex"
 msgstr "Append canceling defintions according to Regices"
 
-msgid "pbfctt.inspector.position"
-msgstr "Position"
-
-msgid "pbfctt.inspector.rotation"
-msgstr "Rotation"
-
-msgid "pbfctt.inspector.radius"
-msgstr "Radius"
-
-msgid "pbfctt.inspector.length"
-msgstr "Length"
-
-msgid "pbfctt.report.too-many-targets"
-msgstr "PB Finger Collider Transfer Target: Too many targets ({0})"
-
-msgid "pbfctt.report.too-many-targets:description"
-msgstr "At most 6 targets can be placed in an avatar (ones for index fingers are preserved on hands). Rest targets will be ignored."
-
-msgid "pbfctt.report.deprecated"
-msgstr "Deprecated due to MA Global Collider"
-
-msgid "pbfctt.report.deprecated:description"
-msgstr "MA 1.15 or above has Global Collider component that provides equivalent functionality."
-
 msgid "anhb.inspector.direction"
 msgstr "Normal Direction"
 

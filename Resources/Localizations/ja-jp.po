@@ -162,30 +162,6 @@ msgstr "コピー先の正規表現"
 msgid "ahbsm.inspector.append-regex"
 msgstr "コピー元を打ち消す定義をコピー先に追加"
 
-msgid "pbfctt.inspector.position"
-msgstr "位置"
-
-msgid "pbfctt.inspector.rotation"
-msgstr "回転"
-
-msgid "pbfctt.inspector.radius"
-msgstr "半径"
-
-msgid "pbfctt.inspector.length"
-msgstr "長さ"
-
-msgid "pbfctt.report.too-many-targets"
-msgstr "PB Finger Collider Transfer Target: アバター内の Target が多すぎます ({0})"
-
-msgid "pbfctt.report.too-many-targets:description"
-msgstr "Collider の位置を移動できるのは最大 6 個です(人差し指のコライダーは保持されます)。超えた分は無視されます。"
-
-msgid "pbfctt.report.deprecated"
-msgstr "MA Global Collider への移行を推奨します"
-
-msgid "pbfctt.report.deprecated:description"
-msgstr "MA 1.15 で追加された Global Collider コンポーネントが同等の機能を提供しています。"
-
 msgid "anhb.inspector.direction"
 msgstr "法線方向"
 
