@@ -45,8 +45,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var (lookAdjustLeft, lookAdjustRight) = (Quaternion.identity, Quaternion.identity);
             if (state.Installer.DummyEyeBones)
             {
-                (constrainedLeftEye, lookAdjustLeft) = SubstituteEyeBone(constrainedLeftEye);
-                (constrainedRightEye, lookAdjustRight) = SubstituteEyeBone(constrainedRightEye);
+                (constrainedLeftEye, lookAdjustLeft) = SubstituteEyeBone(context.AvatarRootTransform, constrainedLeftEye);
+                (constrainedRightEye, lookAdjustRight) = SubstituteEyeBone(context.AvatarRootTransform, constrainedRightEye);
             }
             if (state.Installer.FixTargetAxis)
             {
@@ -142,7 +142,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             return (leftEyeTransform, rightEyeTransform);
         }
 
-        private static (Transform, Quaternion) SubstituteEyeBone(Transform originalEye)
+        private static (Transform, Quaternion) SubstituteEyeBone(Transform avatarRoot, Transform originalEye)
         {
             if (originalEye == null) return (null, Quaternion.identity);
 
