@@ -115,29 +115,21 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return anchorProxy.transform;
         }
 
-        internal static void SetupApsProperties(GameObject avatarRoot, params Transform[] unfixAnchors)
+        internal static void SetupApsProperties(Component apsComponent, params Transform[] unfixAnchors)
         {
-            var apsComponentType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany((a) => a.GetTypes())
-                .FirstOrDefault((t) => t.FullName == "ZeroFactory.AvatarPoseSystem.NDMF.AvatarPoseSystem");
-            if (apsComponentType == null) return;
-            var apsComponent = avatarRoot.GetComponentInChildren(apsComponentType);
-            if (apsComponent == null) return;
-
             var soAps = new SerializedObject(apsComponent);
             var unhandleEyesProperty = soAps.FindProperty("UnhandleEyes");
             var unfixObjectsProperty = soAps.FindProperty("UnfixObjects");
 
             unhandleEyesProperty.boolValue = true;
             var nextIndex = unfixObjectsProperty.arraySize;
-            foreach(var unfixAnchor in unfixAnchors)
+            foreach (var unfixAnchor in unfixAnchors)
             {
                 unfixObjectsProperty.InsertArrayElementAtIndex(nextIndex);
                 var unfixElement = unfixObjectsProperty.GetArrayElementAtIndex(nextIndex);
                 unfixElement.objectReferenceValue = unfixAnchor.gameObject;
                 ++nextIndex;
             }
-
             soAps.ApplyModifiedProperties();
         }
 
@@ -417,7 +409,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
-        internal static ((Transform OriginalLeftEye, Transform OriginalRightEye), (Transform LeftEye, Transform RightEye)) FindApsProxyedEyeBones(Transform avatarRoot)
+        internal static ((Transform OriginalLeftEye, Transform OriginalRightEye), (Transform LeftEye, Transform RightEye)) FindApsProxyedEyeBones(Transform avatarRoot, string apsVersion)
         {
             var animator = avatarRoot.GetComponent<Animator>();
             var head = animator.GetBoneTransform(HumanBodyBones.Head);
@@ -425,7 +417,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var originalRightEye = animator.GetBoneTransform(HumanBodyBones.RightEye);
 
             Transform proxyedHead;
-            if (DetectApsVersionNormalized().CompareTo(ApsVersionFor420StyleHeadProxy) >= 0)
+            if (apsVersion.CompareTo(ApsVersionFor420StyleHeadProxy) >= 0)
             {
                 // APS >=4.2.0: Head の子要素として Head_Const/Head/ がある
                 proxyedHead = head.Find($"{head.name}_Const/{head.name}");
@@ -488,13 +480,30 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             descriptor.customEyeLookSettings = adjustedSettings;
         }
 
-        private static string DetectApsVersionNormalized()
+        internal static (Component ApsComponent, string ApsVersion) DetectApsInstallation(GameObject avatarRoot)
         {
-            var apsPluginType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany((a) => a.GetTypes())
-                .FirstOrDefault((t) => t.FullName == "ZeroFactory.AvatarPoseSystem.NDMF.Editor.AvatarPoseSystemPlugin");
-            var apsPluginConstructor = apsPluginType?.GetConstructor(Type.EmptyTypes);
-            var apsPluginVersionField = apsPluginType?.GetField("Version", BindingFlags.NonPublic | BindingFlags.Instance);
+            Type apsComponentType = null, apsPluginType = null;
+            foreach (var typeInDomain in AppDomain.CurrentDomain.GetAssemblies().SelectMany((a) => a.GetTypes()))
+            {
+                switch (typeInDomain.FullName)
+                {
+                    case "ZeroFactory.AvatarPoseSystem.NDMF.AvatarPoseSystem":
+                        apsComponentType = typeInDomain;
+                        break;
+                    case "ZeroFactory.AvatarPoseSystem.NDMF.Editor.AvatarPoseSystemPlugin":
+                        apsPluginType = typeInDomain;
+                        break;
+                }
+            }
+            if (apsComponentType == null || apsPluginType == null) return (null, "");
+
+            return (avatarRoot.GetComponentInChildren(apsComponentType), DetectApsVersionNormalized(apsPluginType));
+        }
+
+        private static string DetectApsVersionNormalized(Type apsPluginType)
+        {
+            var apsPluginConstructor = apsPluginType.GetConstructor(Type.EmptyTypes);
+            var apsPluginVersionField = apsPluginType.GetField("Version", BindingFlags.NonPublic | BindingFlags.Instance);
             var apsPluginInstance = apsPluginConstructor?.Invoke(null);
             var versionString = apsPluginVersionField?.GetValue(apsPluginInstance) as string;
             if (versionString == null) return "??????????";

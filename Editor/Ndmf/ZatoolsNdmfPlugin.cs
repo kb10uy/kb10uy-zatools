@@ -15,7 +15,8 @@ namespace KusakaFactory.Zatools.Ndmf
         {
             // Resolving
             InPhase(BuildPhase.Resolving)
-                .Run(new AsvResolving());
+                .Run(new AsvResolving())
+                .Then.Run(new EepiResolving());
 
             // Generating before APS
             InPhase(BuildPhase.Generating)

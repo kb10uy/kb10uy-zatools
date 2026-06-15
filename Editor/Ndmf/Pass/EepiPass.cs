@@ -4,11 +4,32 @@ using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using nadena.dev.ndmf.runtime;
 using nadena.dev.ndmf.vrchat;
+using nadena.dev.modular_avatar.core;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using KusakaFactory.Zatools.Ndmf.Core;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
+    internal sealed class EepiResolving : Pass<EepiResolving>
+    {
+        public override string QualifiedName => nameof(EepiResolving);
+        public override string DisplayName => "Collect information for EyePointer installation";
+
+        protected override void Execute(BuildContext context)
+        {
+            var state = context.GetState(EepiState.Initializer);
+            if (state.Installer == null) return;
+
+            state.MergeAnimator = state.Installer.GetComponent<ModularAvatarMergeAnimator>();
+            state.TargetAnchors = (
+                state.Installer.transform.Find("WorldAnchor/TargetHand_L"),
+                state.Installer.transform.Find("WorldAnchor/TargetHand_R"),
+                state.Installer.transform.Find("WorldAnchor/TargetHead")
+            );
+            state.ApsInstallation = Eepi.DetectApsInstallation(context.AvatarRootObject);
+        }
+    }
+
     internal sealed class EepiGeneratingBeforeAps : Pass<EepiGeneratingBeforeAps>
     {
         public override string QualifiedName => nameof(EepiGeneratingBeforeAps);
@@ -31,7 +52,15 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             {
                 (left, right, head) = state.TargetAnchors;
             }
-            Eepi.SetupApsProperties(context.AvatarRootObject, left, right, head);
+
+            if (state.ApsInstallation.Component != null)
+            {
+                state.Installer.VRCConstraint = true;
+                state.Installer.DummyEyeBones = false;
+                state.Installer.AdaptedFXLayer = true;
+                Eepi.SetupApsProperties(state.ApsInstallation.Component, left, right, head);
+                ErrorReport.ReportError(new ZatoolsNdmfError(context.VRChatAvatarDescriptor(), ErrorSeverity.Information, "eepi.report.aps-detected"));
+            }
         }
     }
 
@@ -113,12 +142,11 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         protected override void Execute(BuildContext context)
         {
             var state = context.GetState(EepiState.Initializer);
-            if (!state.Installed) return;
+            if (!state.Installed || state.ApsInstallation.Version == "") return;
             var descriptor = context.VRChatAvatarDescriptor();
-            var ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye)) = Eepi.FindApsProxyedEyeBones(context.AvatarRootTransform);
+            var ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye)) = Eepi.FindApsProxyedEyeBones(context.AvatarRootTransform, state.ApsInstallation.Version);
             if (proxyedLeftEye == null || proxyedRightEye == null) return;
 
-            ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Information, "eepi.report.aps-detected"));
             Eepi.DisableApsRotationConstraint(proxyedLeftEye, proxyedRightEye);
             Eepi.MoveApsAimConstraint(originalLeftEye, proxyedLeftEye);
             Eepi.MoveApsAimConstraint(originalRightEye, proxyedRightEye);
