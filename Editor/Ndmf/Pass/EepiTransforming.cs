@@ -151,7 +151,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var dummyEye = new GameObject($"DummyEye_{side}");
             dummyEye.transform.SetParent(originalEye.parent, true);
             dummyEye.transform.position = originalEye.position;
-            dummyEye.transform.localRotation = Quaternion.identity;
+            dummyEye.transform.rotation = avatarRoot.rotation;
             originalEye.transform.SetParent(dummyEye.transform, true);
             return (dummyEye.transform, Quaternion.Inverse(originalEye.localRotation));
         }
