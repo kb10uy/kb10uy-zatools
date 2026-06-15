@@ -75,7 +75,7 @@ msgid "eepi.inspector.vrc-constraint:tooltip"
 msgstr "Use VRC Aim Constraint instead of Unity's one. Must be used with EyePointer v1.2 or later."
 
 msgid "eepi.inspector.dummy-bones"
-msgstr "Insert Dummy Bones"
+msgstr "Insert Dummy Bones to Eyes"
 
 msgid "eepi.inspector.dummy-bones:tooltip"
 msgstr "Insert dummy eye bones between head and default eye bones."

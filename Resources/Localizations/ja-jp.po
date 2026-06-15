@@ -75,7 +75,7 @@ msgid "eepi.inspector.vrc-constraint:tooltip"
 msgstr "Unity の Aim Constraint ではなく VRC Aim Constraint を使用する。EyePointer v1.2 以降が必要です"
 
 msgid "eepi.inspector.dummy-bones"
-msgstr "ダミーボーンを挿入する"
+msgstr "目にダミーボーンを挿入する"
 
 msgid "eepi.inspector.target-axis"
 msgstr "ターゲットの配置軸を修正する"
