@@ -17,6 +17,11 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Resolving)
                 .Run(new AsvResolving());
 
+            // Generating before APS
+            InPhase(BuildPhase.Generating)
+                .BeforePlugin("ZeroFactory.AvatarPoseSystem.NDMF")
+                .Run(new EepiGeneratingBeforeAps());
+
             // Generating
             InPhase(BuildPhase.Generating)
                 .Run(new UtmdGenerating()).PreviewingWith(new UtmdRenderFilter())
