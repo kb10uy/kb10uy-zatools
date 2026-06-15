@@ -51,8 +51,7 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .AfterPlugin("ZeroFactory.AvatarPoseSystem.NDMF")
-                .Run(new EepiTransformingAfterMA())
-                .Then.Run(new PbfcttTransforming());
+                .Run(new EepiTransformingAfterMA());
         }
     }
 }
