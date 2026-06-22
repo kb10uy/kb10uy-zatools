@@ -415,6 +415,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var head = animator.GetBoneTransform(HumanBodyBones.Head);
             var originalLeftEye = animator.GetBoneTransform(HumanBodyBones.LeftEye);
             var originalRightEye = animator.GetBoneTransform(HumanBodyBones.RightEye);
+            if (head == null || originalLeftEye == null || originalRightEye == null) return ((null, null), (null, null));
 
             Transform proxyedHead;
             if (apsVersion.CompareTo(ApsVersionFor420StyleHeadProxy) >= 0)
