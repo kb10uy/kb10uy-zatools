@@ -1,9 +1,9 @@
 using UnityEngine;
-using VRC.SDKBase;
+using nadena.dev.ndmf;
 
 namespace KusakaFactory.Zatools.Runtime
 {
-    public abstract class ZatoolsComponent : MonoBehaviour, IEditorOnly
+    public abstract class ZatoolsComponent : MonoBehaviour, INDMFEditorOnly
     {
     }
 
