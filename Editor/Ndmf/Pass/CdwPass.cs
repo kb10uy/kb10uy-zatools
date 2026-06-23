@@ -7,12 +7,12 @@ using CdwComponent = KusakaFactory.Zatools.Runtime.ConvexDepthWrapper;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class CdwGenerating : Pass<CdwGenerating>
+    internal sealed class CdwGenerating : ZatoolsPass<CdwGenerating>
     {
         internal static readonly string WrapperMaterialGuid = "c40c829946d3b494d807a73fd79af5c5";
 
-        public override string QualifiedName => nameof(CdwGenerating);
-        public override string DisplayName => "Generate convex depth wrapper";
+        internal override string ZatoolsPassName => nameof(CdwGenerating);
+        internal override string ZatoolsPassDescription => "Generate convex mesh for depth override";
 
         protected override void Execute(BuildContext context)
         {

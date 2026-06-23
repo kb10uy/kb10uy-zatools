@@ -5,15 +5,15 @@ using nadena.dev.ndmf.animator;
 using nadena.dev.ndmf.runtime;
 using nadena.dev.ndmf.vrchat;
 using nadena.dev.modular_avatar.core;
-using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 using KusakaFactory.Zatools.Ndmf.Core;
+using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class EepiResolving : Pass<EepiResolving>
+    internal sealed class EepiResolving : ZatoolsPass<EepiResolving>
     {
-        public override string QualifiedName => nameof(EepiResolving);
-        public override string DisplayName => "Collect information for EyePointer installation";
+        internal override string ZatoolsPassName => nameof(EepiResolving);
+        internal override string ZatoolsPassDescription => "Set up GameObjects and constraints for EyePointer";
 
         protected override void Execute(BuildContext context)
         {
@@ -30,10 +30,10 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
-    internal sealed class EepiGeneratingBeforeAps : Pass<EepiGeneratingBeforeAps>
+    internal sealed class EepiGeneratingBeforeAps : ZatoolsPass<EepiGeneratingBeforeAps>
     {
-        public override string QualifiedName => nameof(EepiGeneratingBeforeAps);
-        public override string DisplayName => "Generate target proxy if needed";
+        internal override string ZatoolsPassName => nameof(EepiGeneratingBeforeAps);
+        internal override string ZatoolsPassDescription => "Generate target proxy if needed";
 
         protected override void Execute(BuildContext context)
         {
@@ -64,10 +64,10 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
-    internal sealed class EepiTransforming : Pass<EepiTransforming>
+    internal sealed class EepiTransforming : ZatoolsPass<EepiTransforming>
     {
-        public override string QualifiedName => nameof(EepiTransforming);
-        public override string DisplayName => "Substitute eye bones and add constraints to them";
+        internal override string ZatoolsPassName => nameof(EepiTransforming);
+        internal override string ZatoolsPassDescription => "Substitute eye bones and add constraints to them";
 
         protected override void Execute(BuildContext context)
         {
@@ -134,10 +134,10 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
-    internal sealed class EepiTransformingAfterMA : Pass<EepiTransformingAfterMA>
+    internal sealed class EepiTransformingAfterMA : ZatoolsPass<EepiTransformingAfterMA>
     {
-        public override string QualifiedName => nameof(EepiTransformingAfterMA);
-        public override string DisplayName => "Additional process for Enhanced Eye Pointer Installer";
+        internal override string ZatoolsPassName => nameof(EepiTransformingAfterMA);
+        internal override string ZatoolsPassDescription => "Additional process for Enhanced Eye Pointer Installer";
 
         protected override void Execute(BuildContext context)
         {

@@ -6,8 +6,11 @@ using AhmsComponent = KusakaFactory.Zatools.Runtime.AdHocMeshSplit;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class AhmsGenerating : Pass<AhmsGenerating>
+    internal sealed class AhmsGenerating : ZatoolsPass<AhmsGenerating>
     {
+        internal override string ZatoolsPassName => nameof(AhmsGenerating);
+        internal override string ZatoolsPassDescription => "Split submesh";
+
         protected override void Execute(BuildContext context)
         {
             var components = context.AvatarRootObject.GetComponentsInChildren<AhmsComponent>();
