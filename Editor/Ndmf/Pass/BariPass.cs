@@ -6,10 +6,10 @@ using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class BariTransforming : Pass<BariTransforming>
+    internal sealed class BariTransforming : ZatoolsPass<BariTransforming>
     {
-        public override string QualifiedName => nameof(BariTransforming);
-        public override string DisplayName => "Apply bone array influence";
+        internal override string ZatoolsPassName => nameof(BariTransforming);
+        internal override string ZatoolsPassDescription => "Apply bone array influences";
 
         protected override void Execute(BuildContext context)
         {

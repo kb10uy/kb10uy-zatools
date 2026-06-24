@@ -6,10 +6,10 @@ using AhnbComponent = KusakaFactory.Zatools.Runtime.AdHocNormalBending;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class AhnbTransforming : Pass<AhnbTransforming>
+    internal sealed class AhnbTransforming : ZatoolsPass<AhnbTransforming>
     {
-        public override string QualifiedName => nameof(AhnbTransforming);
-        public override string DisplayName => "Bend Normal";
+        internal override string ZatoolsPassName => nameof(AhnbTransforming);
+        internal override string ZatoolsPassDescription => "Bend vertex normals";
 
         protected override void Execute(BuildContext context)
         {

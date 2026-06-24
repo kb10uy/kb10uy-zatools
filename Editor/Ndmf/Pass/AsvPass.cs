@@ -10,8 +10,11 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class AsvResolving : Pass<AsvResolving>
+    internal sealed class AsvResolving : ZatoolsPass<AsvResolving>
     {
+        internal override string ZatoolsPassName => nameof(AsvResolving);
+        internal override string ZatoolsPassDescription => "Validate avatar statuses";
+
         // セフィラちゃんの armature root が "Sonia" だったりするので子に Hips があるかどうかでも判定する必要が多分ある
         private static readonly ImmutableArray<(Func<Transform, bool>, ErrorSeverity, string)> ArmatureLikeDetectors =
             ImmutableArray.CreateRange(new (Func<Transform, bool>, ErrorSeverity, string)[] {

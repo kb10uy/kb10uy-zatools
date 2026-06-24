@@ -6,10 +6,10 @@ using UtmdComponent = KusakaFactory.Zatools.Runtime.UvTileMapDistribution;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class UtmdGenerating : Pass<UtmdGenerating>
+    internal sealed class UtmdGenerating : ZatoolsPass<UtmdGenerating>
     {
-        public override string QualifiedName => nameof(UtmdGenerating);
-        public override string DisplayName => "UV Tile Map Distribution";
+        internal override string ZatoolsPassName => nameof(UtmdGenerating);
+        internal override string ZatoolsPassDescription => "Modify UV tilemap distribution";
 
         protected override void Execute(BuildContext context)
         {

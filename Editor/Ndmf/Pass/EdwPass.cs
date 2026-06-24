@@ -7,12 +7,12 @@ using EdwComponent = KusakaFactory.Zatools.Runtime.EyeholeDepthWrapper;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class EdwGenerating : Pass<EdwGenerating>
+    internal sealed class EdwGenerating : ZatoolsPass<EdwGenerating>
     {
         internal static readonly string WrapperMaterialGuid = "c40c829946d3b494d807a73fd79af5c5";
 
-        public override string QualifiedName => nameof(EdwGenerating);
-        public override string DisplayName => "Generate wrapping polygons for eyeholes";
+        internal override string ZatoolsPassName => nameof(EdwGenerating);
+        internal override string ZatoolsPassDescription => "Generate overlapping mesh for depth override";
 
         protected override void Execute(BuildContext context)
         {

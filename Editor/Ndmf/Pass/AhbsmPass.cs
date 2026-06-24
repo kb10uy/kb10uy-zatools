@@ -6,10 +6,10 @@ using AhbsmComponent = KusakaFactory.Zatools.Runtime.AdHocBlendShapeMix;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class AhbsmTransforming : Pass<AhbsmTransforming>
+    internal sealed class AhbsmTransforming : ZatoolsPass<AhbsmTransforming>
     {
-        public override string QualifiedName => nameof(AhbsmTransforming);
-        public override string DisplayName => "Mix BlendShapes";
+        internal override string ZatoolsPassName => nameof(AhbsmTransforming);
+        internal override string ZatoolsPassDescription => "Mix BlendShapes";
 
         protected override void Execute(BuildContext context)
         {

@@ -6,8 +6,11 @@ using AhbssComponent = KusakaFactory.Zatools.Runtime.AdHocBlendShapeSplit;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class AhbssGenerating : Pass<AhbssGenerating>
+    internal sealed class AhbssGenerating : ZatoolsPass<AhbssGenerating>
     {
+        internal override string ZatoolsPassName => nameof(AhbssGenerating);
+        internal override string ZatoolsPassDescription => "Split BlendShapes";
+
         protected override void Execute(BuildContext context)
         {
             var components = context.AvatarRootObject.GetComponentsInChildren<AhbssComponent>();
