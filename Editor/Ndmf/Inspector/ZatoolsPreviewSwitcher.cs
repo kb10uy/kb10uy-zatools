@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.UIElements;
 using nadena.dev.ndmf.preview;
@@ -7,8 +6,12 @@ using KusakaFactory.Zatools.Localization;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
-    internal sealed class ZatoolsPreviewSwitcher : VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    internal sealed partial class ZatoolsPreviewSwitcher : VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlFactory : UxmlFactory<ZatoolsPreviewSwitcher, UxmlTraits>
         {
         }
@@ -17,7 +20,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             UxmlTypeAttributeDescription<IRenderFilter> _targetFilterType = new UxmlTypeAttributeDescription<IRenderFilter> { name = "target-filter-type" };
 
-            public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
+            public override System.Collections.Generic.IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
             {
                 get
                 {
@@ -32,7 +35,11 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 switcher._targetFilterType = _targetFilterType.GetValueFromBag(bag, cc);
             }
         }
+#endif
 
+#if UNITY_6000_0_OR_NEWER
+        [UxmlAttribute("target-filter-type")]
+#endif
         private Type _targetFilterType;
 
         private TogglablePreviewNode _targetPreviewNode;
@@ -61,7 +68,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (previewNodeProperty == null) return;
             _targetPreviewNode = previewNodeProperty.GetValue(_targetFilterType, BindingFlags.Static, null, null, null) as TogglablePreviewNode;
             if (previewNodeProperty == null) return;
-            
+
             _targetPreviewNode.IsEnabled.OnChange += OnPublishedValueChanged;
             UpdateStateLabel();
         }

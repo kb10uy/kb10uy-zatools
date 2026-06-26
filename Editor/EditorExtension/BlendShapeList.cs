@@ -26,7 +26,11 @@ namespace KusakaFactory.Zatools.EditorExtension
             var rendererField = rootVisualElement.Q<ObjectField>("FieldSkinnedMeshRenderer");
             var namesField = rootVisualElement.Q<TextField>("FieldNamesText");
             rendererField.RegisterValueChangedCallback((e) => namesField.value = OnUpdateRenderer(e.newValue as SkinnedMeshRenderer));
+#if UNITY_2023_1_OR_NEWER
+            namesField.verticalScrollerVisibility = ScrollerVisibility.Auto;
+#else
             namesField.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
+#endif
 
             var saveButton = rootVisualElement.Q<Button>("ButtonSave");
             saveButton.clicked += () => SaveAsFile(rendererField.value as SkinnedMeshRenderer);
