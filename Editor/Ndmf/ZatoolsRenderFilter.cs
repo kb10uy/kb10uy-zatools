@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
-using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
@@ -87,51 +86,6 @@ namespace KusakaFactory.Zatools.Ndmf
         void IDisposable.Dispose()
         {
             ZatoolsDispose();
-        }
-    }
-
-    internal abstract class ZatoolsBasicRenderFilterNode<TComponent> : ZatoolsRenderFilterNode<TComponent>
-    {
-        private Mesh _duplicatedMesh = null;
-
-        internal abstract ValueTask ProcessEdit(
-            SkinnedMeshRenderer original,
-            SkinnedMeshRenderer proxyed,
-            Mesh duplicatedMesh,
-            TComponent[] components,
-            ComputeContext context
-        );
-
-        internal override async ValueTask Initialize(
-            SkinnedMeshRenderer original,
-            SkinnedMeshRenderer proxyed,
-            TComponent[] components,
-            ComputeContext context
-        )
-        {
-            if (proxyed == null || proxyed.sharedMesh == null) return;
-
-            var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
-            duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
-
-            await ProcessEdit(original, proxyed, duplicatedMesh, components, context);
-
-            _duplicatedMesh = duplicatedMesh;
-            proxyed.sharedMesh = duplicatedMesh;
-        }
-
-        internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
-        {
-            if (_duplicatedMesh == null) return;
-            if (proxy is SkinnedMeshRenderer proxyedSkinnedMeshRenderer) proxyedSkinnedMeshRenderer.sharedMesh = _duplicatedMesh;
-        }
-
-        internal override void ZatoolsDispose()
-        {
-            if (_duplicatedMesh == null) return;
-
-            UnityObject.DestroyImmediate(_duplicatedMesh);
-            _duplicatedMesh = null;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
+using nadena.dev.ndmf;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -87,12 +88,15 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             internal static FixedParameters FixFromComponent(AdHocMeshSplit component)
             {
+                var filteringMaterialReference = component.FilteringMaterial != null ?
+                    ObjectRegistry.GetReference(component.FilteringMaterial) :
+                    null;
                 return new FixedParameters()
                 {
                     MaskTexture = component.Mask,
                     MaskMode = component.Mode,
                     CanReadMask = component.Mask != null && component.Mask.isReadable,
-                    FilteringMaterial = component.FilteringMaterial,
+                    FilteringMaterial = filteringMaterialReference?.Object as Material,
                     SplitMaterial = component.SplitMaterial,
                 };
             }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using nadena.dev.ndmf;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Core;
@@ -34,7 +35,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         {
             if (proxyed == null || proxyed.sharedMesh == null) return default;
 
-            var duplicatedMesh = UnityObject.Instantiate(proxyed.sharedMesh);
+            var baseMesh = proxyed.sharedMesh;
+            var duplicatedMesh = UnityObject.Instantiate(baseMesh);
             duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
 
             var observedParameters = components.Select((c) => context.Observe(c, Ahms.FixedParameters.FixFromComponent, (op, np) => op == np));
@@ -50,6 +52,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             _duplicatedMesh = duplicatedMesh;
             _reassignedMaterials = proxyed.sharedMaterials.ToList();
             proxyed.sharedMesh = duplicatedMesh;
+            ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
         }

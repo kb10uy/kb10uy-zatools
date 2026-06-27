@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using nadena.dev.ndmf;
 using nadena.dev.ndmf.preview;
 using nadena.dev.ndmf.runtime;
 using KusakaFactory.Zatools.Runtime;
@@ -65,6 +66,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             _duplicatedMesh = duplicatedMesh;
             proxyed.sharedMesh = duplicatedMesh;
+            ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
         }
