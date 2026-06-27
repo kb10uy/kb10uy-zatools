@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         [MenuItem("Window/Zatools: kb10uy's Various Tools/Custom Mipmap Combiner")]
         internal static void OpenWindow()
         {
-            GetWindow<CustomMipmapCombiner>();
+            GetWindow<CustomMipmapCombiner>("Custom Mipmap Combiner");
         }
 
         internal void CreateGUI()
