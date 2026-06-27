@@ -10,7 +10,7 @@ namespace KusakaFactory.Zatools.Ndmf
     internal sealed class ZatoolsNdmfPlugin : Plugin<ZatoolsNdmfPlugin>
     {
         public override string QualifiedName => "org.kb10uy.zatools";
-        public override string DisplayName => "kb10uy's Various Tools";
+        public override string DisplayName => "Zatools: kb10uy's Various Tools";
 
         protected override void Configure()
         {
