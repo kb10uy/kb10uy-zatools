@@ -19,6 +19,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var components = context.AvatarRootObject.GetComponentsInChildren<EdwComponent>();
             foreach (var component in components)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "edw.report.deprecated", component.name));
                 ProcessFor(component, component.GetComponent<SkinnedMeshRenderer>(), context.AvatarRootTransform);
             }
         }

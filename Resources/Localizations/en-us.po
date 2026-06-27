@@ -256,6 +256,12 @@ msgstr "Eyelash Cut Distance"
 msgid "edw.inspector.advanced"
 msgstr "Advanced"
 
+msgid "edw.report.deprecated"
+msgstr "ConvexDepthWrapper is recommended"
+
+msgid "edw.report.deprecated:description"
+msgstr "In general ConvexDepthWrapper generates more optimal mesh for this purpose."
+
 msgid "cdw.inspector.source"
 msgstr "Target Renderer"
 
