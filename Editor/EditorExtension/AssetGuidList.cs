@@ -53,7 +53,11 @@ namespace KusakaFactory.Zatools.EditorExtension
             _asset.RegisterValueChangedCallback(OnUpdateBaseAsset);
             _rootPath.RegisterValueChangedCallback((e) => OnUpdateQueriedAssets());
             _query.RegisterValueChangedCallback((e) => OnUpdateQueriedAssets());
+#if UNITY_2023_1_OR_NEWER
+            _list.verticalScrollerVisibility = ScrollerVisibility.Auto;
+#else
             _list.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
+#endif
 
             _buttonSave.clicked += SaveAsFile;
             _buttonPrev.clicked += MovePrevPage;
