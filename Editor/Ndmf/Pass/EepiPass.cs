@@ -10,6 +10,7 @@ using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiResolving : ZatoolsPass<EepiResolving>
     {
         internal override string ZatoolsPassName => nameof(EepiResolving);
@@ -30,6 +31,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiGeneratingBeforeAps : ZatoolsPass<EepiGeneratingBeforeAps>
     {
         internal override string ZatoolsPassName => nameof(EepiGeneratingBeforeAps);
@@ -64,6 +66,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransforming : ZatoolsPass<EepiTransforming>
     {
         internal override string ZatoolsPassName => nameof(EepiTransforming);
@@ -134,6 +137,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransformingAfterMA : ZatoolsPass<EepiTransformingAfterMA>
     {
         internal override string ZatoolsPassName => nameof(EepiTransformingAfterMA);
