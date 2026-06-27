@@ -7,6 +7,7 @@ using UnityEngine;
 using nadena.dev.ndmf.preview;
 using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
+using nadena.dev.ndmf;
 
 namespace KusakaFactory.Zatools.Ndmf
 {

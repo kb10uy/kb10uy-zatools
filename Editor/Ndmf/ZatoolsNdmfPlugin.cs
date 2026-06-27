@@ -37,8 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
                 .Then.Run(new AhnbTransforming()).PreviewingWith(new AhnbRenderFilter())
-                .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter())
-                .Then.Run(new NpeTransforming()).PreviewingWith(new NpeRenderFilter());
+                .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter());
 
             // Transforming before MA with VirtualControllerContext
             InPhase(BuildPhase.Transforming)
