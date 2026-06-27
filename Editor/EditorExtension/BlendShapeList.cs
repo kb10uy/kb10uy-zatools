@@ -14,7 +14,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         [MenuItem("Window/Zatools: kb10uy's Various Tools/BlendShape List")]
         internal static void OpenWindow()
         {
-            GetWindow<BlendShapeList>();
+            GetWindow<BlendShapeList>("BlendShape List");
         }
 
         internal void CreateGUI()

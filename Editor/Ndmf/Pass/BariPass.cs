@@ -6,6 +6,7 @@ using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class BariTransforming : ZatoolsPass<BariTransforming>
     {
         internal override string ZatoolsPassName => nameof(BariTransforming);

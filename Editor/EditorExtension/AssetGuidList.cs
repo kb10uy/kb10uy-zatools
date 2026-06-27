@@ -32,7 +32,7 @@ namespace KusakaFactory.Zatools.EditorExtension
         [MenuItem("Window/Zatools: kb10uy's Various Tools/Asset GUID List")]
         internal static void OpenWindow()
         {
-            GetWindow<AssetGuidList>();
+            GetWindow<AssetGuidList>("Asset GUID List");
         }
 
         internal void CreateGUI()

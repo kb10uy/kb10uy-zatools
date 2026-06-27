@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using nadena.dev.ndmf;
-using nadena.dev.ndmf.animator;
-using nadena.dev.ndmf.runtime;
-using nadena.dev.ndmf.vrchat;
 using nadena.dev.modular_avatar.core;
 using KusakaFactory.Zatools.Ndmf.Core;
 using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
 
+#if ZATOOLS_HAS_VRCSDK
+using nadena.dev.ndmf.animator;
+using nadena.dev.ndmf.runtime;
+using nadena.dev.ndmf.vrchat;
+#endif
+
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiResolving : ZatoolsPass<EepiResolving>
     {
         internal override string ZatoolsPassName => nameof(EepiResolving);
@@ -30,6 +34,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         }
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiGeneratingBeforeAps : ZatoolsPass<EepiGeneratingBeforeAps>
     {
         internal override string ZatoolsPassName => nameof(EepiGeneratingBeforeAps);
@@ -59,16 +64,18 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 state.Installer.DummyEyeBones = false;
                 state.Installer.AdaptedFXLayer = true;
                 Eepi.SetupApsProperties(state.ApsInstallation.Component, left, right, head);
-                ErrorReport.ReportError(new ZatoolsNdmfError(context.VRChatAvatarDescriptor(), ErrorSeverity.Information, "eepi.report.aps-detected"));
+                ErrorReport.ReportError(new ZatoolsNdmfError(context.AvatarRootObject, ErrorSeverity.Information, "eepi.report.aps-detected"));
             }
         }
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransforming : ZatoolsPass<EepiTransforming>
     {
         internal override string ZatoolsPassName => nameof(EepiTransforming);
         internal override string ZatoolsPassDescription => "Substitute eye bones and add constraints to them";
 
+#if ZATOOLS_HAS_VRCSDK
         protected override void Execute(BuildContext context)
         {
             // MEMO: NDMF Portable Component で eye が取れるようになったら移行できるかも
@@ -132,13 +139,23 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             state.Destroy();
         }
+#else
+        protected override void Execute(BuildContext context)
+        {
+            var state = context.GetState(EepiState.Initializer);
+            if (state.Installer == null) return;
+            state.Destroy();
+        }
+#endif
     }
 
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransformingAfterMA : ZatoolsPass<EepiTransformingAfterMA>
     {
         internal override string ZatoolsPassName => nameof(EepiTransformingAfterMA);
         internal override string ZatoolsPassDescription => "Additional process for Enhanced Eye Pointer Installer";
 
+#if ZATOOLS_HAS_VRCSDK
         protected override void Execute(BuildContext context)
         {
             var state = context.GetState(EepiState.Initializer);
@@ -152,6 +169,11 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             Eepi.MoveApsAimConstraint(originalRightEye, proxyedRightEye);
             Eepi.FixApsEyeLookSettings(descriptor, proxyedLeftEye, proxyedRightEye);
         }
+#else
+        protected override void Execute(BuildContext context)
+        {
+        }
+#endif
     }
 
     [ParameterProviderFor(typeof(Installer))]

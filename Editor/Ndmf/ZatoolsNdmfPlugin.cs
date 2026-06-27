@@ -6,6 +6,7 @@ using KusakaFactory.Zatools.Ndmf.Preview;
 [assembly: ExportsPlugin(typeof(KusakaFactory.Zatools.Ndmf.ZatoolsNdmfPlugin))]
 namespace KusakaFactory.Zatools.Ndmf
 {
+    [RunsOnAllPlatforms]
     internal sealed class ZatoolsNdmfPlugin : Plugin<ZatoolsNdmfPlugin>
     {
         public override string QualifiedName => "org.kb10uy.zatools";

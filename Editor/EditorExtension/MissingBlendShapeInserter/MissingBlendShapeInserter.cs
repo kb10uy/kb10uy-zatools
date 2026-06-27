@@ -40,7 +40,7 @@ namespace KusakaFactory.Zatools.EditorExtension.MissingBlendShapeInserter
         [MenuItem("Window/Zatools: kb10uy's Various Tools/Missing BlendShape Inserter")]
         internal static void OpenWindow()
         {
-            GetWindow<MissingBlendShapeInserter>();
+            GetWindow<MissingBlendShapeInserter>("Missing BlendShape Inserter");
         }
 
         internal void CreateGUI()

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ZATOOLS_HAS_VRCSDK
 using nadena.dev.ndmf.runtime;
 using VRC.SDK3.Avatars.Components;
 #endif
@@ -19,7 +19,7 @@ namespace KusakaFactory.Zatools.Runtime
         public Transform Basis = null;
         public float CentroidPush = 0.005f;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && ZATOOLS_HAS_VRCSDK
         private void Reset()
         {
             var descriptor = RuntimeUtil.FindAvatarInParents(transform)?.GetComponent<VRCAvatarDescriptor>();

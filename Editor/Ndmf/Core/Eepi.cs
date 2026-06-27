@@ -1,21 +1,24 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.Animations;
 using UnityEditor;
-using UnityEditor.Animations;
+using nadena.dev.ndmf;
+using nadena.dev.ndmf.animator;
+using nadena.dev.modular_avatar.core;
+using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
+using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
+
+#if ZATOOLS_HAS_VRCSDK
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.Constraint.Components;
-using nadena.dev.ndmf;
 using nadena.dev.ndmf.runtime;
-using nadena.dev.ndmf.animator;
-using nadena.dev.modular_avatar.core;
+using UnityEngine.Animations;
+using UnityEditor.Animations;
 using UnityObject = UnityEngine.Object;
-using CustomEyeLookSettings = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings;
-using Installer = KusakaFactory.Zatools.Runtime.EnhancedEyePointerInstaller;
-using System.Reflection;
+#endif
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -46,6 +49,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
+#if ZATOOLS_HAS_VRCSDK
         internal static (Transform LeftEye, Transform RightEye) LocateEyeBones(VRCAvatarDescriptor avatarDescriptor)
         {
             if (avatarDescriptor.enableEyeLook)
@@ -70,6 +74,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var rightEyeTransform = animator.GetBoneTransform(HumanBodyBones.RightEye);
             return (leftEyeTransform, rightEyeTransform);
         }
+#endif
 
         internal static (Transform, Quaternion) SubstituteEyeBone(Transform avatarRoot, Transform originalEye)
         {
@@ -146,6 +151,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return eyePointerTargetTransform.gameObject;
         }
 
+#if ZATOOLS_HAS_VRCSDK
         internal static VRCAimConstraint SetupConstaintsWithVRCVariant(Transform targetTransform, Transform constrainedEye)
         {
             if (constrainedEye == null) return null;
@@ -173,6 +179,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             return aimConstraint;
         }
+#endif
 
         internal static void AdaptBundledAnimationController(VirtualAnimatorController controller, bool useDummyBones, string leftPath, string rightPath)
         {
@@ -205,6 +212,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
+#if ZATOOLS_HAS_VRCSDK
         internal static void AdjustEyeLookSettings(
             VRCAvatarDescriptor descriptor,
             Transform leftEye,
@@ -248,6 +256,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             descriptor.customEyeLookSettings = adjustedSettings;
         }
+#endif
 
         private static void AdjustEyeRotations(
             CustomEyeLookSettings.EyeRotations original,
@@ -259,6 +268,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             original.right = original.right * rightAdjustment;
         }
 
+#if ZATOOLS_HAS_VRCSDK
         internal static void GenerateGlobalWeightOverride(BuildContext context, Installer installer, Component leftAim, Component rightAim)
         {
             var virtualControllerContext = context.Extension<VirtualControllerContext>();
@@ -408,6 +418,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 defaultMenuInstaller.menuToAppend = copiedRootMenuAsset;
             }
         }
+#endif
 
         internal static ((Transform OriginalLeftEye, Transform OriginalRightEye), (Transform LeftEye, Transform RightEye)) FindApsProxyedEyeBones(Transform avatarRoot, string apsVersion)
         {
@@ -435,6 +446,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return ((originalLeftEye, originalRightEye), (proxyedLeftEye, proxyedRightEye));
         }
 
+#if ZATOOLS_HAS_VRCSDK
         internal static void DisableApsRotationConstraint(Transform left, Transform right)
         {
             var leftRotationConstraint = left.GetComponent<VRCRotationConstraint>();
@@ -480,6 +492,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             adjustedSettings.eyesLookingRight = zeroedLooking;
             descriptor.customEyeLookSettings = adjustedSettings;
         }
+#endif
 
         internal static (Component ApsComponent, string ApsVersion) DetectApsInstallation(GameObject avatarRoot)
         {
