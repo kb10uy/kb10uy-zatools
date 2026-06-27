@@ -22,11 +22,22 @@ jobs:
         with:
           args: "-z -u"
 
+      - name: "Determine Prerelease"
+        id: "release"
+        shell: "bash"
+        run: |
+          if [[ "${{ steps.build.outputs.package-version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: "Create Release"
-        uses: "softprops/action-gh-release@v2"
+        uses: "softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b" # pointing at 3.0.1
         if: ${{ steps.build.outputs.package-version != '0.0.0' }}
         with:
           tag_name: ${{ steps.build.outputs.package-version }}
+          prerelease: ${{ steps.release.outputs.prerelease }}
           files: |
             ${{ steps.build.outputs.zip-path }}
             ${{ steps.build.outputs.unitypackage-path }}
