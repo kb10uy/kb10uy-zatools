@@ -16,19 +16,19 @@ namespace KusakaFactory.Zatools.Runtime
 
     public enum UvChannel : int
     {
-        UV0 = 0,
-        UV1 = 1,
-        UV2 = 2,
-        UV3 = 3,
-        UV4 = 4,
-        UV5 = 5,
-        UV6 = 6,
-        UV7 = 7,
+        [InspectorName("UV 0")] UV0 = 0,
+        [InspectorName("UV 1")] UV1 = 1,
+        [InspectorName("UV 2")] UV2 = 2,
+        [InspectorName("UV 3")] UV3 = 3,
+        [InspectorName("UV 4")] UV4 = 4,
+        [InspectorName("UV 5")] UV5 = 5,
+        [InspectorName("UV 6")] UV6 = 6,
+        [InspectorName("UV 7")] UV7 = 7,
     }
 
     public enum TileDistribution
     {
-        RedGreen,
-        Ansi16,
+        [InspectorName("Red / Green")] RedGreen,
+        [InspectorName("ANSI 16")] Ansi16,
     }
 }

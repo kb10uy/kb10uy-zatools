@@ -22,7 +22,6 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             }
             _boundElementRoot.Clear();
             _boundElementRoot.Add(CreateInspectorGUIImpl());
-
             return _boundElementRoot;
         }
 

@@ -99,5 +99,29 @@ namespace KusakaFactory.Zatools.EditorExtension
             var target = Selection.activeGameObject;
             return target.GetComponent<SkinnedMeshRenderer>() != null;
         }
+
+        [MenuItem(GOA_MENU_PREFIX + "Add Vertex Data Transfer (Outline Mask Preset)", false, 30)]
+        private static void AddVertexDataTransferOutlineMask()
+        {
+            if (Selection.gameObjects.Length != 1) return;
+            var target = Selection.activeGameObject;
+            if (target.GetComponent<SkinnedMeshRenderer>() == null) return;
+
+            var ahvdt = target.AddComponent<AdHocVertexDataTransfer>();
+            ahvdt.SourceUv = UvChannel.UV0;
+            ahvdt.TransferTarget = VertexDataTransferTarget.VertexColor;
+            ahvdt.TransferMode = VertexDataTransferMode.Const01AndLuminance;
+            ahvdt.ConstantVector3 = Vector3.forward;
+            Undo.RegisterCreatedObjectUndo(ahvdt, "Setup Vertex Data Transfer");
+            if (!EditorUtility.IsPersistent(target)) PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+        }
+
+        [MenuItem(GOA_MENU_PREFIX + "Add Vertex Data Transfer (Outline Mask Preset)", true, 30)]
+        private static bool AddVertexDataTransferOutlineMaskCheck()
+        {
+            if (Selection.gameObjects.Length != 1) return false;
+            var target = Selection.activeGameObject;
+            return target.GetComponent<SkinnedMeshRenderer>() != null;
+        }
     }
 }

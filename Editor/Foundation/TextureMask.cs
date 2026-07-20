@@ -66,7 +66,9 @@ namespace KusakaFactory.Zatools.Foundation
 
     internal static class NativeTextureSampler
     {
-
+        /// <remarks>
+        /// colorsOutput should be allocated with Allocator.Persistent.
+        /// </remarks>
         internal static void SampleByComputeShader(Texture2D texture, ref NativeArray<float4> uvs, ref NativeArray<float4> colorsOutput)
         {
             var computeShader = ZatoolsResources.LoadComputeShaderByGuid("69529c6a64173b142a4966bbb00ea374");

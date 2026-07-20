@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <uie:ObjectField label="ahvdt.inspector.source-texture" name="FieldSourceTexture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="SourceTexture" class="ndmf-tr" />
+        <ui:EnumField label="ahvdt.inspector.source-uv" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" binding-path="SourceUv" name="FieldSourceUv" class="ndmf-tr" />
+        <ui:EnumField label="ahvdt.inspector.transfer-target" type="KusakaFactory.Zatools.Runtime.VertexDataTransferTarget, org.kb10uy.zatools.runtime" name="FieldTransferTarget" binding-path="TransferTarget" value="VertexColor" class="ndmf-tr" />
+        <ui:VisualElement style="flex-grow: 1;">
+            <ui:EnumField label="ahvdt.inspector.transfer-mode" type="KusakaFactory.Zatools.Runtime.VertexDataTransferMode, org.kb10uy.zatools.runtime" binding-path="TransferMode" name="FieldTransferMode" class="ndmf-tr" />
+            <ui:Vector3Field name="FieldConstantVector3" binding-path="ConstantVector3" label="ahvdt.inspector.constant" class="ndmf-tr label-indent-1" />
+            <ui:FloatField label="ahvdt.inspector.constant" value="0" name="FieldConstantFloat" binding-path="ConstantFloat" class="ndmf-tr label-indent-1" />
+        </ui:VisualElement>
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhvdtRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>
