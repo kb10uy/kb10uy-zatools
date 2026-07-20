@@ -2,10 +2,10 @@
     width: 240px;
 }
 
-.label-indent-1 .unity-base-field__label {
+.label-indent-1 > .unity-base-field__label {
     padding-left: 12px;
 }
 
-.label-indent-2 .unity-base-field__label {
+.label-indent-2 > .unity-base-field__label {
     padding-left: 24px;
 }

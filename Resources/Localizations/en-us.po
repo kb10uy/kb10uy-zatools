@@ -286,6 +286,9 @@ msgstr "Transfer Target"
 msgid "ahvdt.inspector.transfer-mode"
 msgstr "Transfer Mode"
 
+msgid "ahvdt.inspector.constant"
+msgstr "Constant"
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 

@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.Runtime
 
     public enum NormalBendMaskMode
     {
-        White,
-        Black,
+        [InspectorLabel("White")] White,
+        [InspectorLabel("Black")] Black,
     }
 }

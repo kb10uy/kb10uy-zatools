@@ -283,10 +283,13 @@ msgid "ahvdt.inspector.source-uv"
 msgstr "ソース UV"
 
 msgid "ahvdt.inspector.transfer-target"
-msgstr "書き込み先 UV"
+msgstr "書き込み先"
 
 msgid "ahvdt.inspector.transfer-mode"
 msgstr "転送モード"
+
+msgid "ahvdt.inspector.constant"
+msgstr "定数部"
 
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
