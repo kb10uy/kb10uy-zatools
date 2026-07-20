@@ -5,8 +5,8 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
+using KusakaFactory.Zatools.Foundation;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
