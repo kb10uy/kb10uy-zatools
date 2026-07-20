@@ -276,6 +276,18 @@ msgstr "BlendShape オーバーライド"
 msgid "cdw.inspector.advanced"
 msgstr "上級者向け設定"
 
+msgid "ahvdt.inspector.source-texture"
+msgstr "ソーステクスチャ"
+
+msgid "ahvdt.inspector.source-uv"
+msgstr "ソース UV"
+
+msgid "ahvdt.inspector.transfer-target"
+msgstr "書き込み先 UV"
+
+msgid "ahvdt.inspector.transfer-mode"
+msgstr "転送モード"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 

@@ -274,6 +274,18 @@ msgstr "BlendShape Overrides"
 msgid "cdw.inspector.advanced"
 msgstr "Advanced Settings"
 
+msgid "ahvdt.inspector.source-texture"
+msgstr "Source Texture"
+
+msgid "ahvdt.inspector.source-uv"
+msgstr "Source UV"
+
+msgid "ahvdt.inspector.transfer-target"
+msgstr "Transfer Target"
+
+msgid "ahvdt.inspector.transfer-mode"
+msgstr "Transfer Mode"
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 
