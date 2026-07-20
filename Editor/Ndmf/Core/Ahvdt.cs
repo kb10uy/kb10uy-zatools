@@ -29,7 +29,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             modifyingMesh.GetUVs((int)parameters.SourceUv, uvs);
             while (vertices.Count < vertexCount) vertices.Add(Vector3.zero);
             while (normals.Count < vertexCount) normals.Add(Vector3.zero);
-            while (tangents.Count < vertexCount) uvs.Add(Vector4.zero);
+            while (tangents.Count < vertexCount) tangents.Add(Vector4.zero);
             while (uvs.Count < vertexCount) uvs.Add(Vector4.zero);
 
             var verticesInput = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -68,7 +68,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     case VertexDataTransferTarget.VertexColor:
                         // SetColors overload which takes NativeArray<T> requires T size to be 4 or 16 bytes.
-                        modifyingMesh.SetColors(transferValues);
+                        modifyingMesh.SetColors(transferValues.Reinterpret<Color>());
                         break;
                     case VertexDataTransferTarget.UV0:
                     case VertexDataTransferTarget.UV1:

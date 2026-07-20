@@ -21,10 +21,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 ZatoolsLocalization.OnNdmfLanguageChanged += RebuildUI;
             }
             _boundElementRoot.Clear();
-
-            var inspector = CreateInspectorGUIImpl();
-
-            _boundElementRoot.Add(inspector);
+            _boundElementRoot.Add(CreateInspectorGUIImpl());
             return _boundElementRoot;
         }
 

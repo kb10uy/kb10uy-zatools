@@ -100,7 +100,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             return target.GetComponent<SkinnedMeshRenderer>() != null;
         }
 
-        [MenuItem(GOA_MENU_PREFIX + "Transfer Outline Mask to Vertex Color", false, 30)]
+        [MenuItem(GOA_MENU_PREFIX + "Add Vertex Data Transfer (Outline Mask Preset)", false, 30)]
         private static void AddVertexDataTransferOutlineMask()
         {
             if (Selection.gameObjects.Length != 1) return;
@@ -112,11 +112,11 @@ namespace KusakaFactory.Zatools.EditorExtension
             ahvdt.TransferTarget = VertexDataTransferTarget.VertexColor;
             ahvdt.TransferMode = VertexDataTransferMode.Const01AndLuminance;
             ahvdt.ConstantVector3 = Vector3.forward;
-            Undo.RegisterCreatedObjectUndo(ahvdt, "Setup Inverted Convex Depth Wrapper");
+            Undo.RegisterCreatedObjectUndo(ahvdt, "Setup Vertex Data Transfer");
             if (!EditorUtility.IsPersistent(target)) PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
 
-        [MenuItem(GOA_MENU_PREFIX + "Transfer Outline Mask to Vertex Color", true, 30)]
+        [MenuItem(GOA_MENU_PREFIX + "Add Vertex Data Transfer (Outline Mask Preset)", true, 30)]
         private static bool AddVertexDataTransferOutlineMaskCheck()
         {
             if (Selection.gameObjects.Length != 1) return false;

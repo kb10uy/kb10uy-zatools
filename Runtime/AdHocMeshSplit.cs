@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.Runtime
 
     public enum MeshSplitMaskMode
     {
-        [InspectorLabel("White")] White,
-        [InspectorLabel("Black")] Black,
+        [InspectorName("White")] White,
+        [InspectorName("Black")] Black,
     }
 }

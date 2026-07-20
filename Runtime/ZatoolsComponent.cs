@@ -11,15 +11,4 @@ namespace KusakaFactory.Zatools.Runtime
     public abstract class ZatoolsMeshEditingComponent : ZatoolsComponent
     {
     }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class InspectorLabelAttribute : Attribute
-    {
-        public readonly string Label;
-
-        public InspectorLabelAttribute(string label)
-        {
-            Label = label;
-        }
-    }
 }

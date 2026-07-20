@@ -10,6 +10,6 @@
             <ui:Vector3Field name="FieldConstantVector3" binding-path="ConstantVector3" label="ahvdt.inspector.constant" class="ndmf-tr label-indent-1" />
             <ui:FloatField label="ahvdt.inspector.constant" value="0" name="FieldConstantFloat" binding-path="ConstantFloat" class="ndmf-tr label-indent-1" />
         </ui:VisualElement>
-        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhvdtRenderFilter, org.kb10uy.zatools" aaaa="asdasda" style="margin-top: 4px;" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhvdtRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
 </ui:UXML>
