@@ -6,7 +6,7 @@ namespace KusakaFactory.Zatools.Runtime
     [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/adhoc-vertex-data-transfer/")]
     [RequireComponent(typeof(SkinnedMeshRenderer))]
-    public class AdHocVertexDataTransfer : MonoBehaviour
+    public class AdHocVertexDataTransfer : ZatoolsMeshEditingComponent
     {
         public Texture2D SourceTexture;
         public UvChannel SourceUv;
