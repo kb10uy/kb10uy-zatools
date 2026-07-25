@@ -289,6 +289,12 @@ msgstr "Transfer Mode"
 msgid "ahvdt.inspector.constant"
 msgstr "Constant"
 
+msgid "vsvc.report.incompatible-version"
+msgstr "Unsupported version of VRCSDK"
+
+msgid "vsvc.report.incompatible-version:description"
+msgstr "Process aborted since incompatible version of VRCSDK that Zatools does not support detected. Update it to {0} or later."
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 

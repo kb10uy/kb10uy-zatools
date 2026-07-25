@@ -291,6 +291,12 @@ msgstr "転送モード"
 msgid "ahvdt.inspector.constant"
 msgstr "定数部"
 
+msgid "vsvc.report.incompatible-version"
+msgstr "非サポート VRCSDK バージョン"
+
+msgid "vsvc.report.incompatible-version:description"
+msgstr "Zatools がサポートしてないバージョンの VRCSDK が検出されたため処理を停止しました。{0} 以降のバージョンにアップデートしてください。"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 
