@@ -34,6 +34,11 @@
             "name": "com.vrchat.avatars",
             "expression": "3.10.0",
             "define": "ZATOOLS_HAS_VRCSDK"
+        },
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "",
+            "define": "ZATOOLS_FOUND_ANY_VRCSDK"
         }
     ],
     "noEngineReferences": false
