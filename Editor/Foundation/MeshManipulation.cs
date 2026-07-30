@@ -8,12 +8,19 @@ using Unity.Jobs;
 
 namespace KusakaFactory.Zatools.Foundation
 {
-    internal static class MeshManipulation
+    /// <summary>
+    /// Provides common mesh manipulation operations used by Zatools.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public static class MeshManipulation
     {
         private static readonly int MaxBlendShapesPerBatch = 8;
         private static readonly int VerticesPerBatch = 128;
 
-        internal static Vector3[] ComputeBlendShapeAppliedVertices(Mesh mesh, SkinnedMeshRenderer renderer, ImmutableArray<(string Name, float Value)> overrides, float epsilon = 1e-4f)
+        public static Vector3[] ComputeBlendShapeAppliedVertices(Mesh mesh, SkinnedMeshRenderer renderer, ImmutableArray<(string Name, float Value)> overrides, float epsilon = 1e-4f)
         {
             if (mesh == null) throw new ArgumentNullException(nameof(mesh));
             if (renderer == null) throw new ArgumentNullException(nameof(renderer));

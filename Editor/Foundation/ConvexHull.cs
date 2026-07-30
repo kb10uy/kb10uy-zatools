@@ -5,14 +5,21 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Foundation
 {
-    internal static class ConvexHull
+    /// <summary>
+    /// Provides convex hull algorithms for two- and three-dimensional points.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public static class ConvexHull
     {
         private const float Epsilon = 1e-6f;
 
         /// <summary>
-        /// Andrew's Algorithm (Monotone Chain) で凸包を計算し、入力に対する凸包のインデックスリストを返す。
+        /// Computes a convex hull using Andrew's monotone chain algorithm and returns indices into the input.
         /// </summary> 
-        /// <returns>凸包を形成する点のインデックスリスト。巡回順序。</returns>
+        /// <returns>The indices of the points forming the convex hull, in traversal order.</returns>
         public static ImmutableArray<int> ComputeAndrews(IReadOnlyList<Vector2> points)
         {
             var n = points.Count;
@@ -55,7 +62,7 @@ namespace KusakaFactory.Zatools.Foundation
         private static float Cross(Vector2 o, Vector2 a, Vector2 b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
 
         /// <summary>
-        /// 3D QuickHull で凸包を計算し、三角形インデックス (3つで1面) を返す。
+        /// Computes a convex hull using 3D QuickHull and returns triangle indices, with three indices per face.
         /// </summary>
         public static ImmutableArray<int> ComputeQuickHull3D(IReadOnlyList<Vector3> points)
         {

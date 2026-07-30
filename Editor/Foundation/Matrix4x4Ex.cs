@@ -3,12 +3,19 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Foundation
 {
-    internal static class ExtraMath
+    /// <summary>
+    /// Provides additional mathematical operations used by Zatools.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public static class ExtraMath
     {
         /// <summary>
-        /// Matrix4x4 を指定したウェイトで合成する。
+        /// Blends matrices using the specified weights.
         /// </summary>
-        internal static Matrix4x4 BlendMatrices(IReadOnlyList<Matrix4x4> sources, params (int Index, float Weight)[] weights)
+        public static Matrix4x4 BlendMatrices(IReadOnlyList<Matrix4x4> sources, params (int Index, float Weight)[] weights)
         {
             var result = Matrix4x4.zero;
             foreach ((var index, var weight) in weights)
