@@ -9,7 +9,14 @@ using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
-    internal abstract class ZatoolsRenderFilter<TComponent> : IRenderFilter
+    /// <summary>
+    /// Base class for render filters implemented by Zatools.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that render filters in external in-house assemblies can inherit from it.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public abstract class ZatoolsRenderFilter<TComponent> : IRenderFilter
     where TComponent : ZatoolsMeshEditingComponent
     {
         public IEnumerable<TogglablePreviewNode> GetPreviewControlNodes() => new[] { PreviewNode };
@@ -39,33 +46,40 @@ namespace KusakaFactory.Zatools.Ndmf
             return node;
         }
 
-        internal abstract ZatoolsRenderFilterNode<TComponent> CreateNode();
-        internal abstract TogglablePreviewNode PreviewNode { get; }
+        protected abstract ZatoolsRenderFilterNode<TComponent> CreateNode();
+        protected abstract TogglablePreviewNode PreviewNode { get; }
 
-        internal static TogglablePreviewNode CreateTogglablePreviewNode(string name, string qualifiedName, bool initialState = true)
+        protected static TogglablePreviewNode CreateTogglablePreviewNode(string name, string qualifiedName, bool initialState = true)
         {
             return TogglablePreviewNode.Create(() => name, $"org.kb10uy.zatools/{qualifiedName}", initialState);
         }
     }
 
-    internal abstract class ZatoolsRenderFilterNode<TComponent> : IRenderFilterNode
+    /// <summary>
+    /// Base class for render filter nodes implemented by Zatools.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that render filter nodes in external in-house assemblies can inherit from it.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public abstract class ZatoolsRenderFilterNode<TComponent> : IRenderFilterNode
     {
         public abstract RenderAspects WhatChanged { get; }
 
-        internal abstract ValueTask Initialize(
+        protected abstract ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             TComponent[] components,
             ComputeContext context
         );
 
-        internal virtual ZatoolsRenderFilterNode<TComponent> ZatoolsRefresh(
+        protected virtual ZatoolsRenderFilterNode<TComponent> ZatoolsRefresh(
             IEnumerable<(Renderer, Renderer)> proxyPairs,
             ComputeContext context,
             RenderAspects nonzeroUpdatedAspects
         ) => null;
-        internal abstract void ZatoolsOnFrame(Renderer original, Renderer proxy);
-        internal abstract void ZatoolsDispose();
+        protected abstract void ZatoolsOnFrame(Renderer original, Renderer proxy);
+        protected abstract void ZatoolsDispose();
 
         Task<IRenderFilterNode> IRenderFilterNode.Refresh(
             IEnumerable<(Renderer, Renderer)> proxyPairs,

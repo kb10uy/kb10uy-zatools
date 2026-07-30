@@ -11,8 +11,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     {
         internal static readonly string WrapperMaterialGuid = "c40c829946d3b494d807a73fd79af5c5";
 
-        internal override string ZatoolsPassName => nameof(EdwGenerating);
-        internal override string ZatoolsPassDescription => "Generate overlapping mesh for depth override";
+        protected override string ZatoolsPassName => nameof(EdwGenerating);
+        protected override string ZatoolsPassDescription => "Generate overlapping mesh for depth override";
 
         protected override void Execute(BuildContext context)
         {

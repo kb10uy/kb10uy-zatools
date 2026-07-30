@@ -15,8 +15,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc BlendShape Mix", "ad-hoc-blendshape-mix");
 
-        internal override ZatoolsRenderFilterNode<AdHocBlendShapeMix> CreateNode() => new AhbsmRenderFilterNode();
-        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        protected override ZatoolsRenderFilterNode<AdHocBlendShapeMix> CreateNode() => new AhbsmRenderFilterNode();
+        protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
@@ -26,7 +26,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
-        internal override ValueTask Initialize(
+        protected override ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             AdHocBlendShapeMix[] components,
@@ -70,7 +70,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             return default;
         }
 
-        internal override ZatoolsRenderFilterNode<AdHocBlendShapeMix> ZatoolsRefresh(
+        protected override ZatoolsRenderFilterNode<AdHocBlendShapeMix> ZatoolsRefresh(
             IEnumerable<(Renderer, Renderer)> proxyPairs,
             ComputeContext context,
             RenderAspects nonzeroUpdatedAspects
@@ -81,13 +81,13 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             return null;
         }
 
-        internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
+        protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)
         {
             if (_duplicatedMesh == null) return;
             if (proxy is SkinnedMeshRenderer proxyed) proxyed.sharedMesh = _duplicatedMesh;
         }
 
-        internal override void ZatoolsDispose()
+        protected override void ZatoolsDispose()
         {
             if (_duplicatedMesh == null) return;
 

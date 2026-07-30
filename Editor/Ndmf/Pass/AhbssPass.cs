@@ -8,8 +8,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AhbssGenerating : ZatoolsPass<AhbssGenerating>
     {
-        internal override string ZatoolsPassName => nameof(AhbssGenerating);
-        internal override string ZatoolsPassDescription => "Split BlendShapes";
+        protected override string ZatoolsPassName => nameof(AhbssGenerating);
+        protected override string ZatoolsPassDescription => "Split BlendShapes";
 
         protected override void Execute(BuildContext context)
         {

@@ -8,8 +8,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AhmsGenerating : ZatoolsPass<AhmsGenerating>
     {
-        internal override string ZatoolsPassName => nameof(AhmsGenerating);
-        internal override string ZatoolsPassDescription => "Split submesh";
+        protected override string ZatoolsPassName => nameof(AhmsGenerating);
+        protected override string ZatoolsPassDescription => "Split submesh";
 
         protected override void Execute(BuildContext context)
         {
