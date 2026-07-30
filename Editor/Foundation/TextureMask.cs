@@ -1,12 +1,8 @@
 using System;
 using UnityEngine;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Jobs;
-using Unity.Mathematics;
-using UnityEditor.PackageManager.UI;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.Rendering;
+using Unity.Collections;
+using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation
 {
