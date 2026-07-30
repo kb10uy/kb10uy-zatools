@@ -30,7 +30,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
-        protected override ValueTask Initialize(
+        protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             EyeholeDepthWrapper[] components,

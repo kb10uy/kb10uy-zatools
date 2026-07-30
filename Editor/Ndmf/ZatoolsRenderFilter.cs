@@ -66,7 +66,7 @@ namespace KusakaFactory.Zatools.Ndmf
     {
         public abstract RenderAspects WhatChanged { get; }
 
-        protected abstract ValueTask Initialize(
+        protected internal abstract ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             TComponent[] components,
