@@ -1,6 +1,6 @@
 using nadena.dev.ndmf;
 
-namespace KusakaFactory.Zatools.Ndmf.Pass
+namespace KusakaFactory.Zatools.Ndmf
 {
     internal abstract class ZatoolsPass<T> : Pass<T> where T : ZatoolsPass<T>, new()
     {
