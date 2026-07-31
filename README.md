@@ -1,7 +1,7 @@
 # Zatools: kb10uy's Various Tools
 
 ## インストール
-1. [Haï~氏のリポジトリ](https://docs.hai-vr.dev/docs/products/listing)をあらかじめ追加しておく
+1. [bd_ さんの VPM リポジトリ](vcc://vpm/addRepo?url=https://vpm.nadena.dev/vpm.json) を追加
 2. [kb10uy VRChat Package Repository](https://kb10uy.github.io/vrc-repository/) を追加
 3. その中の kb10uy's Various Tools をインストール
 
