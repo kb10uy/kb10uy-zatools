@@ -1,18 +1,21 @@
 using System;
 using UnityEngine;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Jobs;
-using Unity.Mathematics;
-using UnityEditor.PackageManager.UI;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.Rendering;
+using Unity.Collections;
+using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation
 {
-    internal sealed class TextureMask
+    /// <summary>
+    /// Samples a readable texture as a grayscale mask.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public sealed class TextureMask
     {
-        internal enum Mode
+        public enum Mode
         {
             TakeWhite,
             TakeBlack,
@@ -23,7 +26,7 @@ namespace KusakaFactory.Zatools.Foundation
         private readonly int _height;
         private readonly Mode _mode;
 
-        internal TextureMask(Texture2D texture, Mode mode)
+        public TextureMask(Texture2D texture, Mode mode)
         {
             if (texture != null && texture.isReadable)
             {
@@ -40,7 +43,7 @@ namespace KusakaFactory.Zatools.Foundation
             _mode = mode;
         }
 
-        internal float Take(Vector2 uv)
+        public float Take(Vector2 uv)
         {
             var sample = SampleByUv(uv);
             var luma1000 = 213 * sample.r + 715 * sample.g + 72 * sample.b;
@@ -64,12 +67,19 @@ namespace KusakaFactory.Zatools.Foundation
         }
     }
 
-    internal static class NativeTextureSampler
+    /// <summary>
+    /// Samples textures into native arrays using a compute shader.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public static class NativeTextureSampler
     {
         /// <remarks>
         /// colorsOutput should be allocated with Allocator.Persistent.
         /// </remarks>
-        internal static void SampleByComputeShader(Texture2D texture, ref NativeArray<float4> uvs, ref NativeArray<float4> colorsOutput)
+        public static void SampleByComputeShader(Texture2D texture, ref NativeArray<float4> uvs, ref NativeArray<float4> colorsOutput)
         {
             var computeShader = ZatoolsResources.LoadComputeShaderByGuid("69529c6a64173b142a4966bbb00ea374");
             var computeKernelId = computeShader.FindKernel("SampleColorsByUv");

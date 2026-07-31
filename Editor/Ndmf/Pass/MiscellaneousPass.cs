@@ -5,8 +5,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     // Vsvc stands for VrchatSdkVersionCheck
     internal sealed class VsvcResolving : ZatoolsPass<VsvcResolving>
     {
-        internal override string ZatoolsPassName => nameof(VsvcResolving);
-        internal override string ZatoolsPassDescription => "Check VRCSDK version";
+        protected override string ZatoolsPassName => nameof(VsvcResolving);
+        protected override string ZatoolsPassDescription => "Check VRCSDK version";
 
         internal static readonly string SupportedVrchatSdkVersion = "3.10.0";
 

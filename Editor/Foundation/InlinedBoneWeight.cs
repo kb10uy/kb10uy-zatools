@@ -4,13 +4,20 @@ using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation
 {
+    /// <summary>
+    /// Stores the indices and weights of a four-bone influence in vector form.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct InlinedBoneWeight
+    public struct InlinedBoneWeight
     {
         public int4 Indices;
         public float4 Weights;
 
-        internal static InlinedBoneWeight FromBoneWeight(BoneWeight weight)
+        public static InlinedBoneWeight FromBoneWeight(BoneWeight weight)
         {
             return new InlinedBoneWeight
             {

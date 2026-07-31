@@ -8,8 +8,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class UtmdGenerating : ZatoolsPass<UtmdGenerating>
     {
-        internal override string ZatoolsPassName => nameof(UtmdGenerating);
-        internal override string ZatoolsPassDescription => "Modify UV tilemap distribution";
+        protected override string ZatoolsPassName => nameof(UtmdGenerating);
+        protected override string ZatoolsPassDescription => "Modify UV tilemap distribution";
 
         protected override void Execute(BuildContext context)
         {

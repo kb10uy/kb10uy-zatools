@@ -9,8 +9,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class BariTransforming : ZatoolsPass<BariTransforming>
     {
-        internal override string ZatoolsPassName => nameof(BariTransforming);
-        internal override string ZatoolsPassDescription => "Apply bone array influences";
+        protected override string ZatoolsPassName => nameof(BariTransforming);
+        protected override string ZatoolsPassDescription => "Apply bone array influences";
 
         protected override void Execute(BuildContext context)
         {

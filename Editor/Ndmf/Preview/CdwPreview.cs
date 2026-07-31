@@ -15,8 +15,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Convex Depth Wrapper", "convex-depth-wrapper", false);
 
-        internal override ZatoolsRenderFilterNode<ConvexDepthWrapper> CreateNode() => new CdwRenderFilterNode();
-        internal override TogglablePreviewNode PreviewNode => _previewNode;
+        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> CreateNode() => new CdwRenderFilterNode();
+        protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
@@ -31,7 +31,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
-        internal override ValueTask Initialize(
+        protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
             SkinnedMeshRenderer proxyed,
             ConvexDepthWrapper[] components,
@@ -74,7 +74,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             return default;
         }
 
-        internal override ZatoolsRenderFilterNode<ConvexDepthWrapper> ZatoolsRefresh(
+        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> ZatoolsRefresh(
             IEnumerable<(Renderer, Renderer)> proxyPairs,
             ComputeContext context,
             RenderAspects nonzeroUpdatedAspects
@@ -84,7 +84,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             return null;
         }
 
-        internal override void ZatoolsOnFrame(Renderer original, Renderer proxy)
+        protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)
         {
             if (_duplicatedMesh == null || _reassignedMaterials == null) return;
             if (proxy is SkinnedMeshRenderer proxyedSkinnedMeshRenderer)
@@ -102,7 +102,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             }
         }
 
-        internal override void ZatoolsDispose()
+        protected override void ZatoolsDispose()
         {
             if (_duplicatedMesh == null) return;
 

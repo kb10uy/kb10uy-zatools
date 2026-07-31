@@ -16,8 +16,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiResolving : ZatoolsPass<EepiResolving>
     {
-        internal override string ZatoolsPassName => nameof(EepiResolving);
-        internal override string ZatoolsPassDescription => "Set up GameObjects and constraints for EyePointer";
+        protected override string ZatoolsPassName => nameof(EepiResolving);
+        protected override string ZatoolsPassDescription => "Set up GameObjects and constraints for EyePointer";
 
         protected override void Execute(BuildContext context)
         {
@@ -37,8 +37,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiGeneratingBeforeAps : ZatoolsPass<EepiGeneratingBeforeAps>
     {
-        internal override string ZatoolsPassName => nameof(EepiGeneratingBeforeAps);
-        internal override string ZatoolsPassDescription => "Generate target proxy if needed";
+        protected override string ZatoolsPassName => nameof(EepiGeneratingBeforeAps);
+        protected override string ZatoolsPassDescription => "Generate target proxy if needed";
 
         protected override void Execute(BuildContext context)
         {
@@ -72,8 +72,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransforming : ZatoolsPass<EepiTransforming>
     {
-        internal override string ZatoolsPassName => nameof(EepiTransforming);
-        internal override string ZatoolsPassDescription => "Substitute eye bones and add constraints to them";
+        protected override string ZatoolsPassName => nameof(EepiTransforming);
+        protected override string ZatoolsPassDescription => "Substitute eye bones and add constraints to them";
 
 #if ZATOOLS_HAS_VRCSDK
         protected override void Execute(BuildContext context)
@@ -152,8 +152,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class EepiTransformingAfterMA : ZatoolsPass<EepiTransformingAfterMA>
     {
-        internal override string ZatoolsPassName => nameof(EepiTransformingAfterMA);
-        internal override string ZatoolsPassDescription => "Additional process for Enhanced Eye Pointer Installer";
+        protected override string ZatoolsPassName => nameof(EepiTransformingAfterMA);
+        protected override string ZatoolsPassDescription => "Additional process for Enhanced Eye Pointer Installer";
 
 #if ZATOOLS_HAS_VRCSDK
         protected override void Execute(BuildContext context)

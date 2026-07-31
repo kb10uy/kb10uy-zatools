@@ -9,9 +9,9 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AhvdtGenerating : ZatoolsPass<AhvdtGenerating>
     {
-        internal override string ZatoolsPassName => nameof(AhvdtGenerating);
+        protected override string ZatoolsPassName => nameof(AhvdtGenerating);
 
-        internal override string ZatoolsPassDescription => "Transfer texture data to vertices";
+        protected override string ZatoolsPassDescription => "Transfer texture data to vertices";
 
         protected override void Execute(BuildContext context)
         {

@@ -8,8 +8,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class AhnbTransforming : ZatoolsPass<AhnbTransforming>
     {
-        internal override string ZatoolsPassName => nameof(AhnbTransforming);
-        internal override string ZatoolsPassDescription => "Bend vertex normals";
+        protected override string ZatoolsPassName => nameof(AhnbTransforming);
+        protected override string ZatoolsPassDescription => "Bend vertex normals";
 
         protected override void Execute(BuildContext context)
         {
