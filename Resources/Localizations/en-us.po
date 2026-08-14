@@ -295,6 +295,9 @@ msgstr "Unsupported version of VRCSDK"
 msgid "vsvc.report.incompatible-version:description"
 msgstr "Process aborted since incompatible version of VRCSDK that Zatools does not support detected. Update it to {0} or later."
 
+msgid "pbit.inspector.info"
+msgstr "This GameObject will be ignored from PhysBones when affected."
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 

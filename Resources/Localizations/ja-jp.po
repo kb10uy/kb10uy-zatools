@@ -297,6 +297,9 @@ msgstr "非サポート VRCSDK バージョン"
 msgid "vsvc.report.incompatible-version:description"
 msgstr "Zatools がサポートしてないバージョンの VRCSDK が検出されたため処理を停止しました。{0} 以降のバージョンにアップデートしてください。"
 
+msgid "pbit.inspector.info"
+msgstr "このオブジェクトは PhysBone の影響下に入った際に Ignored Transform に登録されます。"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 
