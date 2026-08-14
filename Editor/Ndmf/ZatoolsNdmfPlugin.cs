@@ -49,7 +49,12 @@ namespace KusakaFactory.Zatools.Ndmf
                     seq.Run(new EepiTransforming());
                 });
 
-            // Transforming after MA
+            // Transforming after MA (only)
+            InPhase(BuildPhase.Transforming)
+                .AfterPlugin("nadena.dev.modular-avatar")
+                .Run(new PbitTransforming());
+
+            // Transforming after MA, APS
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .AfterPlugin("ZeroFactory.AvatarPoseSystem.NDMF")
