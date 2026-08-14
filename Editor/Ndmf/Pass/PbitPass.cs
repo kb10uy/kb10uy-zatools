@@ -12,9 +12,9 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 {
     internal sealed class PbitTransforming : ZatoolsPass<PbitTransforming>
     {
-        internal override string ZatoolsPassName => nameof(PbitTransforming);
+        protected override string ZatoolsPassName => nameof(PbitTransforming);
 
-        internal override string ZatoolsPassDescription => "Ignore themselves from PhysBones";
+        protected override string ZatoolsPassDescription => "Ignore themselves from PhysBones";
 
         protected override void Execute(BuildContext context)
         {
