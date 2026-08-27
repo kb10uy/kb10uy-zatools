@@ -3,7 +3,6 @@ using UnityEngine;
 namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools Set UV Tile by Texture")]
-    [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/uv-tile-map-distribution/")]
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     public sealed class UvTileMapDistribution : ZatoolsMeshEditingComponent
