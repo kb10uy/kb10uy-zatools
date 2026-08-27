@@ -8,7 +8,6 @@ using VRC.SDK3.Avatars.Components;
 namespace KusakaFactory.Zatools.Runtime
 {
     [AddComponentMenu("KusakaFactory/Zatools Eyehole Depth Wrapper")]
-    [Icon("Packages/org.kb10uy.zatools/Resources/Icon.png")]
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/eyehole-depth-wrapper/")]
     public sealed class EyeholeDepthWrapper : ZatoolsMeshEditingComponent
     {
