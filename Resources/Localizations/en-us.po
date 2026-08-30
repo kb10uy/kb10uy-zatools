@@ -369,3 +369,39 @@ msgstr "key(s)"
 
 msgid "mbsi.keys-header"
 msgstr "Key(s) to be added"
+
+msgid "zax.diagnostic.invalid-token"
+msgstr "Unrecognized token \"{0}\"."
+
+msgid "zax.diagnostic.invalid-number-literal"
+msgstr "\"{0}\" is not a valid number literal."
+
+msgid "zax.diagnostic.invalid-swizzle"
+msgstr "\"{0}\" is not a valid swizzle. Use 1 to 4 components taken from a single set (xyzw, rgba or uvst)."
+
+msgid "zax.diagnostic.empty-expression"
+msgstr "The expression is empty."
+
+msgid "zax.diagnostic.unknown-name"
+msgstr "Unknown function or constant \"{0}\"."
+
+msgid "zax.diagnostic.unknown-variable"
+msgstr "Unknown variable \"@{0}\"."
+
+msgid "zax.diagnostic.not-enough-operands"
+msgstr "\"{0}\" requires {1} operand(s), but only {2} are on the stack."
+
+msgid "zax.diagnostic.extra-operands"
+msgstr "The expression leaves {0} values on the stack; it must produce exactly one."
+
+msgid "zax.diagnostic.type-mismatch"
+msgstr "\"{0}\" cannot be applied to ({1})."
+
+msgid "zax.diagnostic.swizzle-on-scalar"
+msgstr "\"{0}\" cannot be applied to {1} because it is not a vector."
+
+msgid "zax.diagnostic.swizzle-out-of-range"
+msgstr "\"{0}\" addresses a component that {1} does not have."
+
+msgid "zax.diagnostic.result-type-mismatch"
+msgstr "This expression must produce {0}, but it produces {1}."
