@@ -1,28 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
     public static class ZaxCompiler
     {
-        private static readonly Dictionary<string, ZaxOpCode> StackOperations = new Dictionary<string, ZaxOpCode>
+        private static readonly ImmutableDictionary<string, ZaxOpCode> StackOperations = ImmutableDictionary<string, ZaxOpCode>.Empty.AddRange(new Dictionary<string, ZaxOpCode>
         {
             ["dup"] = ZaxOpCode.Dup,
             ["drop"] = ZaxOpCode.Drop,
             ["swap"] = ZaxOpCode.Swap,
             ["over"] = ZaxOpCode.Over,
             ["rot"] = ZaxOpCode.Rot,
-        };
+        });
 
-        private static readonly Dictionary<ZaxOpCode, int> StackOperationDepths = new Dictionary<ZaxOpCode, int>
+        private static readonly ImmutableDictionary<ZaxOpCode, int> StackOperationDepths = ImmutableDictionary<ZaxOpCode, int>.Empty.AddRange(new Dictionary<ZaxOpCode, int>
         {
             [ZaxOpCode.Dup] = 1,
             [ZaxOpCode.Drop] = 1,
             [ZaxOpCode.Swap] = 2,
             [ZaxOpCode.Over] = 2,
             [ZaxOpCode.Rot] = 3,
-        };
+        });
 
         public static bool TryCompile(
             string source,
@@ -158,26 +159,26 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         typeStack.RemoveAt(top);
                         return true;
                     case ZaxOpCode.Swap:
-                    {
-                        var swapped = typeStack[top];
-                        typeStack[top] = typeStack[top - 1];
-                        typeStack[top - 1] = swapped;
-                        instructions.Add(ZaxInstruction.Stack(opCode, typeStack[top]));
-                        return true;
-                    }
+                        {
+                            var swapped = typeStack[top];
+                            typeStack[top] = typeStack[top - 1];
+                            typeStack[top - 1] = swapped;
+                            instructions.Add(ZaxInstruction.Stack(opCode, typeStack[top]));
+                            return true;
+                        }
                     case ZaxOpCode.Over:
                         instructions.Add(ZaxInstruction.Stack(opCode, typeStack[top - 1]));
                         Push(typeStack[top - 1]);
                         return true;
                     case ZaxOpCode.Rot:
-                    {
-                        var rotated = typeStack[top - 2];
-                        typeStack[top - 2] = typeStack[top - 1];
-                        typeStack[top - 1] = typeStack[top];
-                        typeStack[top] = rotated;
-                        instructions.Add(ZaxInstruction.Stack(opCode, typeStack[top]));
-                        return true;
-                    }
+                        {
+                            var rotated = typeStack[top - 2];
+                            typeStack[top - 2] = typeStack[top - 1];
+                            typeStack[top - 1] = typeStack[top];
+                            typeStack[top] = rotated;
+                            instructions.Add(ZaxInstruction.Stack(opCode, typeStack[top]));
+                            return true;
+                        }
                     default:
                         return false;
                 }
@@ -209,39 +210,39 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         break;
 
                     case ZaxTokenKind.Variable:
-                    {
-                        var variableIndex = IndexOfVariable(declaredVariables, token.Body);
-                        if (variableIndex < 0)
                         {
-                            diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownVariable, token, token.Body));
-                            return false;
+                            var variableIndex = IndexOfVariable(declaredVariables, token.Body);
+                            if (variableIndex < 0)
+                            {
+                                diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownVariable, token, token.Body));
+                                return false;
+                            }
+                            var variableType = declaredVariables[variableIndex].Type;
+                            instructions.Add(ZaxInstruction.Variable(variableIndex, variableType));
+                            Push(variableType);
+                            break;
                         }
-                        var variableType = declaredVariables[variableIndex].Type;
-                        instructions.Add(ZaxInstruction.Variable(variableIndex, variableType));
-                        Push(variableType);
-                        break;
-                    }
 
                     case ZaxTokenKind.Identifier:
-                    {
-                        if (StackOperations.TryGetValue(token.Text, out var stackOperation))
                         {
-                            if (!EmitStackOperation(stackOperation, token)) return false;
-                            break;
+                            if (StackOperations.TryGetValue(token.Text, out var stackOperation))
+                            {
+                                if (!EmitStackOperation(stackOperation, token)) return false;
+                                break;
+                            }
+                            if (ZaxFunctions.TryLookupConstant(token.Text, out var constantValue))
+                            {
+                                EmitConstant(constantValue);
+                                break;
+                            }
+                            if (ZaxFunctions.TryLookup(token.Text, out var namedFunction))
+                            {
+                                if (!EmitCall(namedFunction, token)) return false;
+                                break;
+                            }
+                            diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownName, token, token.Text));
+                            return false;
                         }
-                        if (ZaxFunctions.TryLookupConstant(token.Text, out var constantValue))
-                        {
-                            EmitConstant(constantValue);
-                            break;
-                        }
-                        if (ZaxFunctions.TryLookup(token.Text, out var namedFunction))
-                        {
-                            if (!EmitCall(namedFunction, token)) return false;
-                            break;
-                        }
-                        diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownName, token, token.Text));
-                        return false;
-                    }
                 }
             }
 
