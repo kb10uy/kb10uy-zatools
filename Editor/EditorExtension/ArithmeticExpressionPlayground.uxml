@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px;">
+        <ui:Label text="zaxp.result" class="ndmf-tr" style="-unity-font-style: bold; margin-left: 4px;" />
+        <ui:Label name="LabelResult" style="white-space: normal; margin-bottom: 8px; margin-left: 4px; font-size: 20px; -unity-font-style: bold;" />
+        <ui:Label text="zaxp.expression" class="ndmf-tr" style="-unity-font-style: bold; margin-left: 4px;" />
+        <ui:TextField picking-mode="Ignore" multiline="true" name="FieldExpression" style="white-space: normal; flex-grow: 1; flex-basis: 0;" />
+        <ui:Label name="LabelStatus" style="white-space: normal; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:Label text="zaxp.variables" class="ndmf-tr" style="-unity-font-style: bold; margin-left: 4px;" />
+        <ui:ListView name="ListVariables" show-border="true" show-add-remove-footer="true" style="margin-bottom: 8px; margin-left: 4px; margin-right: 4px;" />
+        <ui:Label text="zaxp.disassembly" class="ndmf-tr" style="-unity-font-style: bold; margin-left: 4px;" />
+        <ui:TextField picking-mode="Ignore" multiline="true" readonly="true" name="FieldDisassembly" style="flex-basis: 0; flex-grow: 1; flex-direction: column;" />
+    </ui:VisualElement>
+</ui:UXML>

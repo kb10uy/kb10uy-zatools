@@ -9,3 +9,18 @@
 .label-indent-2 > .unity-base-field__label {
     padding-left: 24px;
 }
+
+.zax-expression__status {
+    padding-left: 244px;
+    white-space: normal;
+}
+
+.zax-expression__status--error {
+    color: var(--unity-colors-error-text);
+}
+
+.zax-expression__variables {
+    padding-left: 244px;
+    white-space: normal;
+    opacity: 0.6;
+}

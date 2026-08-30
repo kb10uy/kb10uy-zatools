@@ -371,3 +371,62 @@ msgstr "件"
 
 msgid "mbsi.keys-header"
 msgstr "追加される BlendShape"
+
+msgid "zax.diagnostic.invalid-token"
+msgstr "\"{0}\" は不正なトークンです"
+
+msgid "zax.diagnostic.invalid-number-literal"
+msgstr "\"{0}\" は不正な数値リテラルです"
+
+msgid "zax.diagnostic.invalid-swizzle"
+msgstr "\"{0}\" は無効な swizzle 操作です。1～4 要素で単一のセットから選択してください (xyzw / rgba / uvst)"
+
+msgid "zax.diagnostic.empty-expression"
+msgstr "式が空です"
+
+msgid "zax.diagnostic.unknown-name"
+msgstr "\"{0}\"は不明な関数・定数です"
+
+msgid "zax.diagnostic.unknown-variable"
+msgstr "\"@{0}\" は不明な変数です"
+
+msgid "zax.diagnostic.not-enough-operands"
+msgstr "\"{0}\" には {1} 個のオペランドが必要ですが、スタックには {2} 個しかありません"
+
+msgid "zax.diagnostic.extra-operands"
+msgstr "\"{0}\" はスタックに {1} 個の値が残っています。1 個の値しか残せません"
+
+msgid "zax.diagnostic.type-mismatch"
+msgstr "\"{0}\" は ({1}) に適用できません"
+
+msgid "zax.diagnostic.swizzle-on-scalar"
+msgstr "\"{0}\" はベクトルではないため {1} に適用できません"
+
+msgid "zax.diagnostic.swizzle-out-of-range"
+msgstr "\"{0}\" は {1} の範囲外です"
+
+msgid "zax.diagnostic.result-type-mismatch"
+msgstr "この式は {0} を出力する必要がありますが、{1} を出力しています"
+
+msgid "zax.diagnostic.unpack-on-scalar"
+msgstr "\"{0}\" はベクトルではないため {1} に適用できません"
+
+msgid "zax.report.compile-error"
+msgstr "Zax コンパイルエラー"
+
+msgid "zax.report.compile-error:description"
+msgstr ""
+"\"{0}\" がコンパイルできなかったためスキップされます\n"
+"{1}"
+
+msgid "zaxp.expression"
+msgstr "式 (RPN)"
+
+msgid "zaxp.variables"
+msgstr "変数"
+
+msgid "zaxp.result"
+msgstr "結果"
+
+msgid "zaxp.disassembly"
+msgstr "逆アセンブル"
