@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
     public static class ZaxTokenizer
     {
-        private static readonly HashSet<string> Symbols = new HashSet<string>
+        private static readonly ImmutableHashSet<string> Symbols = ImmutableHashSet<string>.Empty.Union(new[]
         {
             "+", "-", "*", "/", "//", "%",
-        };
+        });
 
         public static bool TryTokenize(string source, List<ZaxToken> tokens, List<ZaxDiagnostic> diagnostics)
         {

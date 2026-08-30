@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
@@ -52,7 +53,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
         private static readonly ZaxFunctionInfo[] Table = BuildTable();
 
-        private static readonly Dictionary<string, ZaxFunction> NameTable = new Dictionary<string, ZaxFunction>
+        private static readonly ImmutableDictionary<string, ZaxFunction> NameTable = ImmutableDictionary<string, ZaxFunction>.Empty.AddRange(new Dictionary<string, ZaxFunction>
         {
             ["+"] = ZaxFunction.Add, ["add"] = ZaxFunction.Add,
             ["-"] = ZaxFunction.Sub, ["sub"] = ZaxFunction.Sub,
@@ -101,16 +102,16 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["vec2"] = ZaxFunction.Vec2,
             ["vec3"] = ZaxFunction.Vec3,
             ["vec4"] = ZaxFunction.Vec4,
-        };
+        });
 
-        private static readonly Dictionary<string, ZaxValue> ConstantTable = new Dictionary<string, ZaxValue>
+        private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
         {
             ["PI"] = ZaxValue.FromFloat(math.PI),
             ["TAU"] = ZaxValue.FromFloat(2.0f * math.PI),
             ["E"] = ZaxValue.FromFloat(math.E),
             ["EPSILON"] = ZaxValue.FromFloat(math.EPSILON),
             ["INF"] = ZaxValue.FromFloat(math.INFINITY),
-        };
+        });
 
         private static ZaxFunctionInfo[] BuildTable()
         {

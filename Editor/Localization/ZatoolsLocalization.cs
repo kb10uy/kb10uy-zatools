@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using nadena.dev.ndmf.localization;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
 
 namespace KusakaFactory.Zatools.Localization
 {
@@ -38,6 +39,12 @@ namespace KusakaFactory.Zatools.Localization
         private static readonly ImmutableDictionary<string, string> LocalizationAssetGuids = ImmutableDictionary<string, string>.Empty
             .Add("en-us", "42e06d554b5d0ed41adee8cd05f68b25")
             .Add("ja-jp", "b67eaa55d7ce15a479bdad858d85dfe8");
+
+        internal static string LocalizeZaxDiagnostic(ZaxDiagnostic diagnostic)
+        {
+            var format = NdmfLocalizer.GetLocalizedString(diagnostic.LocalizationKey);
+            return diagnostic.Arguments.Length > 0 ? string.Format(format, diagnostic.Arguments) : format;
+        }
 
         private static void EnsureLocalizerIntialized()
         {
