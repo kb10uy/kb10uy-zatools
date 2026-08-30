@@ -52,11 +52,12 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         public string Disassemble()
         {
             var builder = new StringBuilder();
-            builder.AppendLine($"; {Source}");
-            builder.AppendLine($"; stack = {StackSize}, result = {ResultType.DisplayName()}");
+            builder
+                .Append("; stack = ").Append(StackSize)
+                .Append(", result = ").Append(ResultType.DisplayName()).Append('\n');
             for (var i = 0; i < Instructions.Length; ++i)
             {
-                builder.Append(i.ToString("D4")).Append("  ").AppendLine(Instructions[i].ToString());
+                builder.Append(i.ToString("D4")).Append("  ").Append(Instructions[i]).Append('\n');
             }
             return builder.ToString();
         }
