@@ -392,7 +392,7 @@ msgid "zax.diagnostic.not-enough-operands"
 msgstr "\"{0}\" requires {1} operand(s), but only {2} are on the stack."
 
 msgid "zax.diagnostic.extra-operands"
-msgstr "The expression leaves {0} values on the stack; it must produce exactly one."
+msgstr "\"{0}\" leaves {1} values on the stack; the expression must produce exactly one."
 
 msgid "zax.diagnostic.type-mismatch"
 msgstr "\"{0}\" cannot be applied to ({1})."
@@ -413,3 +413,21 @@ msgid "zax.report.compile-error:description"
 msgstr ""
 "The expression \"{0}\" could not be compiled, so the component using it was skipped.\n"
 "{1}"
+
+msgid "zaxp.expression"
+msgstr "Expression (RPN)"
+
+msgid "zaxp.variables"
+msgstr "Variables"
+
+msgid "zaxp.add-variable"
+msgstr "Add"
+
+msgid "zaxp.remove-variable"
+msgstr "Remove"
+
+msgid "zaxp.result"
+msgstr "Result"
+
+msgid "zaxp.disassembly"
+msgstr "Disassembly"

@@ -43,7 +43,16 @@ namespace KusakaFactory.Zatools.Localization
         internal static string LocalizeZaxDiagnostic(ZaxDiagnostic diagnostic)
         {
             var format = NdmfLocalizer.GetLocalizedString(diagnostic.LocalizationKey);
-            return diagnostic.Arguments.Length > 0 ? string.Format(format, diagnostic.Arguments) : format;
+            if (diagnostic.Arguments.Length == 0) return format;
+
+            try
+            {
+                return string.Format(format, diagnostic.Arguments);
+            }
+            catch (FormatException)
+            {
+                return $"{format} [{string.Join(", ", diagnostic.Arguments)}]";
+            }
         }
 
         private static void EnsureLocalizerIntialized()

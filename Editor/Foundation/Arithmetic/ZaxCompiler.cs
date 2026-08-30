@@ -255,7 +255,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             {
                 var last = tokens[tokens.Count - 1];
                 diagnostics.Add(new ZaxDiagnostic(
-                    ZaxDiagnosticCode.ExtraOperands, last, typeStack.Count.ToString()));
+                    ZaxDiagnosticCode.ExtraOperands, last, last.Text, typeStack.Count.ToString()));
                 return false;
             }
 

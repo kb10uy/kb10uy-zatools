@@ -415,3 +415,21 @@ msgid "zax.report.compile-error:description"
 msgstr ""
 "\"{0}\" がコンパイルできなかったためスキップされます\n"
 "{1}"
+
+msgid "zaxp.expression"
+msgstr "式 (RPN)"
+
+msgid "zaxp.variables"
+msgstr "変数"
+
+msgid "zaxp.add-variable"
+msgstr "追加"
+
+msgid "zaxp.remove-variable"
+msgstr "削除"
+
+msgid "zaxp.result"
+msgstr "結果"
+
+msgid "zaxp.disassembly"
+msgstr "逆アセンブル"
