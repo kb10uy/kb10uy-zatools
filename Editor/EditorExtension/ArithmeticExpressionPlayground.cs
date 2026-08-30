@@ -64,6 +64,13 @@ namespace KusakaFactory.Zatools.EditorExtension
             _variablesList.itemsRemoved += (indices) => ReevaluateDeferred();
             _variablesList.itemIndexChanged += (from, to) => ReevaluateDeferred();
 
+#if UNITY_2023_1_OR_NEWER
+            _expression.verticalScrollerVisibility = ScrollerVisibility.Auto;
+            _disassembly.verticalScrollerVisibility = ScrollerVisibility.Auto;
+#else
+            _expression.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
+            _disassembly.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
+#endif
             _expression.RegisterValueChangedCallback((e) => Reevaluate());
             ZatoolsLocalization.OnNdmfLanguageChanged += Reevaluate;
 
