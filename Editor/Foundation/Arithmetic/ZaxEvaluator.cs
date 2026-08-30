@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
-    public static class ZaxEvaluator
+    public static unsafe class ZaxEvaluator
     {
         public static ZaxValue Evaluate(ZaxProgram program)
         {
@@ -22,8 +22,24 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ReadOnlySpan<ZaxValue> variables,
             Span<ZaxValue> stack)
         {
+            fixed (ZaxInstruction* instructionsPointer = instructions)
+            fixed (ZaxValue* constantsPointer = constants)
+            fixed (ZaxValue* variablesPointer = variables)
+            fixed (ZaxValue* stackPointer = stack)
+            {
+                return Execute(instructionsPointer, instructions.Length, constantsPointer, variablesPointer, stackPointer);
+            }
+        }
+
+        public static ZaxValue Execute(
+            ZaxInstruction* instructions,
+            int instructionCount,
+            ZaxValue* constants,
+            ZaxValue* variables,
+            ZaxValue* stack)
+        {
             var pointer = 0;
-            for (var i = 0; i < instructions.Length; ++i)
+            for (var i = 0; i < instructionCount; ++i)
             {
                 var instruction = instructions[i];
                 switch (instruction.OpCode)
@@ -83,7 +99,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                             instruction.Function,
                             instruction.ArgumentType,
                             instruction.ResultType,
-                            stack.Slice(baseIndex, arity));
+                            stack + baseIndex,
+                            arity);
                         stack[baseIndex] = result;
                         pointer = baseIndex + 1;
                         break;
@@ -107,14 +124,15 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ZaxFunction function,
             ZaxValueType argumentType,
             ZaxValueType resultType,
-            ReadOnlySpan<ZaxValue> arguments)
+            ZaxValue* arguments,
+            int count)
         {
-            if (argumentType == ZaxValueType.Int) return ApplyInteger(function, arguments);
+            if (argumentType == ZaxValueType.Int) return ApplyInteger(function, arguments, count);
 
             var x = arguments[0].ConvertTo(argumentType).ToFloat4();
-            var y = arguments.Length > 1 ? arguments[1].ConvertTo(argumentType).ToFloat4() : float4.zero;
-            var z = arguments.Length > 2 ? arguments[2].ConvertTo(argumentType).ToFloat4() : float4.zero;
-            var w = arguments.Length > 3 ? arguments[3].ConvertTo(argumentType).ToFloat4() : float4.zero;
+            var y = count > 1 ? arguments[1].ConvertTo(argumentType).ToFloat4() : float4.zero;
+            var z = count > 2 ? arguments[2].ConvertTo(argumentType).ToFloat4() : float4.zero;
+            var w = count > 3 ? arguments[3].ConvertTo(argumentType).ToFloat4() : float4.zero;
 
             switch (function)
             {
@@ -168,11 +186,11 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             }
         }
 
-        private static ZaxValue ApplyInteger(ZaxFunction function, ReadOnlySpan<ZaxValue> arguments)
+        private static ZaxValue ApplyInteger(ZaxFunction function, ZaxValue* arguments, int count)
         {
             var a = arguments[0].AsInt;
-            var b = arguments.Length > 1 ? arguments[1].AsInt : 0;
-            var c = arguments.Length > 2 ? arguments[2].AsInt : 0;
+            var b = count > 1 ? arguments[1].AsInt : 0;
+            var c = count > 2 ? arguments[2].AsInt : 0;
 
             switch (function)
             {

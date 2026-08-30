@@ -55,6 +55,11 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             return true;
         }
 
+        public static int ByteSize(this ZaxValueType type)
+        {
+            return type <= ZaxValueType.Float ? 4 : (int)type * 4;
+        }
+
         public static string DisplayName(this ZaxValueType type)
         {
             switch (type)

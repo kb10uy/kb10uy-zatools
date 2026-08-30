@@ -43,8 +43,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxValueType.Float: return FromFloat(value.x);
                 case ZaxValueType.Float2: return FromFloat2(value.xy);
                 case ZaxValueType.Float3: return FromFloat3(value.xyz);
-                case ZaxValueType.Float4: return FromFloat4(value);
-                default: throw new ArgumentOutOfRangeException(nameof(type));
+                default: return FromFloat4(value);
             }
         }
 
