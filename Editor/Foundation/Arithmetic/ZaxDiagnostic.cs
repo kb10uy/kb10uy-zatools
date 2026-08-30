@@ -14,6 +14,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         ExtraOperands,
         TypeMismatch,
         SwizzleOnScalar,
+        UnpackOnScalar,
         SwizzleOutOfRange,
         ResultTypeMismatch,
     }
@@ -57,6 +58,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxDiagnosticCode.ExtraOperands: return "zax.diagnostic.extra-operands";
                 case ZaxDiagnosticCode.TypeMismatch: return "zax.diagnostic.type-mismatch";
                 case ZaxDiagnosticCode.SwizzleOnScalar: return "zax.diagnostic.swizzle-on-scalar";
+                case ZaxDiagnosticCode.UnpackOnScalar: return "zax.diagnostic.unpack-on-scalar";
                 case ZaxDiagnosticCode.SwizzleOutOfRange: return "zax.diagnostic.swizzle-out-of-range";
                 case ZaxDiagnosticCode.ResultTypeMismatch: return "zax.diagnostic.result-type-mismatch";
                 default: return "zax.diagnostic.invalid-token";

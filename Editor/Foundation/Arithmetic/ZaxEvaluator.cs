@@ -60,6 +60,15 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         stack[pointer - 1] = ApplySwizzle(stack[pointer - 1], instruction.Operand, instruction.ResultType);
                         break;
 
+                    case ZaxOpCode.Unpack:
+                    {
+                        var packed = stack[pointer - 1].ToFloat4();
+                        var dimension = instruction.ArgumentType.Dimension();
+                        for (var c = 0; c < dimension; ++c) stack[pointer - 1 + c] = ZaxValue.FromFloat(packed[c]);
+                        pointer += dimension - 1;
+                        break;
+                    }
+
                     case ZaxOpCode.Dup:
                         stack[pointer] = stack[pointer - 1];
                         pointer += 1;

@@ -7,6 +7,9 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
     public static class ZaxCompiler
     {
+        private const string UnpackName = "unpack";
+        private const string UnpackSymbol = "...";
+
         private static readonly ImmutableDictionary<string, ZaxOpCode> StackOperations = ImmutableDictionary<string, ZaxOpCode>.Empty.AddRange(new Dictionary<string, ZaxOpCode>
         {
             ["dup"] = ZaxOpCode.Dup,
@@ -136,6 +139,29 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 return true;
             }
 
+            bool EmitUnpack(ZaxToken token)
+            {
+                if (typeStack.Count < 1)
+                {
+                    diagnostics.Add(new ZaxDiagnostic(
+                        ZaxDiagnosticCode.NotEnoughOperands, token, token.Text, "1", "0"));
+                    return false;
+                }
+
+                var operandType = typeStack[typeStack.Count - 1];
+                if (!operandType.IsVector())
+                {
+                    diagnostics.Add(new ZaxDiagnostic(
+                        ZaxDiagnosticCode.UnpackOnScalar, token, token.Text, operandType.DisplayName()));
+                    return false;
+                }
+
+                typeStack.RemoveAt(typeStack.Count - 1);
+                instructions.Add(ZaxInstruction.Unpack(operandType));
+                for (var i = 0; i < operandType.Dimension(); ++i) Push(ZaxValueType.Float);
+                return true;
+            }
+
             bool EmitStackOperation(ZaxOpCode opCode, ZaxToken token)
             {
                 var required = StackOperationDepths[opCode];
@@ -201,6 +227,11 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         break;
 
                     case ZaxTokenKind.Symbol:
+                        if (token.Text == UnpackSymbol)
+                        {
+                            if (!EmitUnpack(token)) return false;
+                            break;
+                        }
                         if (!ZaxFunctions.TryLookup(token.Text, out var symbolFunction))
                         {
                             diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownName, token, token.Text));
@@ -225,7 +256,12 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
                     case ZaxTokenKind.Identifier:
                         {
-                            if (StackOperations.TryGetValue(token.Text, out var stackOperation))
+                            if (token.Text == UnpackName)
+                        {
+                            if (!EmitUnpack(token)) return false;
+                            break;
+                        }
+                        if (StackOperations.TryGetValue(token.Text, out var stackOperation))
                             {
                                 if (!EmitStackOperation(stackOperation, token)) return false;
                                 break;

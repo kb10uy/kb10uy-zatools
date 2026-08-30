@@ -9,7 +9,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
     {
         private static readonly ImmutableHashSet<string> Symbols = ImmutableHashSet<string>.Empty.Union(new[]
         {
-            "+", "-", "*", "/", "//", "%",
+            "+", "-", "*", "/", "//", "%", "...",
         });
 
         public static bool TryTokenize(string source, List<ZaxToken> tokens, List<ZaxDiagnostic> diagnostics)

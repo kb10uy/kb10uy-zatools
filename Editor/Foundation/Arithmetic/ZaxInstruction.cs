@@ -10,6 +10,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Call,
         Swizzle,
         Convert,
+        Unpack,
         Dup,
         Drop,
         Swap,
@@ -40,6 +41,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         public static ZaxInstruction Call(ZaxFunction function, ZaxValueType argumentType, ZaxValueType resultType, int arity) => new ZaxInstruction(ZaxOpCode.Call, function, resultType, argumentType, (ushort)arity);
         public static ZaxInstruction Swizzle(ushort packed, ZaxValueType argumentType, ZaxValueType resultType) => new ZaxInstruction(ZaxOpCode.Swizzle, default, resultType, argumentType, packed);
         public static ZaxInstruction Convert(ZaxValueType argumentType, ZaxValueType resultType) => new ZaxInstruction(ZaxOpCode.Convert, default, resultType, argumentType, 0);
+        public static ZaxInstruction Unpack(ZaxValueType argumentType) => new ZaxInstruction(ZaxOpCode.Unpack, default, ZaxValueType.Float, argumentType, 0);
         public static ZaxInstruction Stack(ZaxOpCode opCode, ZaxValueType resultType) => new ZaxInstruction(opCode, default, resultType, resultType, 0);
 
         public static ushort PackSwizzle(ReadOnlySpan<int> components)
@@ -62,6 +64,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxOpCode.Call: return $"Call {Function}/{Operand} ({ArgumentType.DisplayName()}) -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Swizzle: return $"Swizzle {Operand:X4} -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Convert: return $"Convert -> {ResultType.DisplayName()}";
+                case ZaxOpCode.Unpack: return $"Unpack {ArgumentType.DisplayName()} -> {ArgumentType.Dimension()} x float";
                 default: return $"{OpCode} -> {ResultType.DisplayName()}";
             }
         }

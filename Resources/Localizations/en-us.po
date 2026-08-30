@@ -406,6 +406,9 @@ msgstr "\"{0}\" addresses a component that {1} does not have."
 msgid "zax.diagnostic.result-type-mismatch"
 msgstr "This expression must produce {0}, but it produces {1}."
 
+msgid "zax.diagnostic.unpack-on-scalar"
+msgstr "\"{0}\" cannot be applied to {1} because it is not a vector."
+
 msgid "zax.report.compile-error"
 msgstr "Zax: could not compile an expression"
 
