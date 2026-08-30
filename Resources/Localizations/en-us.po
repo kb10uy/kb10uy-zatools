@@ -405,3 +405,11 @@ msgstr "\"{0}\" addresses a component that {1} does not have."
 
 msgid "zax.diagnostic.result-type-mismatch"
 msgstr "This expression must produce {0}, but it produces {1}."
+
+msgid "zax.report.compile-error"
+msgstr "Zax: could not compile an expression"
+
+msgid "zax.report.compile-error:description"
+msgstr ""
+"The expression \"{0}\" could not be compiled, so the component using it was skipped.\n"
+"{1}"

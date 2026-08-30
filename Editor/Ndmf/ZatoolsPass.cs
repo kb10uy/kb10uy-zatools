@@ -1,4 +1,8 @@
+using System.Collections.Generic;
 using nadena.dev.ndmf;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
+using KusakaFactory.Zatools.Localization;
+using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
@@ -16,5 +20,28 @@ namespace KusakaFactory.Zatools.Ndmf
 
         public override string QualifiedName => $"org.kb10uy.zatools.pass.{ZatoolsPassName}";
         public override string DisplayName => $"{ZatoolsPassName} ({ZatoolsPassDescription})";
+
+        protected static bool TryCompileZaxExpression(
+            UnityObject target,
+            string source,
+            IReadOnlyList<ZaxVariable> variables,
+            ZaxValueType? expectedType,
+            out ZaxProgram program)
+        {
+            var diagnostics = new List<ZaxDiagnostic>();
+            if (ZaxCompiler.TryCompile(source, variables, expectedType, diagnostics, out program)) return true;
+
+            foreach (var diagnostic in diagnostics)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(
+                    target,
+                    ErrorSeverity.Error,
+                    "zax.report.compile-error",
+                    source ?? string.Empty,
+                    ZatoolsLocalization.LocalizeZaxDiagnostic(diagnostic)));
+            }
+
+            return false;
+        }
     }
 }

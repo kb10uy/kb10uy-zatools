@@ -407,3 +407,11 @@ msgstr "\"{0}\" は {1} の範囲外です"
 
 msgid "zax.diagnostic.result-type-mismatch"
 msgstr "この式は {0} を出力する必要がありますが、{1} を出力しています"
+
+msgid "zax.report.compile-error"
+msgstr "Zax コンパイルエラー"
+
+msgid "zax.report.compile-error:description"
+msgstr ""
+"\"{0}\" がコンパイルできなかったためスキップされます\n"
+"{1}"
