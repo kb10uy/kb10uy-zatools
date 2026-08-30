@@ -420,12 +420,6 @@ msgstr "Expression (RPN)"
 msgid "zaxp.variables"
 msgstr "Variables"
 
-msgid "zaxp.add-variable"
-msgstr "Add"
-
-msgid "zaxp.remove-variable"
-msgstr "Remove"
-
 msgid "zaxp.result"
 msgstr "Result"
 

@@ -12,21 +12,23 @@ namespace KusakaFactory.Zatools.EditorExtension
 {
     internal sealed class ArithmeticExpressionPlayground : EditorWindow
     {
+        private const int ComponentCount = 4;
+
         [MenuItem("Window/Zatools: kb10uy's Various Tools/Arithmetic Expression Playground")]
         internal static void OpenWindow()
         {
             var window = GetWindow<ArithmeticExpressionPlayground>("Arithmetic Expression Playground");
-            window.minSize = new Vector2(420.0f, 480.0f);
+            window.minSize = new Vector2(460.0f, 520.0f);
         }
 
-        private readonly List<VariableRow> _rows = new List<VariableRow>();
+        private readonly List<VariableEntry> _variables = new List<VariableEntry>();
         private readonly List<ZaxDiagnostic> _diagnostics = new List<ZaxDiagnostic>();
 
         private TextField _expression;
         private Label _status;
         private Label _result;
         private TextField _disassembly;
-        private VisualElement _variablesContainer;
+        private ListView _variablesList;
 
         internal void CreateGUI()
         {
@@ -38,18 +40,34 @@ namespace KusakaFactory.Zatools.EditorExtension
             _status = rootVisualElement.Q<Label>("LabelStatus");
             _result = rootVisualElement.Q<Label>("LabelResult");
             _disassembly = rootVisualElement.Q<TextField>("FieldDisassembly");
-            _variablesContainer = rootVisualElement.Q<VisualElement>("ContainerVariables");
+            _variablesList = rootVisualElement.Q<ListView>("ListVariables");
 
-            _rows.Clear();
-            _variablesContainer.Clear();
+            _variables.Clear();
+            _variables.Add(new VariableEntry { Name = "pos", Type = ZaxValueType.Float3, Value = { [0] = 1.0f, [1] = 2.0f, [2] = 3.0f } });
+
+            _variablesList.itemsSource = _variables;
+            _variablesList.makeItem = MakeVariableItem;
+            _variablesList.bindItem = BindVariableItem;
+            _variablesList.selectionType = SelectionType.Single;
+            _variablesList.reorderable = true;
+            _variablesList.reorderMode = ListViewReorderMode.Animated;
+            _variablesList.showAddRemoveFooter = true;
+            _variablesList.showBoundCollectionSize = false;
+            _variablesList.virtualizationMethod = CollectionVirtualizationMethod.FixedHeight;
+            _variablesList.fixedItemHeight = 22.0f;
+
+            _variablesList.itemsAdded += (indices) =>
+            {
+                foreach (var index in indices) _variables[index] = new VariableEntry();
+                ReevaluateDeferred();
+            };
+            _variablesList.itemsRemoved += (indices) => ReevaluateDeferred();
+            _variablesList.itemIndexChanged += (from, to) => ReevaluateDeferred();
 
             _expression.RegisterValueChangedCallback((e) => Reevaluate());
-            rootVisualElement.Q<Button>("ButtonAddVariable").clicked +=
-                () => AddVariable("value", ZaxValueType.Float, float4.zero);
-
             ZatoolsLocalization.OnNdmfLanguageChanged += Reevaluate;
 
-            AddVariable("pos", ZaxValueType.Float3, new float4(1.0f, 2.0f, 3.0f, 0.0f));
+            _variablesList.RefreshItems();
             _expression.value = "@pos normalize";
             Reevaluate();
         }
@@ -59,56 +77,90 @@ namespace KusakaFactory.Zatools.EditorExtension
             ZatoolsLocalization.OnNdmfLanguageChanged -= Reevaluate;
         }
 
-        private void AddVariable(string name, ZaxValueType type, float4 value)
+        private VisualElement MakeVariableItem()
         {
-            var row = new VariableRow
-            {
-                Element = new VisualElement(),
-                Name = new TextField { value = name },
-                Type = new EnumField(type),
-                Components = new FloatField[4],
-            };
-            row.Element.style.flexDirection = FlexDirection.Row;
-            row.Element.style.marginTop = 2.0f;
-            row.Name.style.width = 96.0f;
-            row.Type.style.width = 80.0f;
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.alignItems = Align.Center;
 
-            var initial = new[] { value.x, value.y, value.z, value.w };
-            for (var i = 0; i < 4; ++i)
+            var name = new TextField { name = "ItemName" };
+            name.style.width = 96.0f;
+            name.RegisterValueChangedCallback((e) =>
             {
-                var component = new FloatField { value = initial[i] };
-                component.style.width = 56.0f;
-                component.RegisterValueChangedCallback((e) => Reevaluate());
-                row.Components[i] = component;
-            }
-
-            var remove = new Button { text = "zaxp.remove-variable" };
-            remove.AddToClassList("ndmf-tr");
-            remove.clicked += () =>
-            {
-                _rows.Remove(row);
-                _variablesContainer.Remove(row.Element);
-                Reevaluate();
-            };
-
-            row.Name.RegisterValueChangedCallback((e) => Reevaluate());
-            row.Type.RegisterValueChangedCallback((e) =>
-            {
-                row.UpdateComponentVisibility();
+                if (!TryResolveEntry(row, out var entry)) return;
+                entry.Name = e.newValue;
                 Reevaluate();
             });
+            row.Add(name);
 
-            row.Element.Add(row.Name);
-            row.Element.Add(row.Type);
-            foreach (var component in row.Components) row.Element.Add(component);
-            row.Element.Add(remove);
-            row.UpdateComponentVisibility();
+            var type = new EnumField(ZaxValueType.Float) { name = "ItemType" };
+            type.style.width = 80.0f;
+            type.RegisterValueChangedCallback((e) =>
+            {
+                if (!TryResolveEntry(row, out var entry)) return;
+                entry.Type = (ZaxValueType)e.newValue;
+                UpdateComponentVisibility(row, entry.Type);
+                Reevaluate();
+            });
+            row.Add(type);
 
-            _rows.Add(row);
-            _variablesContainer.Add(row.Element);
-            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(row.Element);
+            for (var i = 0; i < ComponentCount; ++i)
+            {
+                var componentIndex = i;
+                var component = new FloatField { name = $"ItemComponent{i}" };
+                component.style.width = 56.0f;
+                component.RegisterValueChangedCallback((e) =>
+                {
+                    if (!TryResolveEntry(row, out var entry)) return;
+                    entry.Value[componentIndex] = e.newValue;
+                    Reevaluate();
+                });
+                row.Add(component);
+            }
 
-            Reevaluate();
+            return row;
+        }
+
+        private void BindVariableItem(VisualElement element, int index)
+        {
+            if (index < 0 || index >= _variables.Count) return;
+            if (_variables[index] == null) _variables[index] = new VariableEntry();
+
+            var entry = _variables[index];
+            element.userData = index;
+
+            element.Q<TextField>("ItemName").SetValueWithoutNotify(entry.Name);
+            element.Q<EnumField>("ItemType").SetValueWithoutNotify(entry.Type);
+            for (var i = 0; i < ComponentCount; ++i)
+            {
+                element.Q<FloatField>($"ItemComponent{i}").SetValueWithoutNotify(entry.Value[i]);
+            }
+            UpdateComponentVisibility(element, entry.Type);
+        }
+
+        private bool TryResolveEntry(VisualElement row, out VariableEntry entry)
+        {
+            entry = null;
+            if (!(row.userData is int index)) return false;
+            if (index < 0 || index >= _variables.Count) return false;
+
+            entry = _variables[index];
+            return entry != null;
+        }
+
+        private static void UpdateComponentVisibility(VisualElement row, ZaxValueType type)
+        {
+            var dimension = type.Dimension();
+            for (var i = 0; i < ComponentCount; ++i)
+            {
+                row.Q<FloatField>($"ItemComponent{i}").style.display =
+                    i < dimension ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+        }
+
+        private void ReevaluateDeferred()
+        {
+            rootVisualElement.schedule.Execute(Reevaluate);
         }
 
         private void Reevaluate()
@@ -124,7 +176,9 @@ namespace KusakaFactory.Zatools.EditorExtension
                 return;
             }
 
-            var variables = _rows.Select((r) => r.ToVariable()).ToArray();
+            var declared = _variables.Where((v) => v != null).ToArray();
+            var variables = declared.Select((v) => v.ToVariable()).ToArray();
+
             _diagnostics.Clear();
             if (!ZaxCompiler.TryCompile(source, variables, null, _diagnostics, out var program))
             {
@@ -135,7 +189,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             }
 
             SetStatus($"→ {program.ResultType.DisplayName()}", false);
-            var values = _rows.Select((r) => r.ToValue()).ToArray();
+            var values = declared.Select((v) => v.ToValue()).ToArray();
             _result.text = ZaxEvaluator.Evaluate(program, values).ToString();
             _disassembly.SetValueWithoutNotify(program.Disassemble());
         }
@@ -148,41 +202,28 @@ namespace KusakaFactory.Zatools.EditorExtension
                 : new StyleColor(StyleKeyword.Null);
         }
 
-        private sealed class VariableRow
+        private sealed class VariableEntry
         {
-            internal VisualElement Element;
-            internal TextField Name;
-            internal EnumField Type;
-            internal FloatField[] Components;
+            internal string Name = "value";
+            internal ZaxValueType Type = ZaxValueType.Float;
+            internal readonly float[] Value = new float[ComponentCount];
 
-            internal ZaxValueType ValueType => (ZaxValueType)Type.value;
-
-            internal ZaxVariable ToVariable() => new ZaxVariable(Name.value, ValueType);
+            internal ZaxVariable ToVariable() => new ZaxVariable(Name ?? string.Empty, Type);
 
             internal ZaxValue ToValue()
             {
-                switch (ValueType)
+                switch (Type)
                 {
                     case ZaxValueType.Int:
-                        return ZaxValue.FromInt((int)Components[0].value);
+                        return ZaxValue.FromInt((int)Value[0]);
                     case ZaxValueType.Float:
-                        return ZaxValue.FromFloat(Components[0].value);
+                        return ZaxValue.FromFloat(Value[0]);
                     case ZaxValueType.Float2:
-                        return ZaxValue.FromFloat2(new float2(Components[0].value, Components[1].value));
+                        return ZaxValue.FromFloat2(new float2(Value[0], Value[1]));
                     case ZaxValueType.Float3:
-                        return ZaxValue.FromFloat3(new float3(Components[0].value, Components[1].value, Components[2].value));
+                        return ZaxValue.FromFloat3(new float3(Value[0], Value[1], Value[2]));
                     default:
-                        return ZaxValue.FromFloat4(new float4(
-                            Components[0].value, Components[1].value, Components[2].value, Components[3].value));
-                }
-            }
-
-            internal void UpdateComponentVisibility()
-            {
-                var dimension = ValueType.Dimension();
-                for (var i = 0; i < Components.Length; ++i)
-                {
-                    Components[i].style.display = i < dimension ? DisplayStyle.Flex : DisplayStyle.None;
+                        return ZaxValue.FromFloat4(new float4(Value[0], Value[1], Value[2], Value[3]));
                 }
             }
         }
