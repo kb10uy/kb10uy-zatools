@@ -12,6 +12,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             "+", "-", "*", "/", "//", "%", "...",
         });
 
+        private const char CommentPrefix = ';';
+
         public static bool TryTokenize(string source, List<ZaxToken> tokens, List<ZaxDiagnostic> diagnostics)
         {
             tokens.Clear();
@@ -27,8 +29,14 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     continue;
                 }
 
+                if (source[position] == CommentPrefix)
+                {
+                    while (position < source.Length && source[position] != '\n') position += 1;
+                    continue;
+                }
+
                 var start = position;
-                while (position < source.Length && !char.IsWhiteSpace(source[position])) position += 1;
+                while (position < source.Length && !char.IsWhiteSpace(source[position]) && source[position] != CommentPrefix) position += 1;
                 var text = source.Substring(start, position - start);
 
                 if (TryClassify(text, start, diagnostics, out var token)) tokens.Add(token);
