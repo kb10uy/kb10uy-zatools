@@ -7,7 +7,7 @@ using Unity.Mathematics;
 namespace KusakaFactory.Zatools.Foundation
 {
     /// <summary>
-    /// Samples a readable texture as a grayscale mask.
+    /// Samples a texture as a grayscale mask.
     /// </summary>
     /// <remarks>
     /// This type is public only so that it can be used by external in-house assemblies.
@@ -20,6 +20,8 @@ namespace KusakaFactory.Zatools.Foundation
             TakeWhite,
             TakeBlack,
         }
+
+        private static readonly float3 LuminanceCoefficient = new float3(0.213f, 0.715f, 0.072f);
 
         private readonly Color32[] _pixels;
         private readonly int _width;
@@ -41,6 +43,56 @@ namespace KusakaFactory.Zatools.Foundation
                 _height = 1;
             }
             _mode = mode;
+        }
+
+        /// <summary>
+        /// Samples a texture as a grayscale mask without requiring it to be readable.
+        /// </summary>
+        /// <remarks>
+        /// maskOutput may be allocated with any allocator.
+        /// </remarks>
+        public static void SampleByComputeShader(Texture2D texture, Mode mode, ref NativeArray<float4> uvs, ref NativeArray<float> maskOutput)
+        {
+            var takeBlack = mode switch
+            {
+                Mode.TakeWhite => false,
+                Mode.TakeBlack => true,
+                _ => throw new InvalidOperationException("unknown mode"),
+            };
+
+            if (texture == null)
+            {
+                var uniformValue = takeBlack ? 0.0f : 1.0f;
+                for (var i = 0; i < maskOutput.Length; ++i) maskOutput[i] = uniformValue;
+                return;
+            }
+
+            var sampledColors = new NativeArray<float4>(uvs.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            try
+            {
+                NativeTextureSampler.SampleByComputeShader(texture, ref uvs, ref sampledColors);
+
+                // GetPixels32 と異なりサンプラーは sRGB テクスチャを線形化するので、CPU 実装と同じ値に戻す
+                var encodeToGamma = texture.isDataSRGB && QualitySettings.activeColorSpace == ColorSpace.Linear;
+                for (var i = 0; i < maskOutput.Length; ++i)
+                {
+                    var color = sampledColors[i].xyz;
+                    if (encodeToGamma)
+                    {
+                        color = new float3(
+                            Mathf.LinearToGammaSpace(color.x),
+                            Mathf.LinearToGammaSpace(color.y),
+                            Mathf.LinearToGammaSpace(color.z));
+                    }
+
+                    var luminance = math.dot(color, LuminanceCoefficient);
+                    maskOutput[i] = takeBlack ? 1.0f - luminance : luminance;
+                }
+            }
+            finally
+            {
+                sampledColors.Dispose();
+            }
         }
 
         public float Take(Vector2 uv)
@@ -76,11 +128,15 @@ namespace KusakaFactory.Zatools.Foundation
     /// </remarks>
     public static class NativeTextureSampler
     {
+        private const int ThreadGroupSize = 64;
+
         /// <remarks>
         /// colorsOutput should be allocated with Allocator.Persistent.
         /// </remarks>
         public static void SampleByComputeShader(Texture2D texture, ref NativeArray<float4> uvs, ref NativeArray<float4> colorsOutput)
         {
+            if (uvs.Length == 0) return;
+
             var computeShader = ZatoolsResources.LoadComputeShaderByGuid("69529c6a64173b142a4966bbb00ea374");
             var computeKernelId = computeShader.FindKernel("SampleColorsByUv");
 
@@ -91,7 +147,8 @@ namespace KusakaFactory.Zatools.Foundation
             computeShader.SetTexture(computeKernelId, "SourceTexture", texture);
             computeShader.SetBuffer(computeKernelId, "SamplingUvs", uvBuffer);
             computeShader.SetBuffer(computeKernelId, "SampledColors", colorBuffer);
-            computeShader.Dispatch(computeKernelId, uvs.Length, 1, 1);
+            computeShader.SetInt("SamplingCount", uvs.Length);
+            computeShader.Dispatch(computeKernelId, (uvs.Length + ThreadGroupSize - 1) / ThreadGroupSize, 1, 1);
 
             var request = AsyncGPUReadback.RequestIntoNativeArray(ref colorsOutput, colorBuffer);
             request.WaitForCompletion();

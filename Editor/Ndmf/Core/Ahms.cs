@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
+using Unity.Mathematics;
 using KusakaFactory.Zatools.Foundation;
 using KusakaFactory.Zatools.Runtime;
 using nadena.dev.ndmf;
@@ -17,18 +19,32 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// <param name="parameters">固定されたパラメーター</param>
         internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters)
         {
-            var mask = new TextureMask(parameters.MaskTexture, parameters.MaskMode switch
+            var maskMode = parameters.MaskMode switch
             {
                 MeshSplitMaskMode.White => TextureMask.Mode.TakeWhite,
                 MeshSplitMaskMode.Black => TextureMask.Mode.TakeBlack,
                 _ => throw new InvalidOperationException("unknown mode"),
-            });
+            };
 
-            var uvs = new List<Vector2>(modifyingMesh.vertexCount);
+            var vertexCount = modifyingMesh.vertexCount;
+            var uvs = new List<Vector2>(vertexCount);
             modifyingMesh.GetUVs(0, uvs);
+            while (uvs.Count < vertexCount) uvs.Add(Vector2.zero);
 
-            var vertexSelections = new bool[modifyingMesh.vertexCount];
-            for (var i = 0; i < modifyingMesh.vertexCount; ++i) vertexSelections[i] = mask.Take(uvs[i]) >= 0.5f;
+            var vertexSelections = new bool[vertexCount];
+            var nativeMaskUvs = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeMaskValues = new NativeArray<float>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            try
+            {
+                for (var i = 0; i < vertexCount; ++i) nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
+                TextureMask.SampleByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
+                for (var i = 0; i < vertexCount; ++i) vertexSelections[i] = nativeMaskValues[i] >= 0.5f;
+            }
+            finally
+            {
+                nativeMaskUvs.Dispose();
+                nativeMaskValues.Dispose();
+            }
 
             var originalSubMeshCount = modifyingMesh.subMeshCount;
             var subMeshes = new List<List<int>>();
@@ -81,7 +97,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
             internal Texture2D MaskTexture;
-            internal bool CanReadMask;
             internal MeshSplitMaskMode MaskMode;
             internal Material FilteringMaterial;
             internal Material SplitMaterial;
@@ -95,18 +110,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     MaskTexture = component.Mask,
                     MaskMode = component.Mode,
-                    CanReadMask = component.Mask != null && component.Mask.isReadable,
                     FilteringMaterial = filteringMaterialReference?.Object as Material,
                     SplitMaterial = component.SplitMaterial,
                 };
             }
 
-            internal bool IsUnreadableMask => MaskTexture != null && !CanReadMask;
-
             public bool Equals(FixedParameters other)
             {
                 return MaskTexture == other.MaskTexture
-                    && CanReadMask == other.CanReadMask
                     && MaskMode == other.MaskMode
                     && FilteringMaterial == other.FilteringMaterial
                     && SplitMaterial == other.SplitMaterial;

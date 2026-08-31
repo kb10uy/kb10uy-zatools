@@ -172,12 +172,6 @@ msgstr "Mask Texture"
 msgid "anhb.inspector.mask-mode"
 msgstr "Mask Sampling"
 
-msgid "ahnb.report.unreadable-mask"
-msgstr "Specified mask texture cannot be read"
-
-msgid "ahnb.report.unreadable-mask:description"
-msgstr "Enable Read/Write in import settings to use this mask texture properly."
-
 msgid "ahbss.inspector.targets"
 msgstr "BlendShapes to Split"
 
@@ -201,12 +195,6 @@ msgstr "Material to Extract"
 
 msgid "ahms.inspector.split-material"
 msgstr "Material to Assign"
-
-msgid "ahms.report.unreadable-mask"
-msgstr "Specified mask texture cannot be read"
-
-msgid "ahms.report.unreadable-mask:description"
-msgstr "Enable Read/Write in import settings to use this mask texture properly."
 
 msgid "utmd.inspector.source"
 msgstr "Source UV Channel"
