@@ -10,6 +10,10 @@
     padding-left: 24px;
 }
 
+.label-indent-1 > .zax-expression__input > .unity-base-field__label {
+    padding-left: 12px;
+}
+
 .zax-expression__status {
     padding-left: 244px;
     white-space: normal;
