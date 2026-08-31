@@ -30,12 +30,6 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
 
             var fixedParameters = Ahms.FixedParameters.FixFromComponent(component);
-            if (fixedParameters.IsUnreadableMask)
-            {
-                ErrorReport.ReportError(new ZatoolsNdmfError(ErrorSeverity.Error, "ahms.report.unreadable-mask", skinnedMeshRenderer));
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
             if (fixedParameters.SplitMaterial == null)
             {
                 UnityObject.DestroyImmediate(component);

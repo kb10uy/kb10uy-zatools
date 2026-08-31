@@ -44,7 +44,9 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             foreach (var parameters in observedParameters)
             {
-                if (parameters.SourceTexture != null && parameters.TransferTarget != VertexDataTransferTarget.Disabled) Ahvdt.Process(duplicatedMesh, parameters);
+                if (parameters.SourceTexture == null || parameters.TransferTarget == VertexDataTransferTarget.Disabled) continue;
+                if (!Ahvdt.TryCompileExpression(parameters, out var expressionProgram)) continue;
+                Ahvdt.Process(duplicatedMesh, parameters, expressionProgram);
             }
 
             _duplicatedMesh = duplicatedMesh;

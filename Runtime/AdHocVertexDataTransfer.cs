@@ -14,6 +14,7 @@ namespace KusakaFactory.Zatools.Runtime
         public VertexDataTransferMode TransferMode = VertexDataTransferMode.Copy;
         public Vector3 ConstantVector3 = Vector3.zero;
         public float ConstantFloat = 0.0f;
+        public string Expression = "@color";
     }
 
     public enum VertexDataTransferTarget : int
@@ -38,5 +39,6 @@ namespace KusakaFactory.Zatools.Runtime
         [InspectorName("Constant (0 to 1), Luminance")] Const01AndLuminance,
         [InspectorName("Constant * Luminance, Constant")] LuminanceConstAndConst,
         [InspectorName("Constant * Luminance (0 to 1), Constant")] LuminanceConst01AndConst,
+        [InspectorName("Custom Expression (ZAX)")] CustomExpression,
     }
 }

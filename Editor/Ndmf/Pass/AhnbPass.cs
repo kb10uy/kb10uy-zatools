@@ -30,10 +30,6 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
 
             var fixedParameters = Ahnb.FixedParameters.FixFromComponent(avatarRoot, bendComponent);
-            if (fixedParameters.IsUnreadableMask)
-            {
-                ErrorReport.ReportError(new ZatoolsNdmfError(ErrorSeverity.NonFatal, "ahnb.report.unreadable-mask", skinnedMeshRenderer));
-            }
 
             var modifyingMesh = UnityObject.Instantiate(originalMesh);
             Ahnb.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters);

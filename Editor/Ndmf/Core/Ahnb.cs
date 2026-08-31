@@ -33,26 +33,30 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             modifyingMesh.GetBindposes(bindposes);
             var bones = referencingRenderer.bones;
 
-            var mask = new TextureMask(parameters.MaskTexture, parameters.MaskMode switch
+            var vertexCount = normals.Count;
+            while (uvs.Count < vertexCount) uvs.Add(Vector2.zero);
+            var maskMode = parameters.MaskMode switch
             {
-                NormalBendMaskMode.White => TextureMask.Mode.TakeWhite,
-                NormalBendMaskMode.Black => TextureMask.Mode.TakeBlack,
+                NormalBendMaskMode.White => NativeTextureSampler.MaskMode.TakeWhite,
+                NormalBendMaskMode.Black => NativeTextureSampler.MaskMode.TakeBlack,
                 _ => throw new InvalidOperationException("unknown mode"),
-            });
+            };
 
             // 移し替え
-            var nativeNormals = new NativeArray<float3>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var nativeMaskValues = new NativeArray<float>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var nativeInfluentBones = new NativeArray<int4>(normals.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeNormals = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeMaskUvs = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeMaskValues = new NativeArray<float>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeInfluentBones = new NativeArray<int4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneDeforms = new NativeArray<float4x4>(bones.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < modifyingMesh.vertexCount; ++i)
+            for (var i = 0; i < vertexCount; ++i)
             {
                 nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
-                nativeMaskValues[i] = mask.Take(uvs[i]);
+                nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
                 nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
                 nativeInfluentBones[i] = -1;
             }
+            NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
             for (var i = 0; i < bones.Length; ++i)
             {
                 var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
@@ -90,6 +94,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             // 破棄
             nativeNormals.Dispose();
+            nativeMaskUvs.Dispose();
             nativeMaskValues.Dispose();
             nativeBoneWeights.Dispose();
             nativeBoneDeforms.Dispose();
@@ -145,7 +150,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal Vector3 WorldSpaceForward;
             internal float Weight;
             internal Texture2D MaskTexture;
-            internal bool CanReadMask;
             internal NormalBendMaskMode MaskMode;
 
             internal static FixedParameters FixFromComponent(Transform defaultDirection, AdHocNormalBending component)
@@ -157,18 +161,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     Weight = component.Weight,
                     MaskTexture = component.Mask,
                     MaskMode = component.Mode,
-                    CanReadMask = component.Mask != null && component.Mask.isReadable,
                 };
             }
-
-            internal bool IsUnreadableMask => MaskTexture != null && !CanReadMask;
 
             public bool Equals(FixedParameters other)
             {
                 return (WorldSpaceForward - other.WorldSpaceForward).magnitude < 0.0001f
                     && Mathf.Approximately(Weight, other.Weight)
                     && MaskTexture == other.MaskTexture
-                    && CanReadMask == other.CanReadMask
                     && MaskMode == other.MaskMode;
             }
 

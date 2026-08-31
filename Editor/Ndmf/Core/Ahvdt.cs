@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 using Unity.Burst;
 using Unity.Collections;
@@ -7,42 +8,45 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Foundation;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
     internal static class Ahvdt
     {
-        internal static void Process(Mesh modifyingMesh, FixedParameters parameters)
+        internal const ZaxValueType ExpressionResultType = ZaxValueType.Float4;
+
+        internal static readonly ImmutableArray<ZaxVariable> ExpressionVariables = ImmutableArray.Create(
+            new ZaxVariable("color", ZaxValueType.Float4),
+            new ZaxVariable("uv", ZaxValueType.Float4),
+            new ZaxVariable("position", ZaxValueType.Float3),
+            new ZaxVariable("normal", ZaxValueType.Float3),
+            new ZaxVariable("tangent", ZaxValueType.Float4)
+        );
+
+        internal static bool TryCompileExpression(FixedParameters parameters, out ZaxProgram program)
+        {
+            program = null;
+            if (parameters.TransferMode != VertexDataTransferMode.CustomExpression) return true;
+
+            var diagnostics = new List<ZaxDiagnostic>();
+            return ZaxCompiler.TryCompile(parameters.Expression, ExpressionVariables, ExpressionResultType, diagnostics, out program);
+        }
+
+        internal static void Process(Mesh modifyingMesh, FixedParameters parameters, ZaxProgram expressionProgram)
         {
             if (parameters.TransferTarget == VertexDataTransferTarget.Disabled) return;
+            if (parameters.TransferMode == VertexDataTransferMode.CustomExpression && expressionProgram == null) return;
 
             var vertexCount = modifyingMesh.vertexCount;
             if (vertexCount == 0) return;
 
-            var vertices = new List<Vector3>(vertexCount);
-            var normals = new List<Vector3>(vertexCount);
-            var tangents = new List<Vector4>(vertexCount);
             var uvs = new List<Vector4>(vertexCount);
-            modifyingMesh.GetVertices(vertices);
-            modifyingMesh.GetNormals(normals);
-            modifyingMesh.GetTangents(tangents);
             modifyingMesh.GetUVs((int)parameters.SourceUv, uvs);
-            while (vertices.Count < vertexCount) vertices.Add(Vector3.zero);
-            while (normals.Count < vertexCount) normals.Add(Vector3.zero);
-            while (tangents.Count < vertexCount) tangents.Add(Vector4.zero);
             while (uvs.Count < vertexCount) uvs.Add(Vector4.zero);
 
-            var verticesInput = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var normalsInput = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var tangentsInput = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var sourceUvs = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < vertexCount; ++i)
-            {
-                verticesInput[i] = vertices[i];
-                normalsInput[i] = normals[i];
-                tangentsInput[i] = tangents[i];
-                sourceUvs[i] = uvs[i];
-            }
+            for (var i = 0; i < vertexCount; ++i) sourceUvs[i] = uvs[i];
 
             var sampledColors = new NativeArray<float4>(vertexCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             var transferValues = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -50,19 +54,22 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 NativeTextureSampler.SampleByComputeShader(parameters.SourceTexture, ref sourceUvs, ref sampledColors);
 
-                var job = new TransferVertexDataJob
+                if (parameters.TransferMode == VertexDataTransferMode.CustomExpression)
                 {
-                    TransferValues = transferValues,
-                    TransferMode = parameters.TransferMode,
-                    Vertices = verticesInput,
-                    Normals = normalsInput,
-                    Tangents = tangentsInput,
-                    SourceUvs = sourceUvs,
-                    SampledColors = sampledColors,
-                    Constant = parameters.Constant,
-                };
-                var handle = job.Schedule(vertexCount, 4);
-                handle.Complete();
+                    EvaluateExpression(modifyingMesh, expressionProgram, sourceUvs, sampledColors, transferValues);
+                }
+                else
+                {
+                    var job = new TransferVertexDataJob
+                    {
+                        TransferValues = transferValues,
+                        TransferMode = parameters.TransferMode,
+                        SampledColors = sampledColors,
+                        Constant = parameters.Constant,
+                    };
+                    var handle = job.Schedule(vertexCount, 4);
+                    handle.Complete();
+                }
 
                 switch (parameters.TransferTarget)
                 {
@@ -87,26 +94,77 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
             finally
             {
-                verticesInput.Dispose();
-                normalsInput.Dispose();
-                tangentsInput.Dispose();
                 sourceUvs.Dispose();
                 sampledColors.Dispose();
                 transferValues.Dispose();
             }
         }
 
+        private static unsafe void EvaluateExpression(
+            Mesh modifyingMesh,
+            ZaxProgram program,
+            NativeArray<float4> sourceUvs,
+            NativeArray<float4> sampledColors,
+            NativeArray<float4> transferValues)
+        {
+            var vertexCount = transferValues.Length;
+            var vertices = new List<Vector3>(vertexCount);
+            var normals = new List<Vector3>(vertexCount);
+            var tangents = new List<Vector4>(vertexCount);
+            modifyingMesh.GetVertices(vertices);
+            modifyingMesh.GetNormals(normals);
+            modifyingMesh.GetTangents(tangents);
+            while (vertices.Count < vertexCount) vertices.Add(Vector3.zero);
+            while (normals.Count < vertexCount) normals.Add(Vector3.zero);
+            while (tangents.Count < vertexCount) tangents.Add(Vector4.zero);
+
+            var nativeVertices = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeNormals = new NativeArray<float3>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeTangents = new NativeArray<float4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            for (var i = 0; i < vertexCount; ++i)
+            {
+                nativeVertices[i] = vertices[i];
+                nativeNormals[i] = normals[i];
+                nativeTangents[i] = tangents[i];
+            }
+
+            var nativeProgram = ZaxNativeProgram.Allocate(program, Allocator.TempJob);
+            var bindings = new NativeArray<ZaxVariableBinding>(program.Variables.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var results = new NativeArray<ZaxValue>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            try
+            {
+                for (var i = 0; i < program.Variables.Length; ++i)
+                {
+                    bindings[i] = program.Variables[i].Name switch
+                    {
+                        "color" => ZaxVariableBinding.FromArray(sampledColors, ZaxValueType.Float4),
+                        "uv" => ZaxVariableBinding.FromArray(sourceUvs, ZaxValueType.Float4),
+                        "position" => ZaxVariableBinding.FromArray(nativeVertices, ZaxValueType.Float3),
+                        "normal" => ZaxVariableBinding.FromArray(nativeNormals, ZaxValueType.Float3),
+                        "tangent" => ZaxVariableBinding.FromArray(nativeTangents, ZaxValueType.Float4),
+                        _ => throw new InvalidOperationException("unbindable variable: " + program.Variables[i].Name),
+                    };
+                }
+
+                ZaxEvaluateJob.Schedule(nativeProgram, bindings, results).Complete();
+                for (var i = 0; i < vertexCount; ++i) transferValues[i] = results[i].AsFloat4;
+            }
+            finally
+            {
+                nativeVertices.Dispose();
+                nativeNormals.Dispose();
+                nativeTangents.Dispose();
+                nativeProgram.Dispose();
+                bindings.Dispose();
+                results.Dispose();
+            }
+        }
+
         [BurstCompile]
         internal struct TransferVertexDataJob : IJobParallelFor
         {
-            private static readonly float3 LuminanceCoefficient = new float3(0.299f, 0.587f, 0.114f);
-
             internal NativeArray<float4> TransferValues;
             [ReadOnly] internal VertexDataTransferMode TransferMode;
-            [ReadOnly] internal NativeArray<float3> Vertices;
-            [ReadOnly] internal NativeArray<float3> Normals;
-            [ReadOnly] internal NativeArray<float4> Tangents;
-            [ReadOnly] internal NativeArray<float4> SourceUvs;
             [ReadOnly] internal NativeArray<float4> SampledColors;
             [ReadOnly] internal float4 Constant;
 
@@ -122,20 +180,20 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         TransferValues[index] = new float4(1.0f) - sampledColor;
                         break;
                     case VertexDataTransferMode.ConstAndLuminance:
-                        TransferValues[index] = new float4(Constant.xyz, math.dot(sampledColor.xyz, LuminanceCoefficient));
+                        TransferValues[index] = new float4(Constant.xyz, Luminance.Rec709(sampledColor.xyz));
                         break;
                     case VertexDataTransferMode.Const01AndLuminance:
-                        TransferValues[index] = new float4(Constant.xyz / 2.0f + 0.5f, math.dot(sampledColor.xyz, LuminanceCoefficient));
+                        TransferValues[index] = new float4(Constant.xyz / 2.0f + 0.5f, Luminance.Rec709(sampledColor.xyz));
                         break;
                     case VertexDataTransferMode.LuminanceConstAndConst:
                         TransferValues[index] = new float4(
-                            Constant.xyz * math.dot(sampledColor.xyz, LuminanceCoefficient),
+                            Constant.xyz * Luminance.Rec709(sampledColor.xyz),
                             Constant.w
                         );
                         break;
                     case VertexDataTransferMode.LuminanceConst01AndConst:
                         TransferValues[index] = new float4(
-                            Constant.xyz * math.dot(sampledColor.xyz, LuminanceCoefficient) / 2.0f + 0.5f,
+                            Constant.xyz * Luminance.Rec709(sampledColor.xyz) / 2.0f + 0.5f,
                             Constant.w
                         );
                         break;
@@ -153,6 +211,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal VertexDataTransferTarget TransferTarget;
             internal VertexDataTransferMode TransferMode;
             internal float4 Constant;
+            internal string Expression;
 
             internal static FixedParameters FixFromComponent(AdHocVertexDataTransfer component)
             {
@@ -163,6 +222,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     TransferTarget = component.TransferTarget,
                     TransferMode = component.TransferMode,
                     Constant = new float4(component.ConstantVector3, component.ConstantFloat),
+                    Expression = component.Expression,
                 };
             }
 
@@ -172,12 +232,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     && SourceUv == other.SourceUv
                     && TransferTarget == other.TransferTarget
                     && TransferMode == other.TransferMode
-                    && Constant.Equals(other.Constant);
+                    && Constant.Equals(other.Constant)
+                    && string.Equals(Expression, other.Expression, StringComparison.Ordinal);
             }
 
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
 
-            public override int GetHashCode() => (SourceTexture, SourceUv, TransferTarget, TransferMode, Constant).GetHashCode();
+            public override int GetHashCode() => (SourceTexture, SourceUv, TransferTarget, TransferMode, Constant, Expression).GetHashCode();
 
             public static bool operator ==(FixedParameters lhs, FixedParameters rhs) => lhs.Equals(rhs);
 

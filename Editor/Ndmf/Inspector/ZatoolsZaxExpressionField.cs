@@ -68,12 +68,14 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private readonly List<ZaxDiagnostic> _diagnostics = new List<ZaxDiagnostic>();
         private ZaxValueType? _expectedType;
         private ZaxVariable[] _declaredVariables = Array.Empty<ZaxVariable>();
+        private string _revalidatedSource;
 
         internal ZaxProgram Program { get; private set; }
 
         public ZatoolsZaxExpressionField()
         {
-            _input = new TextField { multiline = true };
+            _input = new TextField { multiline = true, isDelayed = true };
+            _input.AddToClassList("zax-expression__input");
             _status = new Label();
             _status.AddToClassList("zax-expression__status");
             _variables = new Label();
@@ -85,12 +87,14 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             Add(_variables);
 
             _input.RegisterValueChangedCallback((e) => Revalidate());
+            _input.RegisterCallback<FocusOutEvent>((e) => Revalidate());
             RegisterCallback<AttachToPanelEvent>((e) =>
             {
-                ZatoolsLocalization.OnNdmfLanguageChanged += Revalidate;
-                Revalidate();
+                ZatoolsLocalization.OnNdmfLanguageChanged += RevalidateForced;
+                RevalidateForced();
+                schedule.Execute(Revalidate);
             });
-            RegisterCallback<DetachFromPanelEvent>((e) => ZatoolsLocalization.OnNdmfLanguageChanged -= Revalidate);
+            RegisterCallback<DetachFromPanelEvent>((e) => ZatoolsLocalization.OnNdmfLanguageChanged -= RevalidateForced);
         }
 
         internal void Configure(ZaxValueType? expectedType, IReadOnlyList<ZaxVariable> variables)
@@ -98,15 +102,22 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _expectedType = expectedType;
             _declaredVariables = variables != null ? variables.ToArray() : Array.Empty<ZaxVariable>();
 
-            _variables.text = string.Join("    ", _declaredVariables.Select((v) => $"@{v.Name} : {v.Type.DisplayName()}"));
+            _variables.text = string.Join("\n", _declaredVariables.Select((v) => $"@{v.Name}: {v.Type.DisplayName()}"));
             _variables.style.display = _declaredVariables.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
 
-            Revalidate();
+            RevalidateForced();
         }
 
         private void Revalidate()
         {
+            if (string.Equals(_revalidatedSource, _input.value, StringComparison.Ordinal)) return;
+            RevalidateForced();
+        }
+
+        private void RevalidateForced()
+        {
             var source = _input.value;
+            _revalidatedSource = source;
             if (string.IsNullOrWhiteSpace(source))
             {
                 Program = null;

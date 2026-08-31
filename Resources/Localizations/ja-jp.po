@@ -174,12 +174,6 @@ msgstr "マスクテクスチャ"
 msgid "anhb.inspector.mask-mode"
 msgstr "マスクのサンプリング方法"
 
-msgid "ahnb.report.unreadable-mask"
-msgstr "指定されたマスクの Read/Write が無効です"
-
-msgid "ahnb.report.unreadable-mask:description"
-msgstr "このマスクテクスチャを使用したい場合は、インポート設定から Read/Write を有効にしてください。"
-
 msgid "ahbss.inspector.targets"
 msgstr "分割する BlendShape"
 
@@ -215,12 +209,6 @@ msgstr "分割対象のマテリアル"
 
 msgid "ahms.inspector.split-material"
 msgstr "割り当てるマテリアル"
-
-msgid "ahms.report.unreadable-mask"
-msgstr "指定されたマスクの Read/Write が無効です"
-
-msgid "ahms.report.unreadable-mask:description"
-msgstr "このマスクテクスチャを使用したい場合は、インポート設定から Read/Write を有効にしてください。"
 
 msgid "asv.inspector.ignored-armature-help"
 msgstr "この Armature は Avatar Status Validator で無視されます。"
@@ -290,6 +278,9 @@ msgstr "転送モード"
 
 msgid "ahvdt.inspector.constant"
 msgstr "定数部"
+
+msgid "ahvdt.inspector.expression"
+msgstr "ZAX 式"
 
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"

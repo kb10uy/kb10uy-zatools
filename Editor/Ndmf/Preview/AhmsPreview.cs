@@ -44,7 +44,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             foreach (var parameters in observedParameters)
             {
-                if (parameters.IsUnreadableMask) continue;
                 if (parameters.SplitMaterial == null) continue;
                 Ahms.Process(proxyed, duplicatedMesh, parameters);
             }
