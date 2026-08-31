@@ -163,8 +163,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         [BurstCompile]
         internal struct TransferVertexDataJob : IJobParallelFor
         {
-            private static readonly float3 LuminanceCoefficient = new float3(0.299f, 0.587f, 0.114f);
-
             internal NativeArray<float4> TransferValues;
             [ReadOnly] internal VertexDataTransferMode TransferMode;
             [ReadOnly] internal NativeArray<float4> SampledColors;
@@ -182,20 +180,20 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         TransferValues[index] = new float4(1.0f) - sampledColor;
                         break;
                     case VertexDataTransferMode.ConstAndLuminance:
-                        TransferValues[index] = new float4(Constant.xyz, math.dot(sampledColor.xyz, LuminanceCoefficient));
+                        TransferValues[index] = new float4(Constant.xyz, Luminance.Rec709(sampledColor.xyz));
                         break;
                     case VertexDataTransferMode.Const01AndLuminance:
-                        TransferValues[index] = new float4(Constant.xyz / 2.0f + 0.5f, math.dot(sampledColor.xyz, LuminanceCoefficient));
+                        TransferValues[index] = new float4(Constant.xyz / 2.0f + 0.5f, Luminance.Rec709(sampledColor.xyz));
                         break;
                     case VertexDataTransferMode.LuminanceConstAndConst:
                         TransferValues[index] = new float4(
-                            Constant.xyz * math.dot(sampledColor.xyz, LuminanceCoefficient),
+                            Constant.xyz * Luminance.Rec709(sampledColor.xyz),
                             Constant.w
                         );
                         break;
                     case VertexDataTransferMode.LuminanceConst01AndConst:
                         TransferValues[index] = new float4(
-                            Constant.xyz * math.dot(sampledColor.xyz, LuminanceCoefficient) / 2.0f + 0.5f,
+                            Constant.xyz * Luminance.Rec709(sampledColor.xyz) / 2.0f + 0.5f,
                             Constant.w
                         );
                         break;

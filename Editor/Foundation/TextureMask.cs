@@ -7,6 +7,24 @@ using Unity.Mathematics;
 namespace KusakaFactory.Zatools.Foundation
 {
     /// <summary>
+    /// Relative luminance in Rec. 709.
+    /// </summary>
+    /// <remarks>
+    /// This type is public only so that it can be used by external in-house assemblies.
+    /// It is not a stable public API and may change or be removed without notice between releases.
+    /// </remarks>
+    public static class Luminance
+    {
+        public const float Rec709Red = 0.2126f;
+        public const float Rec709Green = 0.7152f;
+        public const float Rec709Blue = 0.0722f;
+
+        public static float3 Rec709Coefficient => new float3(Rec709Red, Rec709Green, Rec709Blue);
+
+        public static float Rec709(float3 color) => math.dot(color, Rec709Coefficient);
+    }
+
+    /// <summary>
     /// Samples a texture as a grayscale mask.
     /// </summary>
     /// <remarks>
@@ -20,8 +38,6 @@ namespace KusakaFactory.Zatools.Foundation
             TakeWhite,
             TakeBlack,
         }
-
-        private static readonly float3 LuminanceCoefficient = new float3(0.213f, 0.715f, 0.072f);
 
         private readonly Color32[] _pixels;
         private readonly int _width;
@@ -72,20 +88,9 @@ namespace KusakaFactory.Zatools.Foundation
             {
                 NativeTextureSampler.SampleByComputeShader(texture, ref uvs, ref sampledColors);
 
-                // GetPixels32 と異なりサンプラーは sRGB テクスチャを線形化するので、CPU 実装と同じ値に戻す
-                var encodeToGamma = texture.isDataSRGB && QualitySettings.activeColorSpace == ColorSpace.Linear;
                 for (var i = 0; i < maskOutput.Length; ++i)
                 {
-                    var color = sampledColors[i].xyz;
-                    if (encodeToGamma)
-                    {
-                        color = new float3(
-                            Mathf.LinearToGammaSpace(color.x),
-                            Mathf.LinearToGammaSpace(color.y),
-                            Mathf.LinearToGammaSpace(color.z));
-                    }
-
-                    var luminance = math.dot(color, LuminanceCoefficient);
+                    var luminance = Luminance.Rec709(sampledColors[i].xyz);
                     maskOutput[i] = takeBlack ? 1.0f - luminance : luminance;
                 }
             }
@@ -98,11 +103,11 @@ namespace KusakaFactory.Zatools.Foundation
         public float Take(Vector2 uv)
         {
             var sample = SampleByUv(uv);
-            var luma1000 = 213 * sample.r + 715 * sample.g + 72 * sample.b;
+            var luminance = Luminance.Rec709(new float3(sample.r, sample.g, sample.b) / 255.0f);
             return _mode switch
             {
-                Mode.TakeWhite => luma1000 / 255000.0f,
-                Mode.TakeBlack => (255000 - luma1000) / 255000.0f,
+                Mode.TakeWhite => luminance,
+                Mode.TakeBlack => 1.0f - luminance,
                 _ => throw new InvalidOperationException("unknown mode"),
             };
         }
