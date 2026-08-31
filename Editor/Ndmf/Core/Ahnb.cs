@@ -37,8 +37,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             while (uvs.Count < vertexCount) uvs.Add(Vector2.zero);
             var maskMode = parameters.MaskMode switch
             {
-                NormalBendMaskMode.White => TextureMask.Mode.TakeWhite,
-                NormalBendMaskMode.Black => TextureMask.Mode.TakeBlack,
+                NormalBendMaskMode.White => NativeTextureSampler.MaskMode.TakeWhite,
+                NormalBendMaskMode.Black => NativeTextureSampler.MaskMode.TakeBlack,
                 _ => throw new InvalidOperationException("unknown mode"),
             };
 
@@ -56,7 +56,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
                 nativeInfluentBones[i] = -1;
             }
-            TextureMask.SampleByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
+            NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
             for (var i = 0; i < bones.Length; ++i)
             {
                 var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;

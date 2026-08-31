@@ -21,8 +21,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             var maskMode = parameters.MaskMode switch
             {
-                MeshSplitMaskMode.White => TextureMask.Mode.TakeWhite,
-                MeshSplitMaskMode.Black => TextureMask.Mode.TakeBlack,
+                MeshSplitMaskMode.White => NativeTextureSampler.MaskMode.TakeWhite,
+                MeshSplitMaskMode.Black => NativeTextureSampler.MaskMode.TakeBlack,
                 _ => throw new InvalidOperationException("unknown mode"),
             };
 
@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             try
             {
                 for (var i = 0; i < vertexCount; ++i) nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
-                TextureMask.SampleByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
+                NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
                 for (var i = 0; i < vertexCount; ++i) vertexSelections[i] = nativeMaskValues[i] >= 0.5f;
             }
             finally
