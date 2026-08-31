@@ -289,6 +289,9 @@ msgstr "Transfer Mode"
 msgid "ahvdt.inspector.constant"
 msgstr "Constant"
 
+msgid "ahvdt.inspector.expression"
+msgstr "ZAX Expression"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using nadena.dev.ndmf;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
 using KusakaFactory.Zatools.Ndmf.Core;
 using KusakaFactory.Zatools.Runtime;
 using UnityObject = UnityEngine.Object;
@@ -32,8 +33,21 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
+            ZaxProgram expressionProgram = null;
+            if (fixedParameters.TransferMode == VertexDataTransferMode.CustomExpression
+                && !TryCompileZaxExpression(
+                    component,
+                    fixedParameters.Expression,
+                    Ahvdt.ExpressionVariables,
+                    Ahvdt.ExpressionResultType,
+                    out expressionProgram))
+            {
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
             var modifyingMesh = UnityObject.Instantiate(originalMesh);
-            Ahvdt.Process(modifyingMesh, fixedParameters);
+            Ahvdt.Process(modifyingMesh, fixedParameters, expressionProgram);
 
             skinnedMeshRenderer.sharedMesh = modifyingMesh;
             ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);

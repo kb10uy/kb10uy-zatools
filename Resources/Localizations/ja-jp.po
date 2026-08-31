@@ -291,6 +291,9 @@ msgstr "転送モード"
 msgid "ahvdt.inspector.constant"
 msgstr "定数部"
 
+msgid "ahvdt.inspector.expression"
+msgstr "ZAX 式"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"
 

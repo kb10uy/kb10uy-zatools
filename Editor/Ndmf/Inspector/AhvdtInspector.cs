@@ -1,9 +1,10 @@
+using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Ndmf.Core;
 using KusakaFactory.Zatools.Runtime;
-using UnityEngine;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
 {
@@ -12,6 +13,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
     {
         private Vector3Field _constantVector3;
         private FloatField _constantFloat;
+        private ZatoolsZaxExpressionField _expression;
 
         protected override VisualElement CreateInspectorGUIImpl()
         {
@@ -23,6 +25,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             _constantVector3 = inspector.Q<Vector3Field>("FieldConstantVector3");
             _constantFloat = inspector.Q<FloatField>("FieldConstantFloat");
+            _expression = inspector.Q<ZatoolsZaxExpressionField>("FieldExpression");
+            _expression.Configure(Ahvdt.ExpressionResultType, Ahvdt.ExpressionVariables);
 
             var transferMode = inspector.Q<EnumField>("FieldTransferMode");
             transferMode.RegisterValueChangedCallback((e) =>
@@ -50,8 +54,10 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 VertexDataTransferMode.LuminanceConst01AndConst => true,
                 _ => false,
             };
+            var showExpression = newMode == VertexDataTransferMode.CustomExpression;
             _constantVector3.style.display = showVector3 ? DisplayStyle.Flex : DisplayStyle.None;
             _constantFloat.style.display = showFloat ? DisplayStyle.Flex : DisplayStyle.None;
+            _expression.style.display = showExpression ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }

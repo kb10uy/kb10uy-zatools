@@ -9,6 +9,7 @@
             <ui:EnumField label="ahvdt.inspector.transfer-mode" type="KusakaFactory.Zatools.Runtime.VertexDataTransferMode, org.kb10uy.zatools.runtime" binding-path="TransferMode" name="FieldTransferMode" class="ndmf-tr" />
             <ui:Vector3Field name="FieldConstantVector3" binding-path="ConstantVector3" label="ahvdt.inspector.constant" class="ndmf-tr label-indent-1" />
             <ui:FloatField label="ahvdt.inspector.constant" value="0" name="FieldConstantFloat" binding-path="ConstantFloat" class="ndmf-tr label-indent-1" />
+            <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField label="ahvdt.inspector.expression" binding-path="Expression" name="FieldExpression" class="label-indent-1" />
         </ui:VisualElement>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhvdtRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
