@@ -17,6 +17,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Dot, Cross, Length, LengthSq, Distance, Normalize, Reflect,
         Vec2, Vec3, Vec4,
         Gt, Lt, Geq, Leq, Eq, Neq, Not,
+        RgbToYuv, YuvToRgb,
     }
 
     public enum ZaxSignature : byte
@@ -25,7 +26,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         ElementwiseFloat,
         IntegerOnly,
         ReduceToScalar,
-        Cross,
+        Float3Only,
         Construct,
     }
 
@@ -49,7 +50,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         private const ZaxSignature Ef = ZaxSignature.ElementwiseFloat;
         private const ZaxSignature Io = ZaxSignature.IntegerOnly;
         private const ZaxSignature Rs = ZaxSignature.ReduceToScalar;
-        private const ZaxSignature Cr = ZaxSignature.Cross;
+        private const ZaxSignature F3 = ZaxSignature.Float3Only;
         private const ZaxSignature Cn = ZaxSignature.Construct;
 
         private static readonly ZaxFunctionInfo[] Table = BuildTable();
@@ -110,6 +111,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["=="] = ZaxFunction.Eq, ["eq"] = ZaxFunction.Eq,
             ["!="] = ZaxFunction.Neq, ["neq"] = ZaxFunction.Neq,
             ["!"] = ZaxFunction.Not, ["not"] = ZaxFunction.Not,
+            ["rgb2yuv"] = ZaxFunction.RgbToYuv,
+            ["yuv2rgb"] = ZaxFunction.YuvToRgb,
         });
 
         private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
@@ -119,6 +122,12 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["E"] = ZaxValue.FromFloat(math.E),
             ["EPSILON"] = ZaxValue.FromFloat(math.EPSILON),
             ["INF"] = ZaxValue.FromFloat(math.INFINITY),
+            ["HALF_PI"] = ZaxValue.FromFloat(0.5f * math.PI),
+            ["TRUE"] = ZaxValue.FromFloat(1.0f),
+            ["FALSE"] = ZaxValue.FromFloat(0.0f),
+            ["X_AXIS"] = ZaxValue.FromFloat3(new float3(1.0f, 0.0f, 0.0f)),
+            ["Y_AXIS"] = ZaxValue.FromFloat3(new float3(0.0f, 1.0f, 0.0f)),
+            ["Z_AXIS"] = ZaxValue.FromFloat3(new float3(0.0f, 0.0f, 1.0f)),
         });
 
         private static ZaxFunctionInfo[] BuildTable()
@@ -163,7 +172,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.Step, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Smoothstep, 3, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Dot, 2, Rs),
-                new ZaxFunctionInfo(ZaxFunction.Cross, 2, Cr),
+                new ZaxFunctionInfo(ZaxFunction.Cross, 2, F3),
                 new ZaxFunctionInfo(ZaxFunction.Length, 1, Rs),
                 new ZaxFunctionInfo(ZaxFunction.LengthSq, 1, Rs),
                 new ZaxFunctionInfo(ZaxFunction.Distance, 2, Rs),
@@ -179,6 +188,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.Eq, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Neq, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Not, 1, Ef),
+                new ZaxFunctionInfo(ZaxFunction.RgbToYuv, 1, F3),
+                new ZaxFunctionInfo(ZaxFunction.YuvToRgb, 1, F3),
             };
 
             var table = new ZaxFunctionInfo[entries.Length];
@@ -231,7 +242,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     resultType = ZaxValueType.Int;
                     return true;
 
-                case ZaxSignature.Cross:
+                case ZaxSignature.Float3Only:
                     foreach (var argument in arguments)
                     {
                         if (argument != ZaxValueType.Float3) return false;

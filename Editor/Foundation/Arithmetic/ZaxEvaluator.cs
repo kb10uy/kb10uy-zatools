@@ -122,6 +122,22 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
         private static float4 Boolean(bool4 mask) => math.select(float4.zero, new float4(1.0f), mask);
 
+        private static float3 RgbToYuv(float3 rgb)
+        {
+            return new float3(
+                math.dot(rgb, new float3(0.2126f, 0.7152f, 0.0722f)),
+                math.dot(rgb, new float3(-0.09991f, -0.33609f, 0.436f)),
+                math.dot(rgb, new float3(0.615f, -0.55861f, -0.05639f)));
+        }
+
+        private static float3 YuvToRgb(float3 yuv)
+        {
+            return new float3(
+                math.dot(yuv, new float3(1.0f, 0.0f, 1.28033f)),
+                math.dot(yuv, new float3(1.0f, -0.21482f, -0.38059f)),
+                math.dot(yuv, new float3(1.0f, 2.12798f, 0.0f)));
+        }
+
         private static ZaxValue ApplySwizzle(ZaxValue value, ushort packed, ZaxValueType resultType)
         {
             var source = value.ToFloat4();
@@ -200,6 +216,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxFunction.Eq: return ZaxValue.FromFloatN(Boolean(x == y), resultType);
                 case ZaxFunction.Neq: return ZaxValue.FromFloatN(Boolean(x != y), resultType);
                 case ZaxFunction.Not: return ZaxValue.FromFloatN(Boolean(x == float4.zero), resultType);
+                case ZaxFunction.RgbToYuv: return ZaxValue.FromFloat3(RgbToYuv(x.xyz));
+                case ZaxFunction.YuvToRgb: return ZaxValue.FromFloat3(YuvToRgb(x.xyz));
                 default: return ZaxValue.FromFloatN(x, resultType);
             }
         }
