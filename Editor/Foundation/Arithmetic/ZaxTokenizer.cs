@@ -10,7 +10,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         private static readonly ImmutableHashSet<string> Symbols = ImmutableHashSet<string>.Empty.Union(new[]
         {
             "+", "-", "*", "/", "//", "%", "...",
-            ">", "<", ">=", "<=", "==", "!=", "<eps>", "!",
+            ">", "<", ">=", "<=", "==", "!=", "!",
         });
 
         private const char CommentPrefix = ';';

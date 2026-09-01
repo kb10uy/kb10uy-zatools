@@ -5,8 +5,6 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
     public static unsafe class ZaxEvaluator
     {
-        public const float ApproxEpsilon = 1.0e-6f;
-
         public static ZaxValue Evaluate(ZaxProgram program)
         {
             return Evaluate(program, ReadOnlySpan<ZaxValue>.Empty);
@@ -201,7 +199,6 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxFunction.Leq: return ZaxValue.FromFloatN(Boolean(x <= y), resultType);
                 case ZaxFunction.Eq: return ZaxValue.FromFloatN(Boolean(x == y), resultType);
                 case ZaxFunction.Neq: return ZaxValue.FromFloatN(Boolean(x != y), resultType);
-                case ZaxFunction.Approx: return ZaxValue.FromFloatN(Boolean(math.abs(x - y) <= new float4(ApproxEpsilon)), resultType);
                 case ZaxFunction.Not: return ZaxValue.FromFloatN(Boolean(x == float4.zero), resultType);
                 default: return ZaxValue.FromFloatN(x, resultType);
             }

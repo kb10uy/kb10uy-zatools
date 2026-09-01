@@ -16,7 +16,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Lerp, Step, Smoothstep,
         Dot, Cross, Length, LengthSq, Distance, Normalize, Reflect,
         Vec2, Vec3, Vec4,
-        Gt, Lt, Geq, Leq, Eq, Neq, Approx, Not,
+        Gt, Lt, Geq, Leq, Eq, Neq, Not,
     }
 
     public enum ZaxSignature : byte
@@ -109,7 +109,6 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["<="] = ZaxFunction.Leq, ["leq"] = ZaxFunction.Leq,
             ["=="] = ZaxFunction.Eq, ["eq"] = ZaxFunction.Eq,
             ["!="] = ZaxFunction.Neq, ["neq"] = ZaxFunction.Neq,
-            ["<eps>"] = ZaxFunction.Approx, ["approx"] = ZaxFunction.Approx,
             ["!"] = ZaxFunction.Not, ["not"] = ZaxFunction.Not,
         });
 
@@ -179,7 +178,6 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.Leq, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Eq, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Neq, 2, Ef),
-                new ZaxFunctionInfo(ZaxFunction.Approx, 2, Ef),
                 new ZaxFunctionInfo(ZaxFunction.Not, 1, Ef),
             };
 
