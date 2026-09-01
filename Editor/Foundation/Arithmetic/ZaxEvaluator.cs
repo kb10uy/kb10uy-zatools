@@ -5,6 +5,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
     public static unsafe class ZaxEvaluator
     {
+        public const float ApproxEpsilon = 1.0e-6f;
+
         public static ZaxValue Evaluate(ZaxProgram program)
         {
             return Evaluate(program, ReadOnlySpan<ZaxValue>.Empty);
@@ -120,6 +122,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             return stack[0];
         }
 
+        private static float4 Boolean(bool4 mask) => math.select(float4.zero, new float4(1.0f), mask);
+
         private static ZaxValue ApplySwizzle(ZaxValue value, ushort packed, ZaxValueType resultType)
         {
             var source = value.ToFloat4();
@@ -191,6 +195,14 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxFunction.Vec2: return ZaxValue.FromFloat2(new float2(x.x, y.x));
                 case ZaxFunction.Vec3: return ZaxValue.FromFloat3(new float3(x.x, y.x, z.x));
                 case ZaxFunction.Vec4: return ZaxValue.FromFloat4(new float4(x.x, y.x, z.x, w.x));
+                case ZaxFunction.Gt: return ZaxValue.FromFloatN(Boolean(x > y), resultType);
+                case ZaxFunction.Lt: return ZaxValue.FromFloatN(Boolean(x < y), resultType);
+                case ZaxFunction.Geq: return ZaxValue.FromFloatN(Boolean(x >= y), resultType);
+                case ZaxFunction.Leq: return ZaxValue.FromFloatN(Boolean(x <= y), resultType);
+                case ZaxFunction.Eq: return ZaxValue.FromFloatN(Boolean(x == y), resultType);
+                case ZaxFunction.Neq: return ZaxValue.FromFloatN(Boolean(x != y), resultType);
+                case ZaxFunction.Approx: return ZaxValue.FromFloatN(Boolean(math.abs(x - y) <= new float4(ApproxEpsilon)), resultType);
+                case ZaxFunction.Not: return ZaxValue.FromFloatN(Boolean(x == float4.zero), resultType);
                 default: return ZaxValue.FromFloatN(x, resultType);
             }
         }

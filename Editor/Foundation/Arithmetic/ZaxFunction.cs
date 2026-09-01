@@ -16,6 +16,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Lerp, Step, Smoothstep,
         Dot, Cross, Length, LengthSq, Distance, Normalize, Reflect,
         Vec2, Vec3, Vec4,
+        Gt, Lt, Geq, Leq, Eq, Neq, Approx, Not,
     }
 
     public enum ZaxSignature : byte
@@ -102,6 +103,14 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["vec2"] = ZaxFunction.Vec2,
             ["vec3"] = ZaxFunction.Vec3,
             ["vec4"] = ZaxFunction.Vec4,
+            [">"] = ZaxFunction.Gt, ["gt"] = ZaxFunction.Gt,
+            ["<"] = ZaxFunction.Lt, ["lt"] = ZaxFunction.Lt,
+            [">="] = ZaxFunction.Geq, ["geq"] = ZaxFunction.Geq,
+            ["<="] = ZaxFunction.Leq, ["leq"] = ZaxFunction.Leq,
+            ["=="] = ZaxFunction.Eq, ["eq"] = ZaxFunction.Eq,
+            ["!="] = ZaxFunction.Neq, ["neq"] = ZaxFunction.Neq,
+            ["<eps>"] = ZaxFunction.Approx, ["approx"] = ZaxFunction.Approx,
+            ["!"] = ZaxFunction.Not, ["not"] = ZaxFunction.Not,
         });
 
         private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
@@ -164,6 +173,14 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.Vec2, 2, Cn),
                 new ZaxFunctionInfo(ZaxFunction.Vec3, 3, Cn),
                 new ZaxFunctionInfo(ZaxFunction.Vec4, 4, Cn),
+                new ZaxFunctionInfo(ZaxFunction.Gt, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Lt, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Geq, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Leq, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Eq, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Neq, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Approx, 2, Ef),
+                new ZaxFunctionInfo(ZaxFunction.Not, 1, Ef),
             };
 
             var table = new ZaxFunctionInfo[entries.Length];
