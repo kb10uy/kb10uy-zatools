@@ -17,7 +17,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Dot, Cross, Length, LengthSq, Distance, Normalize, Reflect,
         Vec2, Vec3, Vec4,
         Gt, Lt, Geq, Leq, Eq, Neq, Not,
-        RgbToYuv, YuvToRgb,
+        RgbToYuv, YuvToRgb, SrgbToLinear, LinearToSrgb,
     }
 
     public enum ZaxSignature : byte
@@ -113,6 +113,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["!"] = ZaxFunction.Not, ["not"] = ZaxFunction.Not,
             ["rgb2yuv"] = ZaxFunction.RgbToYuv,
             ["yuv2rgb"] = ZaxFunction.YuvToRgb,
+            ["srgb2linear"] = ZaxFunction.SrgbToLinear,
+            ["linear2srgb"] = ZaxFunction.LinearToSrgb,
         });
 
         private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
@@ -190,6 +192,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.Not, 1, Ef),
                 new ZaxFunctionInfo(ZaxFunction.RgbToYuv, 1, F3),
                 new ZaxFunctionInfo(ZaxFunction.YuvToRgb, 1, F3),
+                new ZaxFunctionInfo(ZaxFunction.SrgbToLinear, 1, Ef),
+                new ZaxFunctionInfo(ZaxFunction.LinearToSrgb, 1, Ef),
             };
 
             var table = new ZaxFunctionInfo[entries.Length];

@@ -138,6 +138,20 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 math.dot(yuv, new float3(1.0f, 2.12798f, 0.0f)));
         }
 
+        private static float4 SrgbToLinear(float4 srgb)
+        {
+            var low = srgb / 12.92f;
+            var high = math.pow((srgb + 0.055f) / 1.055f, 2.4f);
+            return math.select(high, low, srgb <= new float4(0.04045f));
+        }
+
+        private static float4 LinearToSrgb(float4 linear)
+        {
+            var low = linear * 12.92f;
+            var high = 1.055f * math.pow(linear, 1.0f / 2.4f) - 0.055f;
+            return math.select(high, low, linear <= new float4(0.0031308f));
+        }
+
         private static ZaxValue ApplySwizzle(ZaxValue value, ushort packed, ZaxValueType resultType)
         {
             var source = value.ToFloat4();
@@ -218,6 +232,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxFunction.Not: return ZaxValue.FromFloatN(Boolean(x == float4.zero), resultType);
                 case ZaxFunction.RgbToYuv: return ZaxValue.FromFloat3(RgbToYuv(x.xyz));
                 case ZaxFunction.YuvToRgb: return ZaxValue.FromFloat3(YuvToRgb(x.xyz));
+                case ZaxFunction.SrgbToLinear: return ZaxValue.FromFloatN(SrgbToLinear(x), resultType);
+                case ZaxFunction.LinearToSrgb: return ZaxValue.FromFloatN(LinearToSrgb(x), resultType);
                 default: return ZaxValue.FromFloatN(x, resultType);
             }
         }
