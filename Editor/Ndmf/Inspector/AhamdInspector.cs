@@ -43,8 +43,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private static string FormatVariables(IEnumerable<ZaxVariable> variables)
         {
             return string.Join("\n", variables
-                .GroupBy((v) => v.Type)
-                .Select((g) => $"{string.Join(", ", g.Select((v) => $"@{v.Name}"))}: {g.Key.DisplayName()}"));
+                .GroupBy((v) => (v.Name.Substring(0, v.Name.Length - 1), char.IsDigit(v.Name.Last()), v.Type))
+                .Select((g) => $"{string.Join(", ", g.Select((v) => $"@{v.Name}"))}: {g.Key.Type.DisplayName()}"));
         }
 
         private void ResetAddedModifications(IEnumerable<int> indices)
