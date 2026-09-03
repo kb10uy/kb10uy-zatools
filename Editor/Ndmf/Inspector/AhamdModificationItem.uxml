@@ -4,6 +4,6 @@
         <ui:EnumField label="ahamd.inspector.step-target" type="KusakaFactory.Zatools.Runtime.AhamdModificationTarget, org.kb10uy.zatools.runtime" binding-path="Target" name="FieldTarget" class="ndmf-tr" />
         <uie:ObjectField label="ahamd.inspector.step-extra-texture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="ExtraTexture" name="FieldExtraTexture" class="ndmf-tr" />
         <ui:EnumField label="ahamd.inspector.uv-channel" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" binding-path="ExtraTextureUv" name="FieldExtraTextureUv" class="ndmf-tr" />
-        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField label="ahamd.inspector.expression" binding-path="Expression" name="FieldExpression" show-variables="false" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField label="ahamd.inspector.expression" binding-path="Expression" name="FieldExpression" />
     </ui:VisualElement>
 </ui:UXML>

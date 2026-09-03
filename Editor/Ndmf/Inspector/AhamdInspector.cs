@@ -22,7 +22,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
-            inspector.Q<ZatoolsZaxExpressionField>("FieldSelectionExpression").Configure(null, Ahamd.SelectionVariables);
+            inspector.Q<ZatoolsZaxExpressionField>("FieldSelectionExpression").Configure(null, Ahamd.SelectionVariables, false);
             inspector.Q<Label>("LabelCommonVariables").text = FormatVariables(Ahamd.CommonVariables);
 
             var modificationsList = inspector.Q<ListView>("FieldModifications");
@@ -36,7 +36,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
-            item.Q<ZatoolsZaxExpressionField>("FieldExpression").Configure(null, Ahamd.ModificationVariables);
+            item.Q<ZatoolsZaxExpressionField>("FieldExpression").Configure(null, Ahamd.ModificationVariables, false);
             return item;
         }
 

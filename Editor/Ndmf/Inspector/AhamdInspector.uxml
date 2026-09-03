@@ -7,7 +7,7 @@
             <uie:ObjectField label="ahamd.inspector.selection-texture" name="FieldSelectionTexture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="SelectionTexture" class="ndmf-tr" />
             <ui:EnumField label="ahamd.inspector.uv-channel" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" name="FieldSelectionTextureUv" binding-path="SelectionTextureUv" class="ndmf-tr" />
             <ui:Slider label="ahamd.inspector.threshold" high-value="1" binding-path="SelectionThreshold" name="FieldSelectionThreshold" show-input-field="true" class="ndmf-tr" />
-            <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField binding-path="SelectionExpression" label="ahamd.inspector.expression" name="FieldSelectionExpression" show-variables="false" class="ndmf-tr" />
+            <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField binding-path="SelectionExpression" label="ahamd.inspector.expression" name="FieldSelectionExpression" class="ndmf-tr" />
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 0; flex-shrink: 0;">
             <ui:Label tabindex="-1" text="ahamd.inspector.process" parse-escape-sequences="true" display-tooltip-when-elided="true" enable-rich-text="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
