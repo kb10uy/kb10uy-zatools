@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
@@ -39,17 +40,18 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             var targetField = item.Q<EnumField>("FieldTarget");
             var expressionField = item.Q<ZatoolsZaxExpressionField>("FieldExpression");
-            void ConfigureExpression()
-            {
-                var expectedType = targetField.value is AhamdModificationTarget target
-                    ? Ahamd.ResultTypeOf(target)
-                    : (ZaxValueType?)null;
-                expressionField.Configure(expectedType, Ahamd.ModificationVariables, false);
-            }
-            targetField.RegisterValueChangedCallback((_) => ConfigureExpression());
-            ConfigureExpression();
+            expressionField.Configure(() => ExpectedResultTypeOf(targetField), Ahamd.ModificationVariables, false);
+            targetField.RegisterValueChangedCallback((_) => expressionField.RequestRevalidate());
+            targetField.RegisterCallback<SerializedPropertyChangeEvent>((_) => expressionField.RequestRevalidate());
 
             return item;
+        }
+
+        private static ZaxValueType? ExpectedResultTypeOf(EnumField targetField)
+        {
+            return targetField.value is AhamdModificationTarget target && Enum.IsDefined(typeof(AhamdModificationTarget), target)
+                ? Ahamd.ResultTypeOf(target)
+                : (ZaxValueType?)null;
         }
 
         private static string FormatVariables(IEnumerable<ZaxVariable> variables)
