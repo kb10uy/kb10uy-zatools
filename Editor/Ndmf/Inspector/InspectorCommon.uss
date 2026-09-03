@@ -30,13 +30,13 @@
 }
 
 .ahamd-step .unity-base-field__label {
-    width: 120px;
+    width: 160px;
 }
 
 .ahamd-step .zax-expression__status {
-    padding-left: 124px;
+    padding-left: 164px;
 }
 
 .ahamd-step .zax-expression__variables {
-    padding-left: 124px;
+    padding-left: 164px;
 }
