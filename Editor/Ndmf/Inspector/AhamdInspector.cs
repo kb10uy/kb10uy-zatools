@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Ndmf.Core;
 using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
@@ -19,6 +22,9 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
+            inspector.Q<ZatoolsZaxExpressionField>("FieldSelectionExpression").Configure(null, Ahamd.SelectionVariables);
+            inspector.Q<Label>("LabelCommonVariables").text = FormatVariables(Ahamd.CommonVariables);
+
             var modificationsList = inspector.Q<ListView>("FieldModifications");
             modificationsList.makeItem = () => MakeModificationItem(visualTreeItem);
             modificationsList.itemsAdded += ResetAddedModifications;
@@ -30,7 +36,15 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
+            item.Q<ZatoolsZaxExpressionField>("FieldExpression").Configure(null, Ahamd.ModificationVariables);
             return item;
+        }
+
+        private static string FormatVariables(IEnumerable<ZaxVariable> variables)
+        {
+            return string.Join("\n", variables
+                .GroupBy((v) => v.Type)
+                .Select((g) => $"{string.Join(", ", g.Select((v) => $"@{v.Name}"))}: {g.Key.DisplayName()}"));
         }
 
         private void ResetAddedModifications(IEnumerable<int> indices)

@@ -318,6 +318,15 @@ msgstr "法線を再計算する"
 msgid "ahamd.inspector.recalc-tangents"
 msgstr "接線を再計算する"
 
+msgid "ahamd.inspector.variables"
+msgstr "利用可能な変数"
+
+msgid "ahamd.inspector.variables-mask"
+msgstr "@mask: float4 - 選択マスクテクスチャのサンプル結果 (頂点の選択でのみ利用可)"
+
+msgid "ahamd.inspector.variables-texture"
+msgstr "@texture: float4 - 追加テクスチャのサンプル結果 (改変ステップでのみ利用可)"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"
 

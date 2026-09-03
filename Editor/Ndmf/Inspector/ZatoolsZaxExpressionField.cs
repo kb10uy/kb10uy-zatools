@@ -21,6 +21,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             UxmlStringAttributeDescription _label = new UxmlStringAttributeDescription { name = "label" };
             UxmlStringAttributeDescription _bindingPath = new UxmlStringAttributeDescription { name = "binding-path" };
+            UxmlBoolAttributeDescription _showVariables = new UxmlBoolAttributeDescription { name = "show-variables", defaultValue = true };
 
             public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
             {
@@ -36,6 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 var field = ve as ZatoolsZaxExpressionField;
                 field.LabelKey = _label.GetValueFromBag(bag, cc);
                 field.BindingPath = _bindingPath.GetValueFromBag(bag, cc);
+                field.ShowVariables = _showVariables.GetValueFromBag(bag, cc);
             }
         }
 #endif
@@ -62,10 +64,24 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             set => _input.bindingPath = value;
         }
 
+#if UNITY_6000_0_OR_NEWER
+        [UxmlAttribute("show-variables")]
+#endif
+        private bool ShowVariables
+        {
+            get => _showVariables;
+            set
+            {
+                _showVariables = value;
+                UpdateVariablesVisibility();
+            }
+        }
+
         private readonly TextField _input;
         private readonly Label _status;
         private readonly Label _variables;
         private readonly List<ZaxDiagnostic> _diagnostics = new List<ZaxDiagnostic>();
+        private bool _showVariables = true;
         private ZaxValueType? _expectedType;
         private ZaxVariable[] _declaredVariables = Array.Empty<ZaxVariable>();
         private string _revalidatedSource;
@@ -103,9 +119,14 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _declaredVariables = variables != null ? variables.ToArray() : Array.Empty<ZaxVariable>();
 
             _variables.text = string.Join("\n", _declaredVariables.Select((v) => $"@{v.Name}: {v.Type.DisplayName()}"));
-            _variables.style.display = _declaredVariables.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            UpdateVariablesVisibility();
 
             RevalidateForced();
+        }
+
+        private void UpdateVariablesVisibility()
+        {
+            _variables.style.display = _showVariables && _declaredVariables.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void Revalidate()

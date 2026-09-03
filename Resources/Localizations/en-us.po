@@ -316,6 +316,15 @@ msgstr "Recalculate Normals"
 msgid "ahamd.inspector.recalc-tangents"
 msgstr "Recalculate Tangents"
 
+msgid "ahamd.inspector.variables"
+msgstr "Available Variables"
+
+msgid "ahamd.inspector.variables-mask"
+msgstr "@mask: float4 - sampled Selection Mask Texture (Vertex Selection only)"
+
+msgid "ahamd.inspector.variables-texture"
+msgstr "@texture: float4 - sampled Extra Texture (Modification Steps only)"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 
