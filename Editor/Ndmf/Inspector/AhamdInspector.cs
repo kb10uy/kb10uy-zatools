@@ -36,7 +36,19 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
-            item.Q<ZatoolsZaxExpressionField>("FieldExpression").Configure(null, Ahamd.ModificationVariables, false);
+
+            var targetField = item.Q<EnumField>("FieldTarget");
+            var expressionField = item.Q<ZatoolsZaxExpressionField>("FieldExpression");
+            void ConfigureExpression()
+            {
+                var expectedType = targetField.value is AhamdModificationTarget target
+                    ? Ahamd.ResultTypeOf(target)
+                    : (ZaxValueType?)null;
+                expressionField.Configure(expectedType, Ahamd.ModificationVariables, false);
+            }
+            targetField.RegisterValueChangedCallback((_) => ConfigureExpression());
+            ConfigureExpression();
+
             return item;
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using KusakaFactory.Zatools.Foundation.Arithmetic;
+using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Core
 {
@@ -29,5 +30,17 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
         internal static readonly ImmutableArray<ZaxVariable> ModificationVariables =
             CommonVariables.Add(new ZaxVariable("texture", ZaxValueType.Float4));
+
+        internal static ZaxValueType ResultTypeOf(AhamdModificationTarget target)
+        {
+            switch (target)
+            {
+                case AhamdModificationTarget.Position:
+                case AhamdModificationTarget.Normal:
+                    return ZaxValueType.Float3;
+                default:
+                    return ZaxValueType.Float4;
+            }
+        }
     }
 }

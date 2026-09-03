@@ -332,8 +332,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         private static bool IsImplicitlyConvertible(ZaxValueType from, ZaxValueType to)
         {
             if (from == to) return true;
-            if (!from.IsScalar()) return false;
-            return to != ZaxValueType.Int;
+            return from == ZaxValueType.Int && to == ZaxValueType.Float;
         }
 
         private static int IndexOfVariable(ZaxVariable[] variables, string name)
