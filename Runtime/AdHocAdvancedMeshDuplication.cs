@@ -14,7 +14,7 @@ namespace KusakaFactory.Zatools.Runtime
         // Preprocess
         public Texture2D SelectionTexture = null;
         public UvChannel SelectionTextureUv = UvChannel.UV0;
-        public string SelectionExpression = "@mask";
+        public string SelectionExpression = "@mask #r";
         public float SelectionThreshold = 0.5f;
 
         // Main process
