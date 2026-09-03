@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -20,6 +21,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             var modificationsList = inspector.Q<ListView>("FieldModifications");
             modificationsList.makeItem = () => MakeModificationItem(visualTreeItem);
+            modificationsList.itemsAdded += ResetAddedModifications;
 
             return inspector;
         }
@@ -29,6 +31,16 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
             return item;
+        }
+
+        private void ResetAddedModifications(IEnumerable<int> indices)
+        {
+            var modifications = serializedObject.FindProperty(nameof(AdHocAdvancedMeshDuplication.Modifications));
+            foreach (var index in indices)
+            {
+                modifications.GetArrayElementAtIndex(index).boxedValue = new AhamdModificationStep();
+            }
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
