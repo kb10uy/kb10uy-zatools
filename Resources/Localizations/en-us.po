@@ -298,6 +298,15 @@ msgstr "ZAX Expression"
 msgid "ahamd.inspector.process"
 msgstr "Modification Steps"
 
+msgid "ahamd.inspector.step-enabled"
+msgstr "Enabled"
+
+msgid "ahamd.inspector.step-target"
+msgstr "Target Attribute"
+
+msgid "ahamd.inspector.step-extra-texture"
+msgstr "Extra Texture"
+
 msgid "ahamd.inspector.postprocess"
 msgstr "Postprocess"
 

@@ -28,3 +28,15 @@
     white-space: normal;
     opacity: 0.6;
 }
+
+.ahamd-step .unity-base-field__label {
+    width: 120px;
+}
+
+.ahamd-step .zax-expression__status {
+    padding-left: 124px;
+}
+
+.ahamd-step .zax-expression__variables {
+    padding-left: 124px;
+}

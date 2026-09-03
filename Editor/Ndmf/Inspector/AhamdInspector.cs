@@ -12,12 +12,23 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         protected override VisualElement CreateInspectorGUIImpl()
         {
             var visualTree = ZatoolsResources.LoadVisualTreeByGuid("ad33420e2dd38ae4387ec5cf5c1cf2e1");
+            var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("0b75f8a0021b770e5ac6bbaad0d2665b");
 
             var inspector = visualTree.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
+            var modificationsList = inspector.Q<ListView>("FieldModifications");
+            modificationsList.makeItem = () => MakeModificationItem(visualTreeItem);
+
             return inspector;
+        }
+
+        private VisualElement MakeModificationItem(VisualTreeAsset visualTreeItem)
+        {
+            var item = visualTreeItem.CloneTree();
+            ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
+            return item;
         }
     }
 }

@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="VisualElement" class="ahamd-step" style="flex-grow: 1; flex-basis: auto; margin-top: 2px; margin-bottom: 2px; margin-right: 4px;">
+        <ui:Toggle label="ahamd.inspector.step-enabled" binding-path="Enabled" name="FieldEnabled" class="ndmf-tr" />
+        <ui:EnumField label="ahamd.inspector.step-target" type="KusakaFactory.Zatools.Runtime.AhamdModificationTarget, org.kb10uy.zatools.runtime" binding-path="Target" name="FieldTarget" class="ndmf-tr" />
+        <uie:ObjectField label="ahamd.inspector.step-extra-texture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="ExtraTexture" name="FieldExtraTexture" class="ndmf-tr" />
+        <ui:EnumField label="ahamd.inspector.uv-channel" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" binding-path="ExtraTextureUv" name="FieldExtraTextureUv" class="ndmf-tr" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField label="ahamd.inspector.expression" binding-path="Expression" name="FieldExpression" />
+    </ui:VisualElement>
+</ui:UXML>

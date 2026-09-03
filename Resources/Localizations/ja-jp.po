@@ -300,6 +300,15 @@ msgstr "ZAX 式"
 msgid "ahamd.inspector.process"
 msgstr "頂点属性の改変"
 
+msgid "ahamd.inspector.step-enabled"
+msgstr "有効"
+
+msgid "ahamd.inspector.step-target"
+msgstr "書き込み先"
+
+msgid "ahamd.inspector.step-extra-texture"
+msgstr "追加テクスチャ"
+
 msgid "ahamd.inspector.postprocess"
 msgstr "後処理"
 
