@@ -71,7 +71,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             RenderAspects nonzeroUpdatedAspects
         )
         {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
+            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material)) == 0) return this;
             return null;
         }
 
