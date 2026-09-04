@@ -20,11 +20,19 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         private void ProcessFor(AhbsmComponent mixComponent, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             var originalMesh = skinnedMeshRenderer.sharedMesh;
-            if (originalMesh == null) return;
+            if (originalMesh == null)
+            {
+                UnityObject.DestroyImmediate(mixComponent);
+                return;
+            }
             var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(originalMesh);
 
             var resolvedMixDefinitions = Ahbsm.AggregateDefinitions(mixComponent.MixDefinitions.FixSources(), blendShapeIndices);
-            if (resolvedMixDefinitions.Count == 0) return;
+            if (resolvedMixDefinitions.Count == 0)
+            {
+                UnityObject.DestroyImmediate(mixComponent);
+                return;
+            }
 
             var modifiedMesh = mixComponent.Replace ?
                 Ahbsm.ProcessOverwrite(originalMesh, resolvedMixDefinitions) :
