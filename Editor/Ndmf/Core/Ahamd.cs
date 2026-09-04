@@ -46,6 +46,11 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
+        internal static void Process(SkinnedMeshRenderer sourceRenderer, Mesh modifyingMesh, FixedParameters parameters)
+        {
+
+        }
+
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
             internal SkinnedMeshRenderer Source;

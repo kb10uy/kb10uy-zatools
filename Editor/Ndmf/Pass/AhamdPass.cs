@@ -29,6 +29,17 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
+            var fixedParameters = Ahamd.FixedParameters.FixFromComponent(component);
+
+            var generatedMesh = new Mesh { name = $"Advanced Mesh Duplication from {fixedParameters.Source.name}" };
+            Ahamd.Process(skinnedMeshRenderer, generatedMesh, fixedParameters);
+
+            skinnedMeshRenderer.sharedMesh = generatedMesh;
+            skinnedMeshRenderer.bones = fixedParameters.Source.bones;
+            skinnedMeshRenderer.rootBone = fixedParameters.Source.rootBone;
+            skinnedMeshRenderer.probeAnchor = fixedParameters.Source.probeAnchor;
+            skinnedMeshRenderer.localBounds = fixedParameters.Source.localBounds;
+
             UnityObject.DestroyImmediate(component);
         }
     }

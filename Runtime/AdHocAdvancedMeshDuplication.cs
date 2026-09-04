@@ -6,6 +6,7 @@ namespace KusakaFactory.Zatools.Runtime
     [AddComponentMenu("KusakaFactory/Zatools Advanced Duplicate Mesh on Build")]
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/adhoc-advanced-mesh-duplication/")]
     [RequireComponent(typeof(SkinnedMeshRenderer))]
+    [DisallowMultipleComponent]
     public sealed class AdHocAdvancedMeshDuplication : ZatoolsMeshEditingComponent
     {
         public SkinnedMeshRenderer Source;
