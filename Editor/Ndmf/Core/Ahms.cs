@@ -47,12 +47,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
 
             var originalSubMeshCount = modifyingMesh.subMeshCount;
+            var originalMaterials = referencingRenderer.sharedMaterials;
             var subMeshes = new List<List<int>>();
             var materials = new List<Material>();
             var splitIndices = new List<int>();
             for (var sm = 0; sm < originalSubMeshCount; ++sm)
             {
-                var originalMaterial = referencingRenderer.sharedMaterials[sm];
+                var originalMaterial = sm < originalMaterials.Length ? originalMaterials[sm] : null;
                 materials.Add(originalMaterial);
 
                 var originalIndices = new List<int>();
