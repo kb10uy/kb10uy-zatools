@@ -17,6 +17,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         private const int UvChannelCount = 8;
         private const int ScratchCount = 4;
         private const int UInt16VertexLimit = 65535;
+        private const float BlendShapeDeltaThreshold = 1.0e-4f;
 
         internal static readonly ImmutableArray<ZaxVariable> CommonVariables = ImmutableArray.Create(
             new ZaxVariable("position", ZaxValueType.Float3),
@@ -401,36 +402,63 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
         private static void CopyBlendShapes(Mesh modifyingMesh, Mesh sourceMesh, int[] newToOld)
         {
-            if (sourceMesh.blendShapeCount == 0) return;
+            var blendShapeCount = sourceMesh.blendShapeCount;
+            if (blendShapeCount == 0) return;
 
             var sourceVertexCount = sourceMesh.vertexCount;
             var sourceDeltaVertices = new Vector3[sourceVertexCount];
             var sourceDeltaNormals = new Vector3[sourceVertexCount];
             var sourceDeltaTangents = new Vector3[sourceVertexCount];
-            var deltaVertices = new Vector3[newToOld.Length];
-            var deltaNormals = new Vector3[newToOld.Length];
-            var deltaTangents = new Vector3[newToOld.Length];
+            var squaredThreshold = BlendShapeDeltaThreshold * BlendShapeDeltaThreshold;
 
-            for (var shape = 0; shape < sourceMesh.blendShapeCount; ++shape)
+            var frameWeights = new List<float>();
+            var frameVertices = new List<Vector3[]>();
+            var frameNormals = new List<Vector3[]>();
+            var frameTangents = new List<Vector3[]>();
+
+            for (var shape = 0; shape < blendShapeCount; ++shape)
             {
-                var name = sourceMesh.GetBlendShapeName(shape);
                 var frameCount = sourceMesh.GetBlendShapeFrameCount(shape);
+                while (frameVertices.Count < frameCount)
+                {
+                    frameVertices.Add(new Vector3[newToOld.Length]);
+                    frameNormals.Add(new Vector3[newToOld.Length]);
+                    frameTangents.Add(new Vector3[newToOld.Length]);
+                }
+                frameWeights.Clear();
+
+                var hasDelta = false;
                 for (var frame = 0; frame < frameCount; ++frame)
                 {
                     sourceMesh.GetBlendShapeFrameVertices(shape, frame, sourceDeltaVertices, sourceDeltaNormals, sourceDeltaTangents);
+                    frameWeights.Add(sourceMesh.GetBlendShapeFrameWeight(shape, frame));
+
+                    var deltaVertices = frameVertices[frame];
+                    var deltaNormals = frameNormals[frame];
+                    var deltaTangents = frameTangents[frame];
                     for (var i = 0; i < newToOld.Length; ++i)
                     {
                         var oldIndex = newToOld[i];
                         deltaVertices[i] = sourceDeltaVertices[oldIndex];
                         deltaNormals[i] = sourceDeltaNormals[oldIndex];
                         deltaTangents[i] = sourceDeltaTangents[oldIndex];
+                        hasDelta = hasDelta
+                            || deltaVertices[i].sqrMagnitude > squaredThreshold
+                            || deltaNormals[i].sqrMagnitude > squaredThreshold
+                            || deltaTangents[i].sqrMagnitude > squaredThreshold;
                     }
+                }
+                if (!hasDelta) continue;
+
+                var name = sourceMesh.GetBlendShapeName(shape);
+                for (var frame = 0; frame < frameCount; ++frame)
+                {
                     modifyingMesh.AddBlendShapeFrame(
                         name,
-                        sourceMesh.GetBlendShapeFrameWeight(shape, frame),
-                        deltaVertices,
-                        deltaNormals,
-                        deltaTangents);
+                        frameWeights[frame],
+                        frameVertices[frame],
+                        frameNormals[frame],
+                        frameTangents[frame]);
                 }
             }
         }
@@ -438,12 +466,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         private static Material[] BuildMaterials(FixedParameters parameters, List<SubMeshIndices> subMeshes)
         {
             var materials = new Material[subMeshes.Count];
-            if (parameters.OverrideMaterial != null)
-            {
-                for (var i = 0; i < materials.Length; ++i) materials[i] = parameters.OverrideMaterial;
-                return materials;
-            }
-
             var sourceMaterials = parameters.Source.sharedMaterials;
             for (var i = 0; i < materials.Length; ++i)
             {
@@ -714,7 +736,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         internal struct FixedParameters : IEquatable<FixedParameters>
         {
             internal SkinnedMeshRenderer Source;
-            internal Material OverrideMaterial;
             internal Texture2D SelectionTexture;
             internal UvChannel SelectionTextureUv;
             internal string SelectionExpression;
@@ -728,7 +749,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 return new FixedParameters()
                 {
                     Source = component.Source,
-                    OverrideMaterial = component.OverrideMaterial,
                     SelectionTexture = component.SelectionTexture,
                     SelectionTextureUv = component.SelectionTextureUv,
                     SelectionExpression = component.SelectionExpression,
@@ -745,7 +765,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             public bool Equals(FixedParameters other)
             {
                 return Source == other.Source
-                    && OverrideMaterial == other.OverrideMaterial
                     && SelectionTexture == other.SelectionTexture
                     && SelectionTextureUv == other.SelectionTextureUv
                     && string.Equals(SelectionExpression, other.SelectionExpression, StringComparison.Ordinal)
@@ -758,7 +777,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             public override bool Equals(object obj) => obj is FixedParameters && Equals((FixedParameters)obj);
 
             public override int GetHashCode() =>
-                (Source, OverrideMaterial, SelectionTexture, SelectionExpression, Modifications.Length).GetHashCode();
+                (Source, SelectionTexture, SelectionExpression, Modifications.Length).GetHashCode();
 
             public static bool operator ==(FixedParameters lhs, FixedParameters rhs) => lhs.Equals(rhs);
 

@@ -280,6 +280,9 @@ msgstr "Constant"
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX Expression"
 
+msgid "ahamd.inspector.source"
+msgstr "Source Renderer"
+
 msgid "ahamd.inspector.preprocess"
 msgstr "Vertex Selection"
 

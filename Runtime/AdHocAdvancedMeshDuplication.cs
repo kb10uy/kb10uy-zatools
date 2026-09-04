@@ -10,7 +10,6 @@ namespace KusakaFactory.Zatools.Runtime
     public sealed class AdHocAdvancedMeshDuplication : ZatoolsMeshEditingComponent
     {
         public SkinnedMeshRenderer Source;
-        public Material OverrideMaterial;
 
         // Preprocess
         public Texture2D SelectionTexture = null;

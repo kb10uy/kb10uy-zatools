@@ -282,6 +282,9 @@ msgstr "定数部"
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX 式"
 
+msgid "ahamd.inspector.source"
+msgstr "複製対象"
+
 msgid "ahamd.inspector.preprocess"
 msgstr "頂点の選択"
 
