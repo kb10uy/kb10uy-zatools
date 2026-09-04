@@ -26,7 +26,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void ProcessFor(EdwComponent component, SkinnedMeshRenderer skinnedMeshRenderer, Transform avatarRoot)
         {
-            var originalMesh = skinnedMeshRenderer.sharedMesh;
+            var originalMesh = skinnedMeshRenderer != null ? skinnedMeshRenderer.sharedMesh : null;
             if (originalMesh == null)
             {
                 UnityObject.DestroyImmediate(component);

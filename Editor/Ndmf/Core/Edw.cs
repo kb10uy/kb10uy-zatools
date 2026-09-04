@@ -33,7 +33,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var boneWeights = modifyingMesh.boneWeights;
             var vertexCount = modifyingMesh.vertexCount;
             var validTangents = tangents.Length == vertexCount;
-            var hasBoneWeights = boneWeights != null;
+            var hasBoneWeights = boneWeights != null && boneWeights.Length == vertexCount;
             var deltaVertices = new Vector3[vertexCount];
             var _deltaNormals = new Vector3[vertexCount];
             var _deltaTangents = new Vector3[vertexCount];
@@ -71,7 +71,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
             var extendVertices = new List<Vector3>(2);
             var extendNormals = new List<Vector3>(2);
-            var extendTangents = new List<Vector2>(2);
+            var extendTangents = new List<Vector4>(2);
             var extendUvs = new List<Vector2>(2);
             var extendBoneWeights = new List<BoneWeight>(2);
             var triangles = new List<int>();
