@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using nadena.dev.ndmf;
+using KusakaFactory.Zatools.Foundation.Arithmetic;
 using KusakaFactory.Zatools.Ndmf.Core;
 using UnityObject = UnityEngine.Object;
 using AhamdComponent = KusakaFactory.Zatools.Runtime.AdHocAdvancedMeshDuplication;
@@ -30,9 +32,29 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
 
             var fixedParameters = Ahamd.FixedParameters.FixFromComponent(component);
+            if (fixedParameters.Source == null)
+            {
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
+            bool CompileReporting(
+                string source,
+                IReadOnlyList<ZaxVariable> variables,
+                ZaxValueType expectedResultType,
+                out ZaxProgram program)
+            {
+                return TryCompileZaxExpression(component, source, variables, expectedResultType, out program);
+            }
+
+            if (!Ahamd.TryCompilePrograms(fixedParameters, CompileReporting, out var programs))
+            {
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
 
             var generatedMesh = new Mesh { name = $"Advanced Mesh Duplication from {fixedParameters.Source.name}" };
-            Ahamd.Process(skinnedMeshRenderer, generatedMesh, fixedParameters);
+            Ahamd.Process(skinnedMeshRenderer, generatedMesh, fixedParameters, programs);
 
             skinnedMeshRenderer.sharedMesh = generatedMesh;
             skinnedMeshRenderer.bones = fixedParameters.Source.bones;

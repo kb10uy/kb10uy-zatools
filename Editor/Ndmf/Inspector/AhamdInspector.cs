@@ -23,7 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
-            inspector.Q<ZatoolsZaxExpressionField>("FieldSelectionExpression").Configure(ZaxValueType.Float, Ahamd.SelectionVariables, false);
+            inspector.Q<ZatoolsZaxExpressionField>("FieldSelectionExpression").Configure(Ahamd.SelectionResultType, Ahamd.SelectionVariables, false);
             inspector.Q<Label>("LabelCommonVariables").text = FormatVariables(Ahamd.CommonVariables);
 
             var modificationsList = inspector.Q<ListView>("FieldModifications");

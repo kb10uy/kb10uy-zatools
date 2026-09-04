@@ -41,8 +41,10 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             if (proxyed == null || proxyed.sharedMesh != null) return default;
 
+            if (!Ahamd.TryCompilePrograms(observedParameter, Ahamd.TryCompileSilently, out var programs)) return default;
+
             var generatedMesh = new Mesh { name = $"Advanced Mesh Duplication for Preview" };
-            Ahamd.Process(proxyed, generatedMesh, observedParameter);
+            Ahamd.Process(proxyed, generatedMesh, observedParameter, programs);
 
             _generatedMesh = generatedMesh;
             _materials = proxyed.sharedMaterials.ToList();

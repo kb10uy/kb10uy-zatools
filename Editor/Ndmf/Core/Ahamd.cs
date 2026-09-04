@@ -44,6 +44,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         internal static readonly ImmutableArray<ZaxVariable> ModificationVariables =
             CommonVariables.Add(new ZaxVariable("texture", ZaxValueType.Float4));
 
+        internal const ZaxValueType SelectionResultType = ZaxValueType.Float;
+
+        internal delegate bool ZaxExpressionCompiler(
+            string source,
+            IReadOnlyList<ZaxVariable> variables,
+            ZaxValueType expectedResultType,
+            out ZaxProgram program);
+
         internal static ZaxValueType ResultTypeOf(AhamdModificationTarget target)
         {
             switch (target)
@@ -56,51 +64,64 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
-        internal static void Process(SkinnedMeshRenderer targetRenderer, Mesh modifyingMesh, FixedParameters parameters)
+        internal static bool TryCompilePrograms(FixedParameters parameters, ZaxExpressionCompiler compiler, out CompiledPrograms programs)
         {
-            if (targetRenderer == null || modifyingMesh == null || parameters.Source == null) return;
+            programs = null;
+            if (!compiler(parameters.SelectionExpression, SelectionVariables, SelectionResultType, out var selectionProgram)) return false;
+
+            var modifications = ImmutableArray.CreateBuilder<CompiledModification>(parameters.Modifications.Length);
+            foreach (var modification in parameters.Modifications)
+            {
+                if (!compiler(modification.Expression, ModificationVariables, modification.ResultType, out var program)) return false;
+                modifications.Add(new CompiledModification { Modification = modification, Program = program });
+            }
+
+            programs = new CompiledPrograms
+            {
+                Selection = selectionProgram,
+                Modifications = modifications.MoveToImmutable(),
+            };
+            return true;
+        }
+
+        internal static bool TryCompileSilently(
+            string source,
+            IReadOnlyList<ZaxVariable> variables,
+            ZaxValueType expectedResultType,
+            out ZaxProgram program)
+        {
+            return ZaxCompiler.TryCompile(source, variables, expectedResultType, new List<ZaxDiagnostic>(), out program);
+        }
+
+        internal static void Process(
+            SkinnedMeshRenderer targetRenderer,
+            Mesh modifyingMesh,
+            FixedParameters parameters,
+            CompiledPrograms programs)
+        {
+            if (targetRenderer == null || modifyingMesh == null || parameters.Source == null || programs == null) return;
 
             var sourceMesh = parameters.Source.sharedMesh;
             if (sourceMesh == null || sourceMesh.vertexCount == 0) return;
 
-            ZaxCompiler.TryCompile(
-                parameters.SelectionExpression,
-                SelectionVariables,
-                ZaxValueType.Float,
-                new List<ZaxDiagnostic>(),
-                out var selectionProgram);
-
-            var modifications = new List<(FixedModification Modification, ZaxProgram Program)>(parameters.Modifications.Length);
-            foreach (var modification in parameters.Modifications)
-            {
-                var compiled = ZaxCompiler.TryCompile(
-                    modification.Expression,
-                    ModificationVariables,
-                    modification.ResultType,
-                    new List<ZaxDiagnostic>(),
-                    out var program);
-                if (compiled) modifications.Add((modification, program));
-            }
-
-            var required = DetermineRequiredAttributes(sourceMesh, parameters, selectionProgram, modifications);
+            var required = DetermineRequiredAttributes(sourceMesh, parameters, programs);
             using var sourceAttributes = VertexAttributes.ReadFrom(sourceMesh, required);
 
-            var selections = SelectVertices(sourceAttributes, selectionProgram, parameters);
+            var selections = SelectVertices(sourceAttributes, programs.Selection, parameters);
             var (subMeshes, newToOld) = ExtractSelectedTriangles(sourceMesh, selections);
             if (newToOld.Length == 0) return;
 
             using var attributes = sourceAttributes.Compact(newToOld);
-            foreach (var (modification, program) in modifications) ApplyModification(attributes, modification, program);
+            foreach (var compiled in programs.Modifications)
+            {
+                ApplyModification(attributes, compiled.Modification, compiled.Program);
+            }
 
             BuildMesh(modifyingMesh, sourceMesh, attributes, subMeshes, newToOld, parameters);
             targetRenderer.sharedMaterials = BuildMaterials(parameters, subMeshes);
         }
 
-        private static RequiredAttributes DetermineRequiredAttributes(
-            Mesh sourceMesh,
-            FixedParameters parameters,
-            ZaxProgram selectionProgram,
-            List<(FixedModification Modification, ZaxProgram Program)> modifications)
+        private static RequiredAttributes DetermineRequiredAttributes(Mesh sourceMesh, FixedParameters parameters, CompiledPrograms programs)
         {
             var required = new RequiredAttributes
             {
@@ -113,16 +134,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 required.Uvs[channel] = sourceMesh.HasVertexAttribute(VertexAttribute.TexCoord0 + channel);
             }
 
-            if (selectionProgram != null)
+            MarkReferencedVariables(required, programs.Selection);
+            if (parameters.SelectionTexture != null) required.Uvs[(int)parameters.SelectionTextureUv] = true;
+
+            foreach (var compiled in programs.Modifications)
             {
-                MarkReferencedVariables(required, selectionProgram);
-                if (parameters.SelectionTexture != null) required.Uvs[(int)parameters.SelectionTextureUv] = true;
-            }
-            foreach (var (modification, program) in modifications)
-            {
-                MarkReferencedVariables(required, program);
-                MarkTargetAttribute(required, modification.Target);
-                if (modification.ExtraTexture != null) required.Uvs[(int)modification.ExtraTextureUv] = true;
+                MarkReferencedVariables(required, compiled.Program);
+                MarkTargetAttribute(required, compiled.Modification.Target);
+                if (compiled.Modification.ExtraTexture != null) required.Uvs[(int)compiled.Modification.ExtraTextureUv] = true;
             }
 
             return required;
@@ -202,12 +221,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         private static bool[] SelectVertices(VertexAttributes attributes, ZaxProgram selectionProgram, FixedParameters parameters)
         {
             var selections = new bool[attributes.VertexCount];
-            if (selectionProgram == null)
-            {
-                for (var i = 0; i < selections.Length; ++i) selections[i] = true;
-                return selections;
-            }
-
             var sampledColors = SampleTexture(attributes, parameters.SelectionTexture, parameters.SelectionTextureUv);
             try
             {
@@ -473,6 +486,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 materials[i] = sourceSubMesh < sourceMaterials.Length ? sourceMaterials[sourceSubMesh] : null;
             }
             return materials;
+        }
+
+        internal sealed class CompiledPrograms
+        {
+            internal ZaxProgram Selection;
+            internal ImmutableArray<CompiledModification> Modifications;
+        }
+
+        internal struct CompiledModification
+        {
+            internal FixedModification Modification;
+            internal ZaxProgram Program;
         }
 
         private sealed class SubMeshIndices
