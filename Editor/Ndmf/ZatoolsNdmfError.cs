@@ -22,15 +22,13 @@ namespace KusakaFactory.Zatools.Ndmf
         {
             _titleKey = key;
             _severity = severity;
-            _descriptionInterpolations = descArgs.Select((x) => x.ToString()).ToArray();
+            _descriptionInterpolations = descArgs.Select((x) => x?.ToString() ?? string.Empty).ToArray();
         }
 
         public ZatoolsNdmfError(Object target, ErrorSeverity severity, string key, params object[] descArgs)
+            : this(severity, key, descArgs)
         {
-            _titleKey = key;
-            _severity = severity;
-            _descriptionInterpolations = descArgs.Select((x) => x.ToString()).ToArray();
-            AddReference(ObjectRegistry.GetReference(target));
+            if (target != null) AddReference(ObjectRegistry.GetReference(target));
         }
     }
 }
