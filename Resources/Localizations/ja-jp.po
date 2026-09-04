@@ -343,7 +343,7 @@ msgid "pbit.report.deprecated"
 msgstr "MA PB Blocker の利用を推奨します"
 
 msgid "pbit.report.deprecated:description"
-msgstr "Modular Avatar の PB Blocker コンポーネントが同等の機能を提供します。"
+msgstr "Modular Avatar の PB Blocker が同等の機能を提供します。"
 
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
