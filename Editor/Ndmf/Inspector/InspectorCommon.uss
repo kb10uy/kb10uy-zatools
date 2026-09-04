@@ -15,7 +15,7 @@
 }
 
 .zax-expression__status {
-    padding-left: 244px;
+    padding-left: 246px;
     white-space: normal;
 }
 
@@ -24,7 +24,19 @@
 }
 
 .zax-expression__variables {
-    padding-left: 244px;
+    padding-left: 246px;
     white-space: normal;
     opacity: 0.6;
+}
+
+.ahamd-step .unity-base-field__label {
+    width: 160px;
+}
+
+.ahamd-step .zax-expression__status {
+    padding-left: 166px;
+}
+
+.ahamd-step .zax-expression__variables {
+    padding-left: 166px;
 }

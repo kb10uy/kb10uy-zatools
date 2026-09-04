@@ -280,6 +280,54 @@ msgstr "Constant"
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX Expression"
 
+msgid "ahamd.inspector.source"
+msgstr "Source Renderer"
+
+msgid "ahamd.inspector.preprocess"
+msgstr "Vertex Selection"
+
+msgid "ahamd.inspector.selection-texture"
+msgstr "Selection Mask Texture"
+
+msgid "ahamd.inspector.uv-channel"
+msgstr "UV Channel"
+
+msgid "ahamd.inspector.threshold"
+msgstr "Threshold"
+
+msgid "ahamd.inspector.expression"
+msgstr "ZAX Expression"
+
+msgid "ahamd.inspector.process"
+msgstr "Modification Steps"
+
+msgid "ahamd.inspector.step-enabled"
+msgstr "Enabled"
+
+msgid "ahamd.inspector.step-target"
+msgstr "Target Attribute"
+
+msgid "ahamd.inspector.step-extra-texture"
+msgstr "Extra Texture"
+
+msgid "ahamd.inspector.postprocess"
+msgstr "Postprocess"
+
+msgid "ahamd.inspector.recalc-normals"
+msgstr "Recalculate Normals"
+
+msgid "ahamd.inspector.recalc-tangents"
+msgstr "Recalculate Tangents"
+
+msgid "ahamd.inspector.variables"
+msgstr "Available Variables"
+
+msgid "ahamd.inspector.variables-mask"
+msgstr "@mask: float4 - sampled Selection Mask Texture (Vertex Selection only)"
+
+msgid "ahamd.inspector.variables-texture"
+msgstr "@texture: float4 - sampled Extra Texture (Modification Steps only)"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 

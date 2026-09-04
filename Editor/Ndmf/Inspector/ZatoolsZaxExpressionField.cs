@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 using KusakaFactory.Zatools.Foundation.Arithmetic;
 using KusakaFactory.Zatools.Localization;
 
@@ -66,9 +67,11 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private readonly Label _status;
         private readonly Label _variables;
         private readonly List<ZaxDiagnostic> _diagnostics = new List<ZaxDiagnostic>();
-        private ZaxValueType? _expectedType;
+        private Func<ZaxValueType?> _expectedType;
         private ZaxVariable[] _declaredVariables = Array.Empty<ZaxVariable>();
+        private bool _revalidated;
         private string _revalidatedSource;
+        private ZaxValueType? _revalidatedExpectedType;
 
         internal ZaxProgram Program { get; private set; }
 
@@ -87,6 +90,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             Add(_variables);
 
             _input.RegisterValueChangedCallback((e) => Revalidate());
+            _input.RegisterCallback<SerializedPropertyChangeEvent>((e) => Revalidate());
             _input.RegisterCallback<FocusOutEvent>((e) => Revalidate());
             RegisterCallback<AttachToPanelEvent>((e) =>
             {
@@ -97,27 +101,42 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             RegisterCallback<DetachFromPanelEvent>((e) => ZatoolsLocalization.OnNdmfLanguageChanged -= RevalidateForced);
         }
 
-        internal void Configure(ZaxValueType? expectedType, IReadOnlyList<ZaxVariable> variables)
+        internal void Configure(ZaxValueType? expectedType, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
+        {
+            Configure(() => expectedType, variables, showVariables);
+        }
+
+        internal void Configure(Func<ZaxValueType?> expectedType, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
         {
             _expectedType = expectedType;
             _declaredVariables = variables != null ? variables.ToArray() : Array.Empty<ZaxVariable>();
 
             _variables.text = string.Join("\n", _declaredVariables.Select((v) => $"@{v.Name}: {v.Type.DisplayName()}"));
-            _variables.style.display = _declaredVariables.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            _variables.style.display = showVariables && _declaredVariables.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
 
             RevalidateForced();
         }
 
+        internal void RequestRevalidate()
+        {
+            Revalidate();
+        }
+
         private void Revalidate()
         {
-            if (string.Equals(_revalidatedSource, _input.value, StringComparison.Ordinal)) return;
+            if (_revalidated
+                && string.Equals(_revalidatedSource, _input.value, StringComparison.Ordinal)
+                && _revalidatedExpectedType == ResolveExpectedType()) return;
             RevalidateForced();
         }
 
         private void RevalidateForced()
         {
             var source = _input.value;
+            var expectedType = ResolveExpectedType();
+            _revalidated = true;
             _revalidatedSource = source;
+            _revalidatedExpectedType = expectedType;
             if (string.IsNullOrWhiteSpace(source))
             {
                 Program = null;
@@ -127,13 +146,18 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             }
 
             _diagnostics.Clear();
-            var compiled = ZaxCompiler.TryCompile(source, _declaredVariables, _expectedType, _diagnostics, out var program);
+            var compiled = ZaxCompiler.TryCompile(source, _declaredVariables, expectedType, _diagnostics, out var program);
 
             Program = compiled ? program : null;
             _status.text = compiled
                 ? $"→ {program.ResultType.DisplayName()}"
                 : ZatoolsLocalization.LocalizeZaxDiagnostic(_diagnostics[0]);
             _status.EnableInClassList("zax-expression__status--error", !compiled);
+        }
+
+        private ZaxValueType? ResolveExpectedType()
+        {
+            return _expectedType != null ? _expectedType() : null;
         }
     }
 }

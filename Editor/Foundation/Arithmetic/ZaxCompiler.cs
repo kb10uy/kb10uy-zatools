@@ -49,6 +49,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             var instructions = new List<ZaxInstruction>();
             var constants = new List<ZaxValue>();
             var constantIndices = new Dictionary<ZaxValue, int>();
+            var referencedVariables = new List<ZaxVariable>();
+            var referencedIndices = new Dictionary<string, int>(StringComparer.Ordinal);
             var typeStack = new List<ZaxValueType>();
             var argumentBuffer = new ZaxValueType[4];
             var componentBuffer = new int[4];
@@ -242,15 +244,21 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
                     case ZaxTokenKind.Variable:
                         {
-                            var variableIndex = IndexOfVariable(declaredVariables, token.Body);
-                            if (variableIndex < 0)
+                            var declaredIndex = IndexOfVariable(declaredVariables, token.Body);
+                            if (declaredIndex < 0)
                             {
                                 diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownVariable, token, token.Body));
                                 return false;
                             }
-                            var variableType = declaredVariables[variableIndex].Type;
-                            instructions.Add(ZaxInstruction.Variable(variableIndex, variableType));
-                            Push(variableType);
+                            var declaredVariable = declaredVariables[declaredIndex];
+                            if (!referencedIndices.TryGetValue(declaredVariable.Name, out var variableIndex))
+                            {
+                                variableIndex = referencedVariables.Count;
+                                referencedVariables.Add(declaredVariable);
+                                referencedIndices.Add(declaredVariable.Name, variableIndex);
+                            }
+                            instructions.Add(ZaxInstruction.Variable(variableIndex, declaredVariable.Type));
+                            Push(declaredVariable.Type);
                             break;
                         }
 
@@ -315,7 +323,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 source,
                 instructions.ToArray(),
                 constants.ToArray(),
-                declaredVariables,
+                referencedVariables.ToArray(),
                 maxStackSize,
                 producedType);
             return true;
@@ -324,8 +332,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         private static bool IsImplicitlyConvertible(ZaxValueType from, ZaxValueType to)
         {
             if (from == to) return true;
-            if (!from.IsScalar()) return false;
-            return to != ZaxValueType.Int;
+            return from == ZaxValueType.Int && to == ZaxValueType.Float;
         }
 
         private static int IndexOfVariable(ZaxVariable[] variables, string name)

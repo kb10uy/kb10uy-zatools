@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <uie:ObjectField label="ahamd.inspector.source" name="FieldSource" binding-path="Source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" style="margin-bottom: 8px;" />
+        <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-bottom: 8px;">
+            <ui:Label tabindex="-1" text="ahamd.inspector.preprocess" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
+            <uie:ObjectField label="ahamd.inspector.selection-texture" name="FieldSelectionTexture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="SelectionTexture" class="ndmf-tr" />
+            <ui:EnumField label="ahamd.inspector.uv-channel" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" name="FieldSelectionTextureUv" binding-path="SelectionTextureUv" class="ndmf-tr" />
+            <ui:Slider label="ahamd.inspector.threshold" high-value="1" binding-path="SelectionThreshold" name="FieldSelectionThreshold" show-input-field="true" class="ndmf-tr" />
+            <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField binding-path="SelectionExpression" label="ahamd.inspector.expression" name="FieldSelectionExpression" class="ndmf-tr" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; flex-shrink: 0;">
+            <ui:Label tabindex="-1" text="ahamd.inspector.process" parse-escape-sequences="true" display-tooltip-when-elided="true" enable-rich-text="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
+            <ui:ListView name="FieldModifications" virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-add-remove-footer="true" show-foldout-header="false" binding-path="Modifications" show-bound-collection-size="false" reorder-mode="Animated" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; flex-shrink: 0;">
+            <ui:Label tabindex="-1" text="ahamd.inspector.postprocess" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
+            <ui:Toggle label="ahamd.inspector.recalc-normals" name="FieldRecalculateNormals" binding-path="RecalculateNormals" class="ndmf-tr" />
+            <ui:Toggle label="ahamd.inspector.recalc-tangents" name="FieldRecalculateTangents" binding-path="RecalculateTangents" class="ndmf-tr" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-top: 8px;">
+            <ui:Label tabindex="-1" text="ahamd.inspector.variables" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
+            <ui:Label name="LabelCommonVariables" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
+            <ui:Label text="ahamd.inspector.variables-mask" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px; margin-top: 4px;" />
+            <ui:Label text="ahamd.inspector.variables-texture" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
+        </ui:VisualElement>
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhamdRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>

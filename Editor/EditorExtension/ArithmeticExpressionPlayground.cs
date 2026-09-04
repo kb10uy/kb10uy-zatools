@@ -196,7 +196,13 @@ namespace KusakaFactory.Zatools.EditorExtension
             }
 
             SetStatus($"→ {program.ResultType.DisplayName()}", false);
-            var values = declared.Select((v) => v.ToValue()).ToArray();
+            var values = new ZaxValue[program.Variables.Length];
+            for (var i = 0; i < values.Length; ++i)
+            {
+                var referencedName = program.Variables[i].Name;
+                var entry = declared.FirstOrDefault((v) => v.Name == referencedName);
+                values[i] = entry != null ? entry.ToValue() : default;
+            }
             _result.text = ZaxEvaluator.Evaluate(program, values).ToString();
             _disassembly.SetValueWithoutNotify(program.Disassemble());
         }

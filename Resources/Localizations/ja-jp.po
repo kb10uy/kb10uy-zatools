@@ -282,6 +282,54 @@ msgstr "定数部"
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX 式"
 
+msgid "ahamd.inspector.source"
+msgstr "複製対象"
+
+msgid "ahamd.inspector.preprocess"
+msgstr "頂点の選択"
+
+msgid "ahamd.inspector.selection-texture"
+msgstr "選択マスクテクスチャ"
+
+msgid "ahamd.inspector.uv-channel"
+msgstr "サンプリング UV チャンネル"
+
+msgid "ahamd.inspector.threshold"
+msgstr "閾値"
+
+msgid "ahamd.inspector.expression"
+msgstr "ZAX 式"
+
+msgid "ahamd.inspector.process"
+msgstr "頂点属性の改変"
+
+msgid "ahamd.inspector.step-enabled"
+msgstr "有効"
+
+msgid "ahamd.inspector.step-target"
+msgstr "書き込み先"
+
+msgid "ahamd.inspector.step-extra-texture"
+msgstr "追加テクスチャ"
+
+msgid "ahamd.inspector.postprocess"
+msgstr "後処理"
+
+msgid "ahamd.inspector.recalc-normals"
+msgstr "法線を再計算する"
+
+msgid "ahamd.inspector.recalc-tangents"
+msgstr "接線を再計算する"
+
+msgid "ahamd.inspector.variables"
+msgstr "利用可能な変数"
+
+msgid "ahamd.inspector.variables-mask"
+msgstr "@mask: float4 - 選択マスクテクスチャのサンプル結果 (頂点の選択でのみ利用可)"
+
+msgid "ahamd.inspector.variables-texture"
+msgstr "@texture: float4 - 追加テクスチャのサンプル結果 (改変ステップでのみ利用可)"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"
 
