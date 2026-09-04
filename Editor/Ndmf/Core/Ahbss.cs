@@ -34,8 +34,8 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             // 現在の変形状態を固定して左右判定をする
             // BlendShape = 0 状態を取ったほうがいい気もするがまあ速そうだし……
             var smrRelativeDeformedMesh = new Mesh();
-            var smrRelativeVertices = new List<Vector3>(smrRelativeDeformedMesh.vertexCount);
             referenceRenderer.BakeMesh(smrRelativeDeformedMesh);
+            var smrRelativeVertices = new List<Vector3>(smrRelativeDeformedMesh.vertexCount);
             smrRelativeDeformedMesh.GetVertices(smrRelativeVertices);
             UnityObject.DestroyImmediate(smrRelativeDeformedMesh);
 
@@ -58,68 +58,76 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var nativeDeltaVertices = new NativeArray<bool>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeInfluentBones = new NativeArray<int4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < vertexCount; ++i)
+            try
             {
-                nativeDeltaVertices[i] = false;
-                nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
-                nativeInfluentBones[i] = -1;
-            }
-
-            // BakeMesh は SMR の座標系で生成するので Basis は SMR からの相対とする
-            var inverseRelativeBasis = (referenceRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix).inverse;
-            var nameToIndex = Enumerable.Range(0, modifyingMesh.blendShapeCount).ToDictionary((i) => modifyingMesh.GetBlendShapeName(i));
-            var sw = new System.Diagnostics.Stopwatch();
-            foreach (var targetShape in parameters.TargetShapes)
-            {
-                if (!nameToIndex.TryGetValue(targetShape, out var shapeIndex)) continue;
-                if (modifyingMesh.GetBlendShapeFrameCount(shapeIndex) != 1) continue;
-
-                modifyingMesh.GetBlendShapeFrameVertices(shapeIndex, 0, originalVertices, originalNormals, originalTangents);
-                originalWeight = modifyingMesh.GetBlendShapeFrameWeight(shapeIndex, 0);
-
-                // ウェイトの有無の union
-                for (var i = 0; i < vertexCount; ++i) nativeDeltaVertices[i] |= originalVertices[i] != Vector3.zero;
-
-                // 分割
                 for (var i = 0; i < vertexCount; ++i)
                 {
-                    // left-handed, forwarding
-                    var deformedVertexInBasis = inverseRelativeBasis.MultiplyPoint(smrRelativeVertices[i]);
-                    var isRightSide = deformedVertexInBasis.x >= 0;
-                    leftVertices[i] = !isRightSide ? originalVertices[i] : Vector3.zero;
-                    leftNormals[i] = !isRightSide ? originalNormals[i] : Vector3.zero;
-                    leftTangents[i] = !isRightSide ? originalTangents[i] : Vector3.zero;
-                    rightVertices[i] = isRightSide ? originalVertices[i] : Vector3.zero;
-                    rightNormals[i] = isRightSide ? originalNormals[i] : Vector3.zero;
-                    rightTangents[i] = isRightSide ? originalTangents[i] : Vector3.zero;
+                    nativeDeltaVertices[i] = false;
+                    nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+                    nativeInfluentBones[i] = -1;
                 }
 
-                // シェイプキー追加
-                // Distinct() しているので この処理中に追加された BlendShape 同士で被ることはない
-                var leftName = $"{targetShape}{parameters.LeftSuffix}";
-                var rightName = $"{targetShape}{parameters.RightSuffix}";
-                if (addLeft && !nameToIndex.ContainsKey(leftName)) modifyingMesh.AddBlendShapeFrame(leftName, originalWeight, leftVertices, leftNormals, leftTangents);
-                if (addRight && !nameToIndex.ContainsKey(rightName)) modifyingMesh.AddBlendShapeFrame(rightName, originalWeight, rightVertices, rightNormals, rightTangents);
+                // BakeMesh は SMR の座標系で生成するので Basis は SMR からの相対とする
+                var inverseRelativeBasis = (referenceRenderer.transform.worldToLocalMatrix * parameters.Basis.localToWorldMatrix).inverse;
+                var nameToIndex = Enumerable.Range(0, modifyingMesh.blendShapeCount).ToDictionary((i) => modifyingMesh.GetBlendShapeName(i));
+                foreach (var targetShape in parameters.TargetShapes)
+                {
+                    if (!nameToIndex.TryGetValue(targetShape, out var shapeIndex)) continue;
+                    if (modifyingMesh.GetBlendShapeFrameCount(shapeIndex) != 1) continue;
+
+                    modifyingMesh.GetBlendShapeFrameVertices(shapeIndex, 0, originalVertices, originalNormals, originalTangents);
+                    originalWeight = modifyingMesh.GetBlendShapeFrameWeight(shapeIndex, 0);
+
+                    // ウェイトの有無の union
+                    for (var i = 0; i < vertexCount; ++i) nativeDeltaVertices[i] |= originalVertices[i] != Vector3.zero;
+
+                    // 分割
+                    for (var i = 0; i < vertexCount; ++i)
+                    {
+                        // left-handed, forwarding
+                        var deformedVertexInBasis = inverseRelativeBasis.MultiplyPoint(smrRelativeVertices[i]);
+                        var isRightSide = deformedVertexInBasis.x >= 0;
+                        leftVertices[i] = !isRightSide ? originalVertices[i] : Vector3.zero;
+                        leftNormals[i] = !isRightSide ? originalNormals[i] : Vector3.zero;
+                        leftTangents[i] = !isRightSide ? originalTangents[i] : Vector3.zero;
+                        rightVertices[i] = isRightSide ? originalVertices[i] : Vector3.zero;
+                        rightNormals[i] = isRightSide ? originalNormals[i] : Vector3.zero;
+                        rightTangents[i] = isRightSide ? originalTangents[i] : Vector3.zero;
+                    }
+
+                    // シェイプキー追加
+                    // Distinct() しているので この処理中に追加された BlendShape 同士で被ることはない
+                    var leftName = $"{targetShape}{parameters.LeftSuffix}";
+                    var rightName = $"{targetShape}{parameters.RightSuffix}";
+                    if (addLeft && !nameToIndex.ContainsKey(leftName)) modifyingMesh.AddBlendShapeFrame(leftName, originalWeight, leftVertices, leftNormals, leftTangents);
+                    if (addRight && !nameToIndex.ContainsKey(rightName)) modifyingMesh.AddBlendShapeFrame(rightName, originalWeight, rightVertices, rightNormals, rightTangents);
+                }
+
+                // 影響ボーン抽出
+                var job = new SelectInfluentBoneJob
+                {
+                    InfluentBones = nativeInfluentBones,
+                    DeltaVertices = nativeDeltaVertices,
+                    BoneWeights = nativeBoneWeights,
+                    CommonThreshold = 0.01f,
+                };
+                var jobHandle = job.Schedule(vertexCount, 4);
+                jobHandle.Complete();
+
+                foreach (var ib in nativeInfluentBones)
+                {
+                    // Add が重いので弾く
+                    if (ib.x != -1) influentBones.Add(ib.x);
+                    if (ib.y != -1) influentBones.Add(ib.y);
+                    if (ib.z != -1) influentBones.Add(ib.z);
+                    if (ib.w != -1) influentBones.Add(ib.w);
+                }
             }
-
-            // 影響ボーン抽出
-            var job = new SelectInfluentBoneJob
+            finally
             {
-                InfluentBones = nativeInfluentBones,
-                DeltaVertices = nativeDeltaVertices,
-                BoneWeights = nativeBoneWeights,
-                CommonThreshold = 0.01f,
-            };
-            var jobHandle = job.Schedule(vertexCount, 4);
-            jobHandle.Complete();
-
-            foreach (var ib in nativeInfluentBones)
-            {
-                // Add が重いので弾く
-                if (ib.x != -1) influentBones.Add(ib.x);
-                if (ib.y != -1) influentBones.Add(ib.y);
-                if (ib.z != -1) influentBones.Add(ib.z);
-                if (ib.w != -1) influentBones.Add(ib.w);
+                nativeDeltaVertices.Dispose();
+                nativeBoneWeights.Dispose();
+                nativeInfluentBones.Dispose();
             }
 
             return influentBones;

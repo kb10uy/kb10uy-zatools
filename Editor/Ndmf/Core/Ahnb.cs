@@ -49,56 +49,60 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeInfluentBones = new NativeArray<int4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneDeforms = new NativeArray<float4x4>(bones.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < vertexCount; ++i)
-            {
-                nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
-                nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
-                nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
-                nativeInfluentBones[i] = -1;
-            }
-            NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
-            for (var i = 0; i < bones.Length; ++i)
-            {
-                var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
-                nativeBoneDeforms[i] = bd;
-            }
-
-            // 実行
-            var job = new BendNormalJob
-            {
-                Normals = nativeNormals,
-                InfluentBones = nativeInfluentBones,
-                MaskValues = nativeMaskValues,
-                BoneWeights = nativeBoneWeights,
-                BoneDeforms = nativeBoneDeforms,
-                WorldSpaceForward = new float3(parameters.WorldSpaceForward.x, parameters.WorldSpaceForward.y, parameters.WorldSpaceForward.z),
-                GlobalWeight = parameters.Weight,
-                CommonThreshold = 0.01f,
-            };
-            var jobHandle = job.Schedule(nativeNormals.Length, 4);
-            jobHandle.Complete();
-
-            // 書き戻し
-            modifyingMesh.SetNormals(nativeNormals);
-            modifyingMesh.RecalculateTangents();
-
             var influentBones = new HashSet<int>();
-            foreach (var ib in nativeInfluentBones)
+            try
             {
-                // Add が重いので弾く
-                if (ib.x != -1) influentBones.Add(ib.x);
-                if (ib.y != -1) influentBones.Add(ib.y);
-                if (ib.z != -1) influentBones.Add(ib.z);
-                if (ib.w != -1) influentBones.Add(ib.w);
-            }
+                for (var i = 0; i < vertexCount; ++i)
+                {
+                    nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
+                    nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
+                    nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+                    nativeInfluentBones[i] = -1;
+                }
+                NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
+                for (var i = 0; i < bones.Length; ++i)
+                {
+                    var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
+                    nativeBoneDeforms[i] = bd;
+                }
 
-            // 破棄
-            nativeNormals.Dispose();
-            nativeMaskUvs.Dispose();
-            nativeMaskValues.Dispose();
-            nativeBoneWeights.Dispose();
-            nativeBoneDeforms.Dispose();
-            nativeInfluentBones.Dispose();
+                // 実行
+                var job = new BendNormalJob
+                {
+                    Normals = nativeNormals,
+                    InfluentBones = nativeInfluentBones,
+                    MaskValues = nativeMaskValues,
+                    BoneWeights = nativeBoneWeights,
+                    BoneDeforms = nativeBoneDeforms,
+                    WorldSpaceForward = new float3(parameters.WorldSpaceForward.x, parameters.WorldSpaceForward.y, parameters.WorldSpaceForward.z),
+                    GlobalWeight = parameters.Weight,
+                    CommonThreshold = 0.01f,
+                };
+                var jobHandle = job.Schedule(nativeNormals.Length, 4);
+                jobHandle.Complete();
+
+                // 書き戻し
+                modifyingMesh.SetNormals(nativeNormals);
+                modifyingMesh.RecalculateTangents();
+
+                foreach (var ib in nativeInfluentBones)
+                {
+                    // Add が重いので弾く
+                    if (ib.x != -1) influentBones.Add(ib.x);
+                    if (ib.y != -1) influentBones.Add(ib.y);
+                    if (ib.z != -1) influentBones.Add(ib.z);
+                    if (ib.w != -1) influentBones.Add(ib.w);
+                }
+            }
+            finally
+            {
+                nativeNormals.Dispose();
+                nativeMaskUvs.Dispose();
+                nativeMaskValues.Dispose();
+                nativeBoneWeights.Dispose();
+                nativeBoneDeforms.Dispose();
+                nativeInfluentBones.Dispose();
+            }
 
             return influentBones;
         }

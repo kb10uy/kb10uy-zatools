@@ -21,24 +21,28 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var sourceUvs = new NativeArray<float4>(uvs.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var targetUvs = new NativeArray<float4>(uvs.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var sourceColors = new NativeArray<float4>(uvs.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-
-            for (var i = 0; i < sourceUvs.Length; ++i) sourceUvs[i] = uvs[i];
-            NativeTextureSampler.SampleByComputeShader(parameters.TileMap, ref sourceUvs, ref sourceColors);
-            var job = new MoveUvTileJob
+            try
             {
-                TargetUvs = targetUvs,
-                SourceUvs = sourceUvs,
-                Colors = sourceColors,
-                Distribution = parameters.Distribution,
-            };
-            var handle = job.Schedule(sourceUvs.Length, 4);
-            handle.Complete();
+                for (var i = 0; i < sourceUvs.Length; ++i) sourceUvs[i] = uvs[i];
+                NativeTextureSampler.SampleByComputeShader(parameters.TileMap, ref sourceUvs, ref sourceColors);
+                var job = new MoveUvTileJob
+                {
+                    TargetUvs = targetUvs,
+                    SourceUvs = sourceUvs,
+                    Colors = sourceColors,
+                    Distribution = parameters.Distribution,
+                };
+                var handle = job.Schedule(sourceUvs.Length, 4);
+                handle.Complete();
 
-            modifyingMesh.SetUVs((int)parameters.Target, targetUvs);
-
-            sourceUvs.Dispose();
-            sourceColors.Dispose();
-            targetUvs.Dispose();
+                modifyingMesh.SetUVs((int)parameters.Target, targetUvs);
+            }
+            finally
+            {
+                sourceUvs.Dispose();
+                sourceColors.Dispose();
+                targetUvs.Dispose();
+            }
         }
 
         internal struct FixedParameters : IEquatable<FixedParameters>
