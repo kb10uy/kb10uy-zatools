@@ -339,6 +339,12 @@ msgstr "Zatools がサポートしてないバージョンの VRCSDK が検出�
 msgid "pbit.inspector.info"
 msgstr "このオブジェクトは PhysBone の影響下に入った際に Ignored Transform に登録されます。"
 
+msgid "pbit.report.deprecated"
+msgstr "MA PB Blocker の利用を推奨します"
+
+msgid "pbit.report.deprecated:description"
+msgstr "Modular Avatar の PB Blocker が同等の機能を提供します。"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 

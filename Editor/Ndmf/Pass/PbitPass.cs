@@ -23,6 +23,11 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var components = avatarRoot.GetComponentsInChildren<PbitComponent>();
             if (components.Length == 0) return;
 
+            foreach (var component in components)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "pbit.report.deprecated", component.name));
+            }
+
 #if ZATOOLS_HAS_VRCSDK
             var effectivePBMap = avatarRoot.GetComponentsInChildren<VRCPhysBone>(true)
                 .Select((pb) => (Transform: pb.GetRootTransform(), Component: pb))
