@@ -38,13 +38,13 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             var baseMesh = proxyed.sharedMesh;
             var blendShapeIndices = Ahbsm.FetchBlendShapeIndices(baseMesh);
 
-            var observedDefinitions = components.Select((c) => (
-                context.Observe(
-                    c,
-                    (c) => c.MixDefinitions != null ? c.MixDefinitions.FixSources() : ImmutableArray<(string, string, float)>.Empty,
-                    (oldList, newList) => oldList.SequenceEqual(newList)
+            var observedDefinitions = components.Select((c) => context.Observe(
+                c,
+                (c) => (
+                    Definitions: c.MixDefinitions != null ? c.MixDefinitions.FixSources() : ImmutableArray<(string, string, float)>.Empty,
+                    Replace: c.Replace
                 ),
-                c.Replace
+                (oldValue, newValue) => oldValue.Replace == newValue.Replace && oldValue.Definitions.SequenceEqual(newValue.Definitions)
             ));
 
             var duplicatedMesh = UnityObject.Instantiate(baseMesh);
