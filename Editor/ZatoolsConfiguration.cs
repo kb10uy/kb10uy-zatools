@@ -45,7 +45,7 @@ namespace KusakaFactory.Zatools
         private const string MENU_PREFIX = "Tools/Zatools: kb10uy's Various Tools/";
         private const string MENU_PREFIX_ASV = MENU_PREFIX + "Avatar Status Validator/";
         private static ConfigurationObject _current = null;
-        private static ConfigurationObject Current
+        internal static ConfigurationObject Current
         {
             get
             {
@@ -57,17 +57,15 @@ namespace KusakaFactory.Zatools
         private static void Save()
         {
             var configJson = JsonConvert.SerializeObject(_current);
-            Debug.Log(configJson);
             EditorUserSettings.SetConfigValue(EDITOR_USER_SETTINGS_KEY, configJson);
         }
 
-        internal static ConfigurationObject Load()
+        private static ConfigurationObject Load()
         {
             try
             {
                 var configJson = EditorUserSettings.GetConfigValue(EDITOR_USER_SETTINGS_KEY);
-                Debug.Log(configJson);
-                return configJson != null ? JsonConvert.DeserializeObject<ConfigurationObject>(configJson) : new ConfigurationObject();
+                return configJson != null ? JsonConvert.DeserializeObject<ConfigurationObject>(configJson) ?? new ConfigurationObject() : new ConfigurationObject();
             }
             catch (Exception e)
             {

@@ -32,7 +32,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         protected override void Execute(BuildContext context)
         {
-            var errorEnabled = ZatoolsConfiguration.Load().EnableAsvScanUnmergedArmature;
+            var errorEnabled = ZatoolsConfiguration.Current.EnableAsvScanUnmergedArmature;
             ScanUnmergedArmaturesIn(context, context.AvatarRootTransform, ArmatureLikeStatus.Unrelated, errorEnabled);
         }
 
