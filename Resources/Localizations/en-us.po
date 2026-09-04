@@ -337,6 +337,12 @@ msgstr "Process aborted since incompatible version of VRCSDK that Zatools does n
 msgid "pbit.inspector.info"
 msgstr "This GameObject will be ignored from PhysBones when affected."
 
+msgid "pbit.report.deprecated"
+msgstr "MA PB Blocker is recommended"
+
+msgid "pbit.report.deprecated:description"
+msgstr "Modular Avatar provides PB Blocker component which has the same functionality."
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 

@@ -2,6 +2,7 @@
     <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement name="VisualElement" style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-bottom: 8px; margin-left: 4px;" />
+        <ui:HelpBox message-type="Warning" text="pbit.report.deprecated" name="DeprecatedWarning" class="ndmf-tr" />
         <ui:HelpBox message-type="Info" text="pbit.inspector.info" class="ndmf-tr" />
     </ui:VisualElement>
 </ui:UXML>
