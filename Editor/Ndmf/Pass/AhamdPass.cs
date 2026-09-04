@@ -44,7 +44,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 ZaxValueType expectedResultType,
                 out ZaxProgram program)
             {
-                return TryCompileZaxExpression(component, source, variables, expectedResultType, out program);
+                return TryCompileZaxExpression(component.gameObject, source, variables, expectedResultType, out program);
             }
 
             if (!Ahamd.TryCompilePrograms(fixedParameters, CompileReporting, out var programs))
