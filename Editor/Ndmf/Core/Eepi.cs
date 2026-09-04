@@ -195,7 +195,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 return null;
             };
 
-            var virtualMotions = controller.Layers.SelectMany((l) => l.StateMachine.States.Select((st) => st.State.Motion));
+            var virtualMotions = controller.Layers
+                .Where((l) => l.StateMachine != null)
+                .SelectMany((l) => l.StateMachine.AllStates().Select((st) => st.Motion));
             foreach (var virtualMotion in virtualMotions) RewriteVirtualMotion(virtualMotion, pathRewriter);
         }
 

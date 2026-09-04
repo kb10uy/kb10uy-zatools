@@ -38,6 +38,12 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             // AdHocAdvancedMeshDuplication has DisallowMultipleComponent, a renderer will have at most one.
             var observedParameter = context.Observe(components[0], Ahamd.FixedParameters.FixFromComponent, (op, np) => op == np);
             _source = observedParameter.Source;
+            if (_source != null) context.Observe(_source, (s) => s.sharedMesh);
+            if (observedParameter.SelectionTexture != null) context.Observe(observedParameter.SelectionTexture, ObserveTextureContents);
+            foreach (var modification in observedParameter.Modifications)
+            {
+                if (modification.ExtraTexture != null) context.Observe(modification.ExtraTexture, ObserveTextureContents);
+            }
 
             if (proxyed == null || proxyed.sharedMesh != null) return default;
 
@@ -59,9 +65,12 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             RenderAspects nonzeroUpdatedAspects
         )
         {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Shapes)) == 0) return this;
+            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes)) == 0) return this;
             return null;
         }
+
+        private static (int Width, int Height, Hash128 ContentsHash) ObserveTextureContents(Texture2D texture) =>
+            (texture.width, texture.height, texture.imageContentsHash);
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)
         {

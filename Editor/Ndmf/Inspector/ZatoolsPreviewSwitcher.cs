@@ -58,6 +58,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _toggler = element.Q<Button>("ButtonSwitch");
 
             RegisterCallback<AttachToPanelEvent>(RegisterPreviewNode);
+            RegisterCallback<DetachFromPanelEvent>(UnregisterPreviewNode);
             _toggler.clicked += ToggleState;
         }
 
@@ -66,16 +67,24 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (_targetFilterType == null) return;
             var previewNodeProperty = _targetFilterType.GetProperty("SwitchingPreviewNode", BindingFlags.Static | BindingFlags.NonPublic);
             if (previewNodeProperty == null) return;
-            _targetPreviewNode = previewNodeProperty.GetValue(_targetFilterType, BindingFlags.Static, null, null, null) as TogglablePreviewNode;
-            if (previewNodeProperty == null) return;
+            _targetPreviewNode = previewNodeProperty.GetValue(null) as TogglablePreviewNode;
+            if (_targetPreviewNode == null) return;
 
             _targetPreviewNode.IsEnabled.OnChange += OnPublishedValueChanged;
             UpdateStateLabel();
         }
 
+        private void UnregisterPreviewNode(DetachFromPanelEvent e)
+        {
+            if (_targetPreviewNode == null) return;
+            _targetPreviewNode.IsEnabled.OnChange -= OnPublishedValueChanged;
+            _targetPreviewNode = null;
+        }
+
         private void OnPublishedValueChanged(bool value)
         {
             // OnChange のたびに event がリセットされるので登録しなおす
+            if (_targetPreviewNode == null) return;
             UpdateStateLabel();
             _targetPreviewNode.IsEnabled.OnChange += OnPublishedValueChanged;
         }

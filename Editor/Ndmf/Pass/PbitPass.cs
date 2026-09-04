@@ -40,7 +40,11 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 var effectivePBs = ImmutableList<VRCPhysBone>.Empty;
                 while (pbTarget != null && pbTarget != avatarRoot)
                 {
-                    if (effectivePBMap.TryGetValue(pbTarget, out effectivePBs)) break;
+                    if (effectivePBMap.TryGetValue(pbTarget, out var foundPBs))
+                    {
+                        effectivePBs = foundPBs;
+                        break;
+                    }
                     pbTarget = pbTarget.parent;
                 }
 
