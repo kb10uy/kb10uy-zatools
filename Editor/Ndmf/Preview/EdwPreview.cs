@@ -41,7 +41,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             var baseMesh = proxyed.sharedMesh;
             var duplicatedMesh = UnityObject.Instantiate(baseMesh);
-            duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
+            duplicatedMesh.name = $"{baseMesh.name} (Zatools modified)";
 
             var avatarRoot = RuntimeUtil.FindAvatarInParents(original.transform);
             var observedParameters = components.Select((c) => context.Observe(

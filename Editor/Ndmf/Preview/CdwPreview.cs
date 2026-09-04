@@ -62,7 +62,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
                 var baseMesh = proxyed.sharedMesh;
                 var duplicatedMesh = UnityObject.Instantiate(baseMesh);
-                duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
+                duplicatedMesh.name = $"{baseMesh.name} (Zatools modified)";
                 Cdw.Process(proxyed, duplicatedMesh, observedParameter, wrapperMaterial);
 
                 _duplicatedMesh = duplicatedMesh;

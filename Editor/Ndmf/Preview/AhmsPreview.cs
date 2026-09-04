@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
 
             var baseMesh = proxyed.sharedMesh;
             var duplicatedMesh = UnityObject.Instantiate(baseMesh);
-            duplicatedMesh.name = $"{duplicatedMesh.name} (Zatools modified)";
+            duplicatedMesh.name = $"{baseMesh.name} (Zatools modified)";
 
             var observedParameters = components.Select((c) => context.Observe(c, Ahms.FixedParameters.FixFromComponent, (op, np) => op == np));
             foreach (var c in components) if (c.Mask != null) context.Observe(c.Mask, (tm) => (tm.width, tm.height, tm.imageContentsHash));
