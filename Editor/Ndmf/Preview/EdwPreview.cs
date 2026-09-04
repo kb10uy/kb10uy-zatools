@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.preview;
-using nadena.dev.ndmf.runtime;
 using KusakaFactory.Zatools.Runtime;
 using KusakaFactory.Zatools.Ndmf.Core;
 using UnityObject = UnityEngine.Object;
@@ -43,7 +42,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             var duplicatedMesh = UnityObject.Instantiate(baseMesh);
             duplicatedMesh.name = $"{baseMesh.name} (Zatools modified)";
 
-            var avatarRoot = RuntimeUtil.FindAvatarInParents(original.transform);
+            var avatarRoot = ZatoolsRenderFilter.FindAvatarRootOrFallback(original.transform);
             var observedParameters = components.Select((c) => context.Observe(
                 c,
                 (c) => Edw.FixedParameters.FixFromComponent(avatarRoot, c),

@@ -5,10 +5,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
+using nadena.dev.ndmf.runtime;
 using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf
 {
+    internal static class ZatoolsRenderFilter
+    {
+        /// <summary>
+        /// Finds the avatar root of the renderer, or falls back to the hierarchy root when the renderer is not under any avatar.
+        /// Preview filters are evaluated for every renderer in the scene, so a fallback is required.
+        /// </summary>
+        internal static Transform FindAvatarRootOrFallback(Transform rendererTransform)
+        {
+            var avatarRoot = RuntimeUtil.FindAvatarInParents(rendererTransform);
+            return avatarRoot != null ? avatarRoot : rendererTransform.root;
+        }
+    }
+
     /// <summary>
     /// Base class for render filters implemented by Zatools.
     /// </summary>
