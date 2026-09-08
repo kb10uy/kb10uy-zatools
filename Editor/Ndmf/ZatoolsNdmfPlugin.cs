@@ -37,7 +37,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
             // Transforming before MA
             InPhase(BuildPhase.Transforming)
-                .BeforePlugin("com.fermatashop.fermata-ft.face-mesh-patch")
+                .AfterPlugin("com.fermatashop.fermata-ft.face-mesh-patch")
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
                 .Then.Run(new AhnbTransforming()).PreviewingWith(new AhnbRenderFilter())
@@ -45,7 +45,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
             // Transforming before MA with VirtualControllerContext
             InPhase(BuildPhase.Transforming)
-                .BeforePlugin("com.fermatashop.fermata-ft.face-mesh-patch")
+                .AfterPlugin("com.fermatashop.fermata-ft.face-mesh-patch")
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .WithRequiredExtension(typeof(VirtualControllerContext), (seq) =>
                 {
