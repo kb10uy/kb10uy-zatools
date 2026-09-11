@@ -343,6 +343,15 @@ msgstr "MA PB Blocker is recommended"
 msgid "pbit.report.deprecated:description"
 msgstr "Modular Avatar provides PB Blocker component which has the same functionality."
 
+msgid "gwdo.inspector.mode"
+msgstr "Mode"
+
+msgid "gwdo.report.component-placement"
+msgstr "Inappropriate Global WD Override placement"
+
+msgid "gwdo.report.component-placement:description"
+msgstr "Global WD Override should be placed just one on the avatar root. 2nd and subsequent will be ignored."
+
 msgid "edx.save-text"
 msgstr "Save as Text File"
 
