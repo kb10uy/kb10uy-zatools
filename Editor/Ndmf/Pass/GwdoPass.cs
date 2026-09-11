@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
+using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using UnityObject = UnityEngine.Object;
 using GwdoComponent = KusakaFactory.Zatools.Runtime.GlobalWriteDefaultsOverride;
@@ -65,11 +66,35 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void ApplyForController(VirtualAnimatorController controller, bool wdTarget)
         {
-            foreach (var virtualState in controller.AllReachableNodes().OfType<VirtualState>())
+            foreach (var layer in controller.Layers)
             {
-                // Suppress redundant cache invalidation
-                if (virtualState.WriteDefaultValues ^ wdTarget) virtualState.WriteDefaultValues = wdTarget;
+                if (layer.StateMachine == null) continue;
+
+                var finalTarget = wdTarget || IsWriteDefaultsRequiredLayer(layer);
+                foreach (var virtualState in layer.StateMachine.AllStates())
+                {
+                    // Suppress redundant cache invalidation
+                    if (virtualState.WriteDefaultValues ^ finalTarget) virtualState.WriteDefaultValues = finalTarget;
+                }
             }
+        }
+
+        private static bool IsWriteDefaultsRequiredLayer(VirtualLayer layer)
+        {
+            // Match Modular Avatar's Merge Animator WD-on exceptions.
+            if (layer.BlendingMode == AnimatorLayerBlendingMode.Additive) return true;
+            var stateMachine = layer.StateMachine;
+            if (stateMachine == null) return false;
+
+            if (stateMachine.StateMachines.Count != 0) return false;
+            if (stateMachine.States.Count != 1) return false;
+            if (stateMachine.AnyStateTransitions.Count != 0) return false;
+            if (stateMachine.DefaultState?.Transitions?.Count != 0) return false;
+            if (stateMachine.DefaultState.Motion is not VirtualBlendTree) return false;
+
+            return stateMachine.DefaultState.Motion.AllReachableNodes()
+                .OfType<VirtualBlendTree>()
+                .Any(blendTree => blendTree.BlendType == BlendTreeType.Direct);
         }
     }
 }
