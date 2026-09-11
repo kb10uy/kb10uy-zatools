@@ -345,6 +345,15 @@ msgstr "MA PB Blocker の利用を推奨します"
 msgid "pbit.report.deprecated:description"
 msgstr "Modular Avatar の PB Blocker が同等の機能を提供します。"
 
+msgid "gwdo.inspector.mode"
+msgstr "モード"
+
+msgid "gwdo.report.component-placement"
+msgstr "不適切な Global WD Override の配置"
+
+msgid "gwdo.report.component-placement:description"
+msgstr "Global WD Override はアバタールートに一つだけ配置してください。2 つ目以降は無視されます。"
+
 msgid "edx.save-text"
 msgstr "テキストファイルに保存"
 

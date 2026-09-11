@@ -62,6 +62,16 @@ namespace KusakaFactory.Zatools.Ndmf
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .AfterPlugin("ZeroFactory.AvatarPoseSystem.NDMF")
                 .Run(new EepiTransformingAfterMA());
+
+            // Optimizing before MA, AAO
+            InPhase(BuildPhase.Optimizing)
+                .BeforePlugin("nadena.dev.modular-avatar")
+                .BeforePlugin("com.anatawa12.avatar-optimizer")
+                .WithRequiredExtension(typeof(AnimatorServicesContext), (seq) =>
+                {
+                    // This pass is delibarately executed in Optimizing phase; see the class doc.
+                    seq.Run(new GwdoOptimizing());
+                });
         }
     }
 }
