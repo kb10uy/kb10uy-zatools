@@ -41,15 +41,24 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             var animatorServicesContext = context.Extension<AnimatorServicesContext>();
             var virtualControllerContext = animatorServicesContext.ControllerContext;
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.Base], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.Additive], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.Gesture], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.Action], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.FX], wdTargetValue);
-
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.Sitting], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.TPose], wdTargetValue);
-            ApplyForController(virtualControllerContext.Controllers[VRCAvatarDescriptor.AnimLayerType.IKPose], wdTargetValue);
+            var layerTypes = new[]
+            {
+                VRCAvatarDescriptor.AnimLayerType.Base,
+                VRCAvatarDescriptor.AnimLayerType.Additive,
+                VRCAvatarDescriptor.AnimLayerType.Gesture,
+                VRCAvatarDescriptor.AnimLayerType.Action,
+                VRCAvatarDescriptor.AnimLayerType.FX,
+                VRCAvatarDescriptor.AnimLayerType.Sitting,
+                VRCAvatarDescriptor.AnimLayerType.TPose,
+                VRCAvatarDescriptor.AnimLayerType.IKPose,
+            };
+            foreach (var layerType in layerTypes)
+            {
+                if (virtualControllerContext.Controllers.TryGetValue(layerType, out var controller) && controller != null)
+                {
+                    ApplyForController(controller, wdTargetValue);
+                }
+            }
 
             UnityObject.DestroyImmediate(component);
         }
