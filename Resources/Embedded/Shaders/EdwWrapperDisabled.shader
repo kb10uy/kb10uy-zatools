@@ -3,7 +3,8 @@ Shader "KusakaFactory/Zatools/EdwWrapperDisabled"
     Properties {}
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="AlphaTest+49" "VRCFallback"="Hidden" }
+        // Exclude this mesh from opaque depth and depth-normal replacement rendering.
+        Tags { "RenderType"="Transparent" "Queue"="Transparent" "VRCFallback"="Hidden" }
         LOD 100
 
         Pass
@@ -11,7 +12,7 @@ Shader "KusakaFactory/Zatools/EdwWrapperDisabled"
             Tags { "LightMode"="ShadowCaster" }
             ColorMask 0
             ZTest LEqual
-            ZWrite On
+            ZWrite Off
 
             CGPROGRAM
             #pragma vertex vert_main
@@ -38,6 +39,7 @@ Shader "KusakaFactory/Zatools/EdwWrapperDisabled"
             }
 
             float4 frag_main(FragmentInput fi) : SV_Target {
+                discard;
                 return 0;
             }
             ENDCG
