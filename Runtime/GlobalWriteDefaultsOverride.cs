@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace KusakaFactory.Zatools.Runtime
 {
-    [AddComponentMenu("KusakaFactory/Global WD Override")]
+    [AddComponentMenu("KusakaFactory/Zatools Global WD Override")]
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/global-write-defaults-override/")]
     [DisallowMultipleComponent]
     public sealed class GlobalWriteDefaultsOverride : ZatoolsComponent
