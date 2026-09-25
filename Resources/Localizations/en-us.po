@@ -358,6 +358,15 @@ msgstr "The BlendShape \"{0}\" already exists on the mesh, so the entry was skip
 msgid "ahabss.inspector.result"
 msgstr "The expression must leave three float3 values: vertex delta, normal delta and tangent delta"
 
+msgid "ahabss.inspector.manipulation"
+msgstr "Manipulation"
+
+msgid "ahabss.inspector.save-json"
+msgstr "Save to JSON"
+
+msgid "ahabss.inspector.load-json"
+msgstr "Load from JSON"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 

@@ -15,5 +15,11 @@
             <ui:ListView name="FieldEntries" virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-add-remove-footer="true" show-foldout-header="false" binding-path="Entries" show-bound-collection-size="false" reorder-mode="Animated" />
         </ui:Foldout>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhabssRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
+        <ui:Foldout text="ahabss.inspector.manipulation" name="FoldoutManipulation" view-data-key="ahabss-foldout-manipulation" value="true" class="ndmf-tr zatools-foldout--flush">
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                <ui:Button text="ahabss.inspector.save-json" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonSaveToJson" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
+                <ui:Button text="ahabss.inspector.load-json" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonLoadFromJson" class="ndmf-tr" style="flex-basis: 0; flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>

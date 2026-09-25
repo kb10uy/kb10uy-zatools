@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Text;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
@@ -48,7 +51,67 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             entriesList.makeItem = () => MakeEntryItem(visualTreeItem);
             entriesList.itemsAdded += ResetAddedEntries;
 
+            inspector.Q<Button>("ButtonSaveToJson").clicked += SaveToJson;
+            inspector.Q<Button>("ButtonLoadFromJson").clicked += LoadFromJson;
+
             return inspector;
+        }
+
+        private void SaveToJson()
+        {
+            var component = target as AdHocAdvancedBlendShapeSynthesis;
+            var pathToSave = EditorUtility.SaveFilePanel(
+                "Save Advanced BlendShape Synthesis Definitions as JSON",
+                "",
+                $"{component.gameObject.name}-AdvancedBlendShapeSynthesis.json",
+                "json"
+            );
+            if (pathToSave.Length == 0) return;
+
+            var definition = new JsonDefinition
+            {
+                Sources = component.SourceBlendShapes.ToArray(),
+                Entries = component.Entries
+                    .Where((e) => e != null)
+                    .Select((e) => new JsonEntry { Name = e.Name, Value = e.Value, Expression = e.Expression })
+                    .ToArray(),
+            };
+            var json = JsonConvert.SerializeObject(definition, Formatting.Indented);
+            File.WriteAllText(pathToSave, json, new UTF8Encoding(false));
+        }
+
+        private void LoadFromJson()
+        {
+            var pathToLoad = EditorUtility.OpenFilePanel("Load Advanced BlendShape Synthesis Definitions from JSON", "", "json");
+            if (pathToLoad.Length == 0) return;
+
+            var jsonText = File.ReadAllText(pathToLoad, new UTF8Encoding(false));
+            var definition = JsonConvert.DeserializeObject<JsonDefinition>(jsonText);
+            if (definition == null) return;
+
+            // SerializedProperty 経由で書き込まないと undo が効かない
+            serializedObject.Update();
+
+            var sources = serializedObject.FindProperty(nameof(AdHocAdvancedBlendShapeSynthesis.SourceBlendShapes));
+            var loadedSources = definition.Sources ?? new string[0];
+            sources.arraySize = loadedSources.Length;
+            for (var i = 0; i < loadedSources.Length; ++i)
+            {
+                sources.GetArrayElementAtIndex(i).stringValue = loadedSources[i] ?? string.Empty;
+            }
+
+            var entries = serializedObject.FindProperty(nameof(AdHocAdvancedBlendShapeSynthesis.Entries));
+            var loadedEntries = (definition.Entries ?? new JsonEntry[0]).Where((e) => e != null).ToArray();
+            entries.arraySize = loadedEntries.Length;
+            for (var i = 0; i < loadedEntries.Length; ++i)
+            {
+                var element = entries.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative(nameof(AhabssEntry.Name)).stringValue = loadedEntries[i].Name ?? string.Empty;
+                element.FindPropertyRelative(nameof(AhabssEntry.Value)).floatValue = loadedEntries[i].Value;
+                element.FindPropertyRelative(nameof(AhabssEntry.Expression)).stringValue = loadedEntries[i].Expression ?? string.Empty;
+            }
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         private List<string> FetchBlendShapeNames()
@@ -124,6 +187,27 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 entries.GetArrayElementAtIndex(index).boxedValue = new AhabssEntry();
             }
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private sealed class JsonDefinition
+        {
+            [JsonProperty("sources")]
+            public string[] Sources;
+
+            [JsonProperty("entries")]
+            public JsonEntry[] Entries;
+        }
+
+        private sealed class JsonEntry
+        {
+            [JsonProperty("name")]
+            public string Name;
+
+            [JsonProperty("value")]
+            public float Value;
+
+            [JsonProperty("expr")]
+            public string Expression;
         }
 
         private sealed class VariableComparer : IEqualityComparer<ZaxVariable>
