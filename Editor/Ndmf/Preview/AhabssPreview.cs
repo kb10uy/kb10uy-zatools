@@ -24,6 +24,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private Mesh _synthesizedMesh = null;
         private ImmutableArray<(int Index, float Weight)> _weights = ImmutableArray<(int Index, float Weight)>.Empty;
+        private AdHocAdvancedBlendShapeSynthesis[] _components = null;
+        private List<Ahabss.FixedParameters> _observedParameters = null;
 
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
@@ -34,9 +36,9 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ComputeContext context
         )
         {
-            var observedParameters = components
-                .Select((c) => context.Observe(c, Ahabss.FixedParameters.FixFromComponent, (op, np) => op == np))
-                .ToList();
+            _components = components;
+            _observedParameters = ObserveParameters(context, components);
+            var observedParameters = _observedParameters;
 
             if (proxyed == null || proxyed.sharedMesh == null) return default;
 
@@ -73,8 +75,20 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             RenderAspects nonzeroUpdatedAspects
         )
         {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
+            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) != 0) return null;
+
+            // Refresh には新しい ComputeContext が渡されるので、this を返すなら監視を登録し直す必要がある
+            if (_components == null || _components.Any((c) => c == null)) return null;
+            var currentParameters = ObserveParameters(context, _components);
+            if (!currentParameters.SequenceEqual(_observedParameters)) return null;
+            return this;
+        }
+
+        private static List<Ahabss.FixedParameters> ObserveParameters(ComputeContext context, AdHocAdvancedBlendShapeSynthesis[] components)
+        {
+            return components
+                .Select((c) => context.Observe(c, Ahabss.FixedParameters.FixFromComponent, (op, np) => op == np))
+                .ToList();
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)
