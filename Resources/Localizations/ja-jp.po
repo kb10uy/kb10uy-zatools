@@ -330,6 +330,45 @@ msgstr "@mask: float4 - 選択マスクテクスチャのサンプル結果 (頂
 msgid "ahamd.inspector.variables-texture"
 msgstr "@texture: float4 - 追加テクスチャのサンプル結果 (改変ステップでのみ利用可)"
 
+msgid "ahabss.inspector.sources"
+msgstr "ソース BlendShape"
+
+msgid "ahabss.inspector.entries"
+msgstr "合成する BlendShape"
+
+msgid "ahabss.inspector.entry-name"
+msgstr "名前"
+
+msgid "ahabss.inspector.entry-value"
+msgstr "初期ウェイト"
+
+msgid "ahabss.inspector.expression"
+msgstr "ZAX 式"
+
+msgid "ahabss.inspector.variables"
+msgstr "利用可能な変数"
+
+msgid "ahabss.inspector.variables-sources"
+msgstr "@vN, @nN, @tN: float3 - N 番目のソース BlendShape の頂点・法線・接線のデルタ"
+
+msgid "ahabss.inspector.result"
+msgstr "式は頂点・法線・接線で 3 つの delta float3 を残す必要があります"
+
+msgid "ahabss.inspector.manipulation"
+msgstr "その他の操作"
+
+msgid "ahabss.inspector.save-json"
+msgstr "JSON に保存"
+
+msgid "ahabss.inspector.load-json"
+msgstr "JSON から読み込み"
+
+msgid "ahabss.report.duplicate-name"
+msgstr "Advanced BlendShape Synthesis: 同名の BlendShape が既に存在します"
+
+msgid "ahabss.report.duplicate-name:description"
+msgstr "BlendShape \"{0}\" はメッシュに既に存在するためスキップされました。既存の BlendShape は上書きされません。"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"
 
