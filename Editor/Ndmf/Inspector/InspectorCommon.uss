@@ -52,3 +52,7 @@
 .ahabss-entry .zax-expression__variables {
     padding-left: 166px;
 }
+
+.zatools-foldout--flush > .unity-foldout__content {
+    margin-left: 4px;
+}

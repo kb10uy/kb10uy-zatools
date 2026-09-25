@@ -68,6 +68,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var sources = serializedObject.FindProperty(nameof(AdHocAdvancedBlendShapeSynthesis.SourceBlendShapes));
             if (index < 0 || index >= sources.arraySize) return;
+            item.Q<Label>("LabelIndex").text = $"#{index}";
             item.Q<TextField>("FieldName").BindProperty(sources.GetArrayElementAtIndex(index));
         }
 

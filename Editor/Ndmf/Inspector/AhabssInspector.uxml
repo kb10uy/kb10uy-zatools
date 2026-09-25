@@ -2,18 +2,18 @@
     <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
-        <ui:Foldout text="ahabss.inspector.sources" name="FoldoutSources" view-data-key="ahabss-foldout-sources" value="true" class="ndmf-tr" style="margin-bottom: 4px;">
+        <ui:Foldout text="ahabss.inspector.sources" name="FoldoutSources" view-data-key="ahabss-foldout-sources" value="true" class="ndmf-tr zatools-foldout--flush" style="margin-bottom: 4px;">
             <ui:ListView name="FieldSourceBlendShapes" virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-add-remove-footer="true" show-foldout-header="false" binding-path="SourceBlendShapes" show-bound-collection-size="false" reorder-mode="Animated" />
         </ui:Foldout>
-        <ui:Foldout text="ahabss.inspector.entries" name="FoldoutEntries" view-data-key="ahabss-foldout-entries" value="true" class="ndmf-tr">
+        <ui:Foldout text="ahabss.inspector.entries" name="FoldoutEntries" view-data-key="ahabss-foldout-entries" value="true" class="ndmf-tr zatools-foldout--flush">
+            <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-bottom: 8px;">
+                <ui:Label tabindex="-1" text="ahabss.inspector.variables" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
+                <ui:Label name="LabelVariables" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
+                <ui:Label text="ahabss.inspector.variables-sources" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px; margin-top: 4px;" />
+                <ui:Label text="ahabss.inspector.result" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
+            </ui:VisualElement>
             <ui:ListView name="FieldEntries" virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-add-remove-footer="true" show-foldout-header="false" binding-path="Entries" show-bound-collection-size="false" reorder-mode="Animated" />
         </ui:Foldout>
-        <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-top: 8px;">
-            <ui:Label tabindex="-1" text="ahabss.inspector.variables" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-bottom: 4px;" />
-            <ui:Label name="LabelVariables" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
-            <ui:Label text="ahabss.inspector.variables-sources" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px; margin-top: 4px;" />
-            <ui:Label text="ahabss.inspector.result" class="ndmf-tr" style="white-space: normal; opacity: 0.6; margin-left: 4px;" />
-        </ui:VisualElement>
         <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsPreviewSwitcher target-filter-type="KusakaFactory.Zatools.Ndmf.Preview.AhabssRenderFilter, org.kb10uy.zatools" style="margin-top: 4px;" />
     </ui:VisualElement>
 </ui:UXML>
