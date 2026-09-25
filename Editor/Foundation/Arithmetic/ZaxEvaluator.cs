@@ -397,7 +397,9 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 {
                     var baseIndex = pointer - n;
                     var m = LoadRows(stack + baseIndex, n);
-                    stack[baseIndex] = ZaxValue.FromFloat(m.c0.x + m.c1.y + m.c2.z + m.c3.w - (4 - n));
+                    var trace = 0.0f;
+                    for (var i = 0; i < n; ++i) trace += m[i][i];
+                    stack[baseIndex] = ZaxValue.FromFloat(trace);
                     return baseIndex + 1;
                 }
 
