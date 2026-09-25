@@ -468,6 +468,12 @@ msgstr "\"{0}\" はベクトルではないため {1} に適用できません"
 msgid "zax.diagnostic.matrix-shape-mismatch"
 msgstr "\"{0}\" にはスタック上に ({1}) が必要ですが、({2}) が見つかりました"
 
+msgid "ahabss.report.duplicate-name"
+msgstr "Advanced BlendShape Synthesis: 同名の BlendShape が既に存在します"
+
+msgid "ahabss.report.duplicate-name:description"
+msgstr "BlendShape \"{0}\" はメッシュに既に存在するためスキップされました。既存の BlendShape は上書きされません。"
+
 msgid "zax.report.compile-error"
 msgstr "Zax コンパイルエラー"
 

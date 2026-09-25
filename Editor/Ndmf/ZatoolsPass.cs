@@ -28,8 +28,19 @@ namespace KusakaFactory.Zatools.Ndmf
             ZaxValueType? expectedType,
             out ZaxProgram program)
         {
+            var expectedTypes = expectedType.HasValue ? new[] { expectedType.Value } : null;
+            return TryCompileZaxExpression(target, source, variables, expectedTypes, out program);
+        }
+
+        protected static bool TryCompileZaxExpression(
+            UnityObject target,
+            string source,
+            IReadOnlyList<ZaxVariable> variables,
+            IReadOnlyList<ZaxValueType> expectedTypes,
+            out ZaxProgram program)
+        {
             var diagnostics = new List<ZaxDiagnostic>();
-            if (ZaxCompiler.TryCompile(source, variables, expectedType, diagnostics, out program)) return true;
+            if (ZaxCompiler.TryCompile(source, variables, expectedTypes, diagnostics, out program)) return true;
 
             foreach (var diagnostic in diagnostics)
             {
