@@ -238,6 +238,25 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     return ZaxMatrixInference.Success;
                 }
 
+                case ZaxFunction.Mfromq:
+                {
+                    expectedShape = "float4";
+                    required = 1;
+                    if (stack.Length < required) return ZaxMatrixInference.NotEnoughOperands;
+                    if (stack[stack.Length - 1] != ZaxValueType.Float4) return ZaxMatrixInference.ShapeMismatch;
+                    effect = new ZaxMatrixEffect(1, 3, ZaxValueType.Float4, ZaxValueType.Float3, 3, 3);
+                    return ZaxMatrixInference.Success;
+                }
+
+                case ZaxFunction.Qfromm:
+                {
+                    if (!TryTopMatrix(stack, out var n, out var element, out required, out expectedShape, MatrixName(3))) return Fail(required, stack);
+                    expectedShape = MatrixName(3);
+                    if (n != 3) return ZaxMatrixInference.ShapeMismatch;
+                    effect = new ZaxMatrixEffect(3, 1, element, ZaxValueType.Float4, 3, 3);
+                    return ZaxMatrixInference.Success;
+                }
+
                 default:
                     return ZaxMatrixInference.ShapeMismatch;
             }

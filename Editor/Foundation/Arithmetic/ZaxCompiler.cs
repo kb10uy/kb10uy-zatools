@@ -109,7 +109,9 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 }
 
                 typeStack.RemoveRange(baseIndex, info.Arity);
-                instructions.Add(ZaxInstruction.Call(function, argumentType, resultType, info.Arity));
+                instructions.Add(info.Signature == ZaxSignature.Fixed
+                    ? ZaxInstruction.Quaternion(function, argumentType, resultType, info.Arity)
+                    : ZaxInstruction.Call(function, argumentType, resultType, info.Arity));
                 Push(resultType);
                 return true;
             }

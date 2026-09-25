@@ -18,6 +18,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Vec2, Vec3, Vec4,
         Gt, Lt, Geq, Leq, Eq, Neq, Not,
         RgbToYuv, YuvToRgb, SrgbToLinear, LinearToSrgb,
+        Qmul, Qrotate, Qinverse, Qconjugate, Qaxisangle, Qeuler, Qlook, Qslerp, Qnlerp,
         Mmul, Madd, Msub, Mmulv, Mscale,
         Mtfpoint, Mtfdir,
         Mtranspose, Minverse, Mdet, Mtrace, Mdiagv,
@@ -25,6 +26,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Mdiag, Mtranslate, Mrotx, Mroty, Mrotz, Mrotaxis, Mroteuler, Mlookrot, Mouter,
         Mto2, Mto3, Mto4,
         Mdup, Mdrop, Mswap,
+        Mfromq, Qfromm,
     }
 
     public enum ZaxSignature : byte
@@ -35,6 +37,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         ReduceToScalar,
         Float3Only,
         Construct,
+        Fixed,
     }
 
     public enum ZaxFunctionKind : byte
@@ -49,6 +52,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         public readonly ZaxFunctionKind Kind;
         public readonly byte Arity;
         public readonly ZaxSignature Signature;
+        public readonly ZaxValueType[] ParameterTypes;
+        public readonly ZaxValueType FixedResultType;
 
         public ZaxFunctionInfo(ZaxFunction function, byte arity, ZaxSignature signature)
         {
@@ -56,6 +61,8 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             Kind = ZaxFunctionKind.Call;
             Arity = arity;
             Signature = signature;
+            ParameterTypes = null;
+            FixedResultType = default;
         }
 
         private ZaxFunctionInfo(ZaxFunction function, ZaxFunctionKind kind)
@@ -64,9 +71,23 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             Kind = kind;
             Arity = 0;
             Signature = default;
+            ParameterTypes = null;
+            FixedResultType = default;
+        }
+
+        private ZaxFunctionInfo(ZaxFunction function, ZaxValueType resultType, ZaxValueType[] parameterTypes)
+        {
+            Function = function;
+            Kind = ZaxFunctionKind.Call;
+            Arity = (byte)parameterTypes.Length;
+            Signature = ZaxSignature.Fixed;
+            ParameterTypes = parameterTypes;
+            FixedResultType = resultType;
         }
 
         public static ZaxFunctionInfo Matrix(ZaxFunction function) => new ZaxFunctionInfo(function, ZaxFunctionKind.Matrix);
+
+        public static ZaxFunctionInfo Fixed(ZaxFunction function, ZaxValueType resultType, params ZaxValueType[] parameterTypes) => new ZaxFunctionInfo(function, resultType, parameterTypes);
     }
 
     public static class ZaxFunctions
@@ -77,6 +98,9 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         private const ZaxSignature Rs = ZaxSignature.ReduceToScalar;
         private const ZaxSignature F3 = ZaxSignature.Float3Only;
         private const ZaxSignature Cn = ZaxSignature.Construct;
+        private const ZaxValueType Tf = ZaxValueType.Float;
+        private const ZaxValueType Tf3 = ZaxValueType.Float3;
+        private const ZaxValueType Tf4 = ZaxValueType.Float4;
 
         private static readonly ZaxFunctionInfo[] Table = BuildTable();
 
@@ -170,6 +194,17 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["Mdup"] = ZaxFunction.Mdup,
             ["Mdrop"] = ZaxFunction.Mdrop,
             ["Mswap"] = ZaxFunction.Mswap,
+            ["Qmul"] = ZaxFunction.Qmul,
+            ["Qrotate"] = ZaxFunction.Qrotate,
+            ["Qinverse"] = ZaxFunction.Qinverse,
+            ["Qconjugate"] = ZaxFunction.Qconjugate,
+            ["Qaxisangle"] = ZaxFunction.Qaxisangle,
+            ["Qeuler"] = ZaxFunction.Qeuler,
+            ["Qlook"] = ZaxFunction.Qlook,
+            ["Qslerp"] = ZaxFunction.Qslerp,
+            ["Qnlerp"] = ZaxFunction.Qnlerp,
+            ["Mfromq"] = ZaxFunction.Mfromq,
+            ["Qfromm"] = ZaxFunction.Qfromm,
         });
 
         private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
@@ -185,6 +220,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["X_AXIS"] = ZaxValue.FromFloat3(new float3(1.0f, 0.0f, 0.0f)),
             ["Y_AXIS"] = ZaxValue.FromFloat3(new float3(0.0f, 1.0f, 0.0f)),
             ["Z_AXIS"] = ZaxValue.FromFloat3(new float3(0.0f, 0.0f, 1.0f)),
+            ["Q_IDENTITY"] = ZaxValue.FromFloat4(new float4(0.0f, 0.0f, 0.0f, 1.0f)),
         });
 
         private static ZaxFunctionInfo[] BuildTable()
@@ -279,6 +315,17 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 ZaxFunctionInfo.Matrix(ZaxFunction.Mdup),
                 ZaxFunctionInfo.Matrix(ZaxFunction.Mdrop),
                 ZaxFunctionInfo.Matrix(ZaxFunction.Mswap),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qmul, Tf4, Tf4, Tf4),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qrotate, Tf3, Tf4, Tf3),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qinverse, Tf4, Tf4),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qconjugate, Tf4, Tf4),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qaxisangle, Tf4, Tf3, Tf),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qeuler, Tf4, Tf3),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qlook, Tf4, Tf3, Tf3),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qslerp, Tf4, Tf4, Tf4, Tf),
+                ZaxFunctionInfo.Fixed(ZaxFunction.Qnlerp, Tf4, Tf4, Tf4, Tf),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mfromq),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Qfromm),
             };
 
             var table = new ZaxFunctionInfo[Enum.GetValues(typeof(ZaxFunction)).Length];
@@ -349,6 +396,18 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     }
                     argumentType = ZaxValueType.Float;
                     resultType = ZaxValueTypeEx.OfDimension(info.Arity);
+                    return true;
+
+                case ZaxSignature.Fixed:
+                    for (var i = 0; i < arguments.Length; ++i)
+                    {
+                        var parameter = info.ParameterTypes[i];
+                        if (arguments[i] == parameter) continue;
+                        if (parameter == ZaxValueType.Float && arguments[i] == ZaxValueType.Int) continue;
+                        return false;
+                    }
+                    argumentType = ZaxValueType.Float4;
+                    resultType = info.FixedResultType;
                     return true;
 
                 default:

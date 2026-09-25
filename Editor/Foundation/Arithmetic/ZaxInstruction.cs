@@ -17,6 +17,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Over,
         Rot,
         Matrix,
+        Quaternion,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -40,6 +41,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         public static ZaxInstruction Constant(int index, ZaxValueType type) => new ZaxInstruction(ZaxOpCode.Constant, default, type, type, (ushort)index);
         public static ZaxInstruction Variable(int index, ZaxValueType type) => new ZaxInstruction(ZaxOpCode.Variable, default, type, type, (ushort)index);
         public static ZaxInstruction Call(ZaxFunction function, ZaxValueType argumentType, ZaxValueType resultType, int arity) => new ZaxInstruction(ZaxOpCode.Call, function, resultType, argumentType, (ushort)arity);
+        public static ZaxInstruction Quaternion(ZaxFunction function, ZaxValueType argumentType, ZaxValueType resultType, int arity) => new ZaxInstruction(ZaxOpCode.Quaternion, function, resultType, argumentType, (ushort)arity);
         public static ZaxInstruction Swizzle(ushort packed, ZaxValueType argumentType, ZaxValueType resultType) => new ZaxInstruction(ZaxOpCode.Swizzle, default, resultType, argumentType, packed);
         public static ZaxInstruction Convert(ZaxValueType argumentType, ZaxValueType resultType, int slot) => new ZaxInstruction(ZaxOpCode.Convert, default, resultType, argumentType, (ushort)slot);
         public static ZaxInstruction Unpack(ZaxValueType argumentType) => new ZaxInstruction(ZaxOpCode.Unpack, default, ZaxValueType.Float, argumentType, 0);
@@ -70,6 +72,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxOpCode.Constant: return $"Constant {Operand} -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Variable: return $"Variable {Operand} -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Call: return $"Call {Function}/{Operand} ({ArgumentType.DisplayName()}) -> {ResultType.DisplayName()}";
+                case ZaxOpCode.Quaternion: return $"Quaternion {Function}/{Operand} -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Swizzle: return $"Swizzle {Operand:X4} -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Convert: return $"Convert [{Operand}] -> {ResultType.DisplayName()}";
                 case ZaxOpCode.Unpack: return $"Unpack {ArgumentType.DisplayName()} -> {ArgumentType.Dimension()} x float";

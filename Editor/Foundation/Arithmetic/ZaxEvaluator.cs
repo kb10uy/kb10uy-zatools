@@ -136,6 +136,10 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     case ZaxOpCode.Matrix:
                         pointer = ApplyMatrix(instruction, stack, pointer);
                         break;
+
+                    case ZaxOpCode.Quaternion:
+                        pointer = ApplyQuaternion(instruction, stack, pointer);
+                        break;
                 }
             }
         }

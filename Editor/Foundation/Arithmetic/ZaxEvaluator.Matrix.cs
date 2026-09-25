@@ -251,6 +251,23 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     return pointer;
                 }
 
+                case ZaxFunction.Mfromq:
+                {
+                    var baseIndex = pointer - 1;
+                    var rotation = new float4x4(new float3x3(new quaternion(stack[baseIndex].AsFloat4)), float3.zero);
+                    StoreRows(stack + baseIndex, math.transpose(rotation), 3, resultType);
+                    return baseIndex + 3;
+                }
+
+                case ZaxFunction.Qfromm:
+                {
+                    var baseIndex = pointer - 3;
+                    var m = LoadRows(stack + baseIndex, 3);
+                    var rotation = new quaternion(new float3x3(math.transpose(m)));
+                    stack[baseIndex] = ZaxValue.FromFloat4(rotation.value);
+                    return baseIndex + 1;
+                }
+
                 default:
                     return pointer;
             }
