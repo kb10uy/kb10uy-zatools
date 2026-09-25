@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -110,13 +109,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private List<string> FetchBlendShapeNames()
         {
             var component = target as Runtime.AdHocBlendShapeMix;
-            var targetSkinnedMesh = component.GetComponent<SkinnedMeshRenderer>();
-            var sharedMesh = targetSkinnedMesh.sharedMesh;
-            if (sharedMesh == null) return new List<string>();
-
-            return Enumerable.Range(0, sharedMesh.blendShapeCount)
-                .Select((i) => sharedMesh.GetBlendShapeName(i))
-                .ToList();
+            return ZatoolsBlendShapeSelector.FetchBlendShapeNames(component.GetComponent<SkinnedMeshRenderer>().sharedMesh);
         }
 
         private List<float> FetchBlendShapeRelativeWeights()
@@ -153,81 +146,10 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             var fromField = item.Q<TextField>("FieldFromBlendShape");
             var toField = item.Q<TextField>("FieldToBlendShape");
-            var openFromPanelButton = item.Q<Button>("ButtonOpenFromBlendShapePanel");
-            var openToPanelButton = item.Q<Button>("ButtonOpenToBlendShapePanel");
-
-            openFromPanelButton.clicked += () => UnityEditor.PopupWindow.Show(openFromPanelButton.worldBound, new BlendShapeSelector(blendShapeNames, fromField));
-            openToPanelButton.clicked += () => UnityEditor.PopupWindow.Show(openToPanelButton.worldBound, new BlendShapeSelector(blendShapeNames, toField));
+            ZatoolsBlendShapeSelector.AttachTo(item.Q<Button>("ButtonOpenFromBlendShapePanel"), fromField, blendShapeNames);
+            ZatoolsBlendShapeSelector.AttachTo(item.Q<Button>("ButtonOpenToBlendShapePanel"), toField, blendShapeNames);
 
             return item;
-        }
-
-        internal sealed class BlendShapeSelector : PopupWindowContent
-        {
-            private IList<string> _names;
-            private TextField _boundField;
-
-            internal BlendShapeSelector(IList<string> names, TextField boundButton)
-            {
-                _names = names;
-                _boundField = boundButton;
-            }
-
-            public override void OnGUI(Rect rect)
-            {
-                // Keep empty
-            }
-
-            public override Vector2 GetWindowSize()
-            {
-                return new Vector2(200.0f, 320.0f);
-            }
-
-            public override void OnOpen()
-            {
-                var visualTree = ZatoolsResources.LoadVisualTreeByGuid("7bb58b5cddd547a4088117846bea5180");
-                var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("3013bdc0f3fd3274db3da3b0709626ff");
-
-                visualTree.CloneTree(editorWindow.rootVisualElement);
-
-                var blendShapeNameList = editorWindow.rootVisualElement.Q<ListView>("FieldBlendShapeNames");
-                blendShapeNameList.itemsSource = (IList)_names;
-                blendShapeNameList.makeItem = visualTreeItem.CloneTree;
-                blendShapeNameList.bindItem = (e, i) => OnBindItem(blendShapeNameList, e, i);
-                blendShapeNameList.selectedIndicesChanged += (idxs) => OnSelectionChanged(blendShapeNameList, idxs);
-                // ダブルクリックで閉じられるようにする
-                var doubleClick = new Clickable(() => editorWindow.Close());
-                doubleClick.activators.Clear();
-                doubleClick.activators.Add(new ManipulatorActivationFilter { button = MouseButton.LeftMouse, clickCount = 2 });
-                blendShapeNameList.AddManipulator(doubleClick);
-                // 初期選択
-                var initialSelect = _names.IndexOf(_boundField.text);
-                if (initialSelect != -1) blendShapeNameList.SetSelection(initialSelect);
-
-                var searchQueryField = editorWindow.rootVisualElement.Q<TextField>("FieldSearchQuery");
-                searchQueryField.RegisterCallback<ChangeEvent<string>>((ce) => OnUpdateSearchQuery(blendShapeNameList, ce.newValue));
-            }
-
-            private void OnBindItem(ListView listView, VisualElement itemElement, int index)
-            {
-                itemElement.Q<Label>("LabelName").text = listView.itemsSource[index] as string;
-            }
-
-            private void OnSelectionChanged(ListView listView, IEnumerable<int> selectionIndices)
-            {
-                var selectedIndex = selectionIndices.DefaultIfEmpty(-1).First();
-                if (selectedIndex == -1) return;
-                var boundItems = listView.itemsSource as IList<string>;
-                _boundField.value = boundItems[selectionIndices.First()];
-            }
-
-            private void OnUpdateSearchQuery(ListView listView, string newQuery)
-            {
-                var trimmedQuery = newQuery.Trim().ToLowerInvariant();
-                var filtered = trimmedQuery != "" ? _names.Where((n) => n.ToLowerInvariant().Contains(trimmedQuery)).ToList() : _names;
-                listView.ClearSelection();
-                listView.itemsSource = (IList)filtered;
-            }
         }
     }
 }

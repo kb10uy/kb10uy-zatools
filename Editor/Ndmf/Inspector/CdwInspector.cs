@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -47,11 +46,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var component = target as Runtime.ConvexDepthWrapper;
             var targetSkinnedMesh = component.GetComponent<SkinnedMeshRenderer>();
             var sharedMesh = component.SourceMeshRenderer != null ? component.SourceMeshRenderer.sharedMesh : targetSkinnedMesh.sharedMesh;
-            if (sharedMesh == null) return new List<string>();
-
-            return Enumerable.Range(0, sharedMesh.blendShapeCount)
-                .Select((i) => sharedMesh.GetBlendShapeName(i))
-                .ToList();
+            return ZatoolsBlendShapeSelector.FetchBlendShapeNames(sharedMesh);
         }
 
         private static VisualElement MakeOverrideItem(VisualTreeAsset visualTreeItem, List<string> blendShapeNames)
@@ -59,10 +54,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var item = visualTreeItem.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(item);
 
-            var nameField = item.Q<TextField>("FieldName");
-            var openFromPanelButton = item.Q<Button>("ButtonOpenBlendShapeNamePanel");
-
-            openFromPanelButton.clicked += () => UnityEditor.PopupWindow.Show(openFromPanelButton.worldBound, new AhbsmInspector.BlendShapeSelector(blendShapeNames, nameField));
+            ZatoolsBlendShapeSelector.AttachTo(item.Q<Button>("ButtonOpenBlendShapeNamePanel"), item.Q<TextField>("FieldName"), blendShapeNames);
 
             return item;
         }

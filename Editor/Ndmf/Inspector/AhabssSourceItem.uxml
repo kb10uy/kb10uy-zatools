@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; flex-basis: auto; align-items: stretch; margin-top: 2px; margin-bottom: 2px; margin-left: 4px;">
+        <ui:TextField picking-mode="Ignore" name="FieldName" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-grow: 1; flex-basis: 0;" />
+        <ui:Button text="..." parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonOpenBlendShapeNamePanel" style="margin-top: 0; margin-right: 4px; margin-bottom: 0; margin-left: 0; padding-right: 4px; padding-left: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>

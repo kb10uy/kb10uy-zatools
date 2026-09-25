@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -19,11 +20,21 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         protected override VisualElement CreateInspectorGUIImpl()
         {
+            var blendShapeNames = FetchBlendShapeNames();
             var visualTree = ZatoolsResources.LoadVisualTreeByGuid("b524fe7c232948bf842dded020757c61");
+            var visualTreeSourceItem = ZatoolsResources.LoadVisualTreeByGuid("0a0a62bee17d452a819a1516cf4a7411");
             var visualTreeItem = ZatoolsResources.LoadVisualTreeByGuid("7095b39550a946b5a3974de7e307c855");
 
             var inspector = visualTree.CloneTree();
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
+
+            // string 配列の要素に独自アイテムを使うので、バインド前に bindItem を差し替えておく
+            var sourcesList = inspector.Q<ListView>("FieldSourceBlendShapes");
+            sourcesList.makeItem = () => MakeSourceItem(visualTreeSourceItem, blendShapeNames);
+            sourcesList.bindItem = BindSourceItem;
+            sourcesList.unbindItem = UnbindSourceItem;
+            sourcesList.itemsAdded += ResetAddedSources;
+
             inspector.Bind(serializedObject);
 
             inspector.Q<Label>("LabelVariables").text = FormatVariables(Ahabss.BaseVariables);
@@ -38,6 +49,41 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             entriesList.itemsAdded += ResetAddedEntries;
 
             return inspector;
+        }
+
+        private List<string> FetchBlendShapeNames()
+        {
+            var component = target as AdHocAdvancedBlendShapeSynthesis;
+            return ZatoolsBlendShapeSelector.FetchBlendShapeNames(component.GetComponent<SkinnedMeshRenderer>().sharedMesh);
+        }
+
+        private static VisualElement MakeSourceItem(VisualTreeAsset visualTreeSourceItem, List<string> blendShapeNames)
+        {
+            var item = visualTreeSourceItem.CloneTree();
+            ZatoolsBlendShapeSelector.AttachTo(item.Q<Button>("ButtonOpenBlendShapeNamePanel"), item.Q<TextField>("FieldName"), blendShapeNames);
+            return item;
+        }
+
+        private void BindSourceItem(VisualElement item, int index)
+        {
+            var sources = serializedObject.FindProperty(nameof(AdHocAdvancedBlendShapeSynthesis.SourceBlendShapes));
+            if (index < 0 || index >= sources.arraySize) return;
+            item.Q<TextField>("FieldName").BindProperty(sources.GetArrayElementAtIndex(index));
+        }
+
+        private static void UnbindSourceItem(VisualElement item, int index)
+        {
+            item.Q<TextField>("FieldName").Unbind();
+        }
+
+        private void ResetAddedSources(IEnumerable<int> indices)
+        {
+            var sources = serializedObject.FindProperty(nameof(AdHocAdvancedBlendShapeSynthesis.SourceBlendShapes));
+            foreach (var index in indices)
+            {
+                sources.GetArrayElementAtIndex(index).stringValue = string.Empty;
+            }
+            serializedObject.ApplyModifiedProperties();
         }
 
         private VisualElement MakeEntryItem(VisualTreeAsset visualTreeItem)
