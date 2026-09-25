@@ -37,18 +37,36 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Construct,
     }
 
+    public enum ZaxFunctionKind : byte
+    {
+        Call,
+        Matrix,
+    }
+
     public readonly struct ZaxFunctionInfo
     {
         public readonly ZaxFunction Function;
+        public readonly ZaxFunctionKind Kind;
         public readonly byte Arity;
         public readonly ZaxSignature Signature;
 
         public ZaxFunctionInfo(ZaxFunction function, byte arity, ZaxSignature signature)
         {
             Function = function;
+            Kind = ZaxFunctionKind.Call;
             Arity = arity;
             Signature = signature;
         }
+
+        private ZaxFunctionInfo(ZaxFunction function, ZaxFunctionKind kind)
+        {
+            Function = function;
+            Kind = kind;
+            Arity = 0;
+            Signature = default;
+        }
+
+        public static ZaxFunctionInfo Matrix(ZaxFunction function) => new ZaxFunctionInfo(function, ZaxFunctionKind.Matrix);
     }
 
     public static class ZaxFunctions
@@ -231,6 +249,36 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.YuvToRgb, 1, F3),
                 new ZaxFunctionInfo(ZaxFunction.SrgbToLinear, 1, Ef),
                 new ZaxFunctionInfo(ZaxFunction.LinearToSrgb, 1, Ef),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mmul),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Madd),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Msub),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mmulv),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mscale),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mtfpoint),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mtfdir),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mtranspose),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Minverse),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mdet),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mtrace),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mdiagv),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Midentity2),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Midentity3),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Midentity4),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mdiag),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mtranslate),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mrotx),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mroty),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mrotz),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mrotaxis),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mroteuler),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mlookrot),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mouter),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mto2),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mto3),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mto4),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mdup),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mdrop),
+                ZaxFunctionInfo.Matrix(ZaxFunction.Mswap),
             };
 
             var table = new ZaxFunctionInfo[Enum.GetValues(typeof(ZaxFunction)).Length];
@@ -240,7 +288,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
         public static ZaxFunctionInfo Info(ZaxFunction function) => Table[(int)function];
 
-        public static bool IsMatrix(ZaxFunction function) => function >= ZaxFunction.Mmul;
+        public static bool IsMatrix(ZaxFunction function) => Table[(int)function].Kind == ZaxFunctionKind.Matrix;
 
         public static bool TryLookup(string name, out ZaxFunction function) => NameTable.TryGetValue(name, out function);
 
