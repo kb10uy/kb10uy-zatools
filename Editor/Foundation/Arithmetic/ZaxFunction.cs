@@ -18,6 +18,13 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         Vec2, Vec3, Vec4,
         Gt, Lt, Geq, Leq, Eq, Neq, Not,
         RgbToYuv, YuvToRgb, SrgbToLinear, LinearToSrgb,
+        Mmul, Madd, Msub, Mmulv, Mscale,
+        Mtfpoint, Mtfdir,
+        Mtranspose, Minverse, Mdet, Mtrace, Mdiagv,
+        Midentity2, Midentity3, Midentity4,
+        Mdiag, Mtranslate, Mrotx, Mroty, Mrotz, Mrotaxis, Mroteuler, Mlookrot, Mouter,
+        Mto2, Mto3, Mto4,
+        Mdup, Mdrop, Mswap,
     }
 
     public enum ZaxSignature : byte
@@ -115,6 +122,36 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             ["yuv2rgb"] = ZaxFunction.YuvToRgb,
             ["srgb2linear"] = ZaxFunction.SrgbToLinear,
             ["linear2srgb"] = ZaxFunction.LinearToSrgb,
+            ["Mmul"] = ZaxFunction.Mmul, ["M*"] = ZaxFunction.Mmul,
+            ["Madd"] = ZaxFunction.Madd, ["M+"] = ZaxFunction.Madd,
+            ["Msub"] = ZaxFunction.Msub, ["M-"] = ZaxFunction.Msub,
+            ["Mmulv"] = ZaxFunction.Mmulv,
+            ["Mscale"] = ZaxFunction.Mscale,
+            ["Mtfpoint"] = ZaxFunction.Mtfpoint,
+            ["Mtfdir"] = ZaxFunction.Mtfdir,
+            ["Mtranspose"] = ZaxFunction.Mtranspose,
+            ["Minverse"] = ZaxFunction.Minverse,
+            ["Mdet"] = ZaxFunction.Mdet,
+            ["Mtrace"] = ZaxFunction.Mtrace,
+            ["Mdiagv"] = ZaxFunction.Mdiagv,
+            ["Midentity2"] = ZaxFunction.Midentity2,
+            ["Midentity3"] = ZaxFunction.Midentity3,
+            ["Midentity4"] = ZaxFunction.Midentity4,
+            ["Mdiag"] = ZaxFunction.Mdiag,
+            ["Mtranslate"] = ZaxFunction.Mtranslate,
+            ["Mrotx"] = ZaxFunction.Mrotx,
+            ["Mroty"] = ZaxFunction.Mroty,
+            ["Mrotz"] = ZaxFunction.Mrotz,
+            ["Mrotaxis"] = ZaxFunction.Mrotaxis,
+            ["Mroteuler"] = ZaxFunction.Mroteuler,
+            ["Mlookrot"] = ZaxFunction.Mlookrot,
+            ["Mouter"] = ZaxFunction.Mouter,
+            ["Mto2"] = ZaxFunction.Mto2,
+            ["Mto3"] = ZaxFunction.Mto3,
+            ["Mto4"] = ZaxFunction.Mto4,
+            ["Mdup"] = ZaxFunction.Mdup,
+            ["Mdrop"] = ZaxFunction.Mdrop,
+            ["Mswap"] = ZaxFunction.Mswap,
         });
 
         private static readonly ImmutableDictionary<string, ZaxValue> ConstantTable = ImmutableDictionary<string, ZaxValue>.Empty.AddRange(new Dictionary<string, ZaxValue>
@@ -196,12 +233,14 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 new ZaxFunctionInfo(ZaxFunction.LinearToSrgb, 1, Ef),
             };
 
-            var table = new ZaxFunctionInfo[entries.Length];
+            var table = new ZaxFunctionInfo[Enum.GetValues(typeof(ZaxFunction)).Length];
             foreach (var entry in entries) table[(int)entry.Function] = entry;
             return table;
         }
 
         public static ZaxFunctionInfo Info(ZaxFunction function) => Table[(int)function];
+
+        public static bool IsMatrix(ZaxFunction function) => function >= ZaxFunction.Mmul;
 
         public static bool TryLookup(string name, out ZaxFunction function) => NameTable.TryGetValue(name, out function);
 

@@ -445,8 +445,8 @@ msgstr "Unknown variable \"@{0}\"."
 msgid "zax.diagnostic.not-enough-operands"
 msgstr "\"{0}\" requires {1} operand(s), but only {2} are on the stack."
 
-msgid "zax.diagnostic.extra-operands"
-msgstr "\"{0}\" leaves {1} values on the stack; the expression must produce exactly one."
+msgid "zax.diagnostic.result-count-mismatch"
+msgstr "This expression must produce {0} value(s), but it leaves {1} on the stack."
 
 msgid "zax.diagnostic.type-mismatch"
 msgstr "\"{0}\" cannot be applied to ({1})."
@@ -462,6 +462,9 @@ msgstr "This expression must produce {0}, but it produces {1}."
 
 msgid "zax.diagnostic.unpack-on-scalar"
 msgstr "\"{0}\" cannot be applied to {1} because it is not a vector."
+
+msgid "zax.diagnostic.matrix-shape-mismatch"
+msgstr "\"{0}\" expects ({1}) on the stack, but found ({2})."
 
 msgid "zax.report.compile-error"
 msgstr "Zax: could not compile an expression"

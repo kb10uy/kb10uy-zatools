@@ -150,7 +150,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             Program = compiled ? program : null;
             _status.text = compiled
-                ? $"→ {program.ResultType.DisplayName()}"
+                ? $"→ {program.ResultDisplayName}"
                 : ZatoolsLocalization.LocalizeZaxDiagnostic(_diagnostics[0]);
             _status.EnableInClassList("zax-expression__status--error", !compiled);
         }
