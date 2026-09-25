@@ -349,6 +349,12 @@ msgstr "Available Variables"
 msgid "ahabss.inspector.variables-sources"
 msgstr "@vN, @nN, @tN: float3 - vertex, normal and tangent deltas of the N-th Source BlendShape"
 
+msgid "ahabss.report.duplicate-name"
+msgstr "Advanced BlendShape Synthesis: BlendShape name already exists"
+
+msgid "ahabss.report.duplicate-name:description"
+msgstr "The BlendShape \"{0}\" already exists on the mesh, so the entry was skipped. Existing BlendShapes are never overwritten."
+
 msgid "ahabss.inspector.result"
 msgstr "The expression must leave three float3 values: vertex delta, normal delta and tangent delta"
 
@@ -489,12 +495,6 @@ msgstr "\"{0}\" cannot be applied to {1} because it is not a vector."
 
 msgid "zax.diagnostic.matrix-shape-mismatch"
 msgstr "\"{0}\" expects ({1}) on the stack, but found ({2})."
-
-msgid "ahabss.report.duplicate-name"
-msgstr "Advanced BlendShape Synthesis: BlendShape name already exists"
-
-msgid "ahabss.report.duplicate-name:description"
-msgstr "The BlendShape \"{0}\" already exists on the mesh, so the entry was skipped. Existing BlendShapes are never overwritten."
 
 msgid "zax.report.compile-error"
 msgstr "Zax: could not compile an expression"
