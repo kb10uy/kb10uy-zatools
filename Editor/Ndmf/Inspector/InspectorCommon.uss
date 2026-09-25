@@ -40,3 +40,15 @@
 .ahamd-step .zax-expression__variables {
     padding-left: 166px;
 }
+
+.ahabss-entry .unity-base-field__label {
+    width: 160px;
+}
+
+.ahabss-entry .zax-expression__status {
+    padding-left: 166px;
+}
+
+.ahabss-entry .zax-expression__variables {
+    padding-left: 166px;
+}

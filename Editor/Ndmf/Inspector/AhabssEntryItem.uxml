@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="VisualElement" class="ahabss-entry" style="flex-grow: 1; flex-basis: auto; margin-top: 2px; margin-bottom: 2px; margin-right: 4px;">
+        <ui:TextField label="ahabss.inspector.entry-name" binding-path="Name" name="FieldName" class="ndmf-tr" />
+        <ui:Slider label="ahabss.inspector.entry-value" high-value="100" binding-path="Value" name="FieldValue" show-input-field="true" class="ndmf-tr" />
+        <KusakaFactory.Zatools.Ndmf.Inspector.ZatoolsZaxExpressionField label="ahabss.inspector.expression" binding-path="Expression" name="FieldExpression" />
+    </ui:VisualElement>
+</ui:UXML>

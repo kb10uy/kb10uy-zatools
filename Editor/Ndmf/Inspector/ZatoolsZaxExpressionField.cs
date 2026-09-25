@@ -67,11 +67,11 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private readonly Label _status;
         private readonly Label _variables;
         private readonly List<ZaxDiagnostic> _diagnostics = new List<ZaxDiagnostic>();
-        private Func<ZaxValueType?> _expectedType;
+        private Func<IReadOnlyList<ZaxValueType>> _expectedTypes;
         private ZaxVariable[] _declaredVariables = Array.Empty<ZaxVariable>();
         private bool _revalidated;
         private string _revalidatedSource;
-        private ZaxValueType? _revalidatedExpectedType;
+        private ZaxValueType[] _revalidatedExpectedTypes;
 
         internal ZaxProgram Program { get; private set; }
 
@@ -103,12 +103,22 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         internal void Configure(ZaxValueType? expectedType, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
         {
-            Configure(() => expectedType, variables, showVariables);
+            Configure(ToExpectedTypes(expectedType), variables, showVariables);
         }
 
         internal void Configure(Func<ZaxValueType?> expectedType, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
         {
-            _expectedType = expectedType;
+            Configure(() => ToExpectedTypes(expectedType()), variables, showVariables);
+        }
+
+        internal void Configure(IReadOnlyList<ZaxValueType> expectedTypes, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
+        {
+            Configure(() => expectedTypes, variables, showVariables);
+        }
+
+        internal void Configure(Func<IReadOnlyList<ZaxValueType>> expectedTypes, IReadOnlyList<ZaxVariable> variables, bool showVariables = true)
+        {
+            _expectedTypes = expectedTypes;
             _declaredVariables = variables != null ? variables.ToArray() : Array.Empty<ZaxVariable>();
 
             _variables.text = string.Join("\n", _declaredVariables.Select((v) => $"@{v.Name}: {v.Type.DisplayName()}"));
@@ -126,17 +136,17 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             if (_revalidated
                 && string.Equals(_revalidatedSource, _input.value, StringComparison.Ordinal)
-                && _revalidatedExpectedType == ResolveExpectedType()) return;
+                && SameExpectedTypes(_revalidatedExpectedTypes, ResolveExpectedTypes())) return;
             RevalidateForced();
         }
 
         private void RevalidateForced()
         {
             var source = _input.value;
-            var expectedType = ResolveExpectedType();
+            var expectedTypes = ResolveExpectedTypes();
             _revalidated = true;
             _revalidatedSource = source;
-            _revalidatedExpectedType = expectedType;
+            _revalidatedExpectedTypes = expectedTypes;
             if (string.IsNullOrWhiteSpace(source))
             {
                 Program = null;
@@ -146,7 +156,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             }
 
             _diagnostics.Clear();
-            var compiled = ZaxCompiler.TryCompile(source, _declaredVariables, expectedType, _diagnostics, out var program);
+            var compiled = ZaxCompiler.TryCompile(source, _declaredVariables, expectedTypes, _diagnostics, out var program);
 
             Program = compiled ? program : null;
             _status.text = compiled
@@ -155,9 +165,21 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _status.EnableInClassList("zax-expression__status--error", !compiled);
         }
 
-        private ZaxValueType? ResolveExpectedType()
+        private ZaxValueType[] ResolveExpectedTypes()
         {
-            return _expectedType != null ? _expectedType() : null;
+            var expectedTypes = _expectedTypes?.Invoke();
+            return expectedTypes?.ToArray();
+        }
+
+        private static ZaxValueType[] ToExpectedTypes(ZaxValueType? expectedType)
+        {
+            return expectedType.HasValue ? new[] { expectedType.Value } : null;
+        }
+
+        private static bool SameExpectedTypes(ZaxValueType[] lhs, ZaxValueType[] rhs)
+        {
+            if (lhs == null || rhs == null) return lhs == rhs;
+            return lhs.SequenceEqual(rhs);
         }
     }
 }

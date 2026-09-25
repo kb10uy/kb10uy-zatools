@@ -328,6 +328,30 @@ msgstr "@mask: float4 - sampled Selection Mask Texture (Vertex Selection only)"
 msgid "ahamd.inspector.variables-texture"
 msgstr "@texture: float4 - sampled Extra Texture (Modification Steps only)"
 
+msgid "ahabss.inspector.sources"
+msgstr "Source BlendShapes"
+
+msgid "ahabss.inspector.entries"
+msgstr "Synthesized BlendShapes"
+
+msgid "ahabss.inspector.entry-name"
+msgstr "Name"
+
+msgid "ahabss.inspector.entry-value"
+msgstr "Initial Weight"
+
+msgid "ahabss.inspector.expression"
+msgstr "ZAX Expression"
+
+msgid "ahabss.inspector.variables"
+msgstr "Available Variables"
+
+msgid "ahabss.inspector.variables-sources"
+msgstr "@vN, @nN, @tN: float3 - vertex, normal and tangent deltas of the N-th Source BlendShape"
+
+msgid "ahabss.inspector.result"
+msgstr "The expression must leave three float3 values: vertex delta, normal delta and tangent delta"
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 
