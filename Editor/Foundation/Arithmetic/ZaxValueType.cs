@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
@@ -71,6 +73,24 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 case ZaxValueType.Float4: return "float4";
                 default: return "<invalid>";
             }
+        }
+
+        public static string DisplayName(ReadOnlySpan<ZaxValueType> types)
+        {
+            if (types.Length == 0) return "<none>";
+            if (types.Length == 1) return types[0].DisplayName();
+
+            var uniform = true;
+            for (var i = 1; i < types.Length; ++i) uniform &= types[i] == types[0];
+            if (uniform) return $"{types[0].DisplayName()} x {types.Length}";
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < types.Length; ++i)
+            {
+                if (i > 0) builder.Append(", ");
+                builder.Append(types[i].DisplayName());
+            }
+            return builder.ToString();
         }
     }
 }

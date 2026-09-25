@@ -11,6 +11,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         {
             "+", "-", "*", "/", "//", "%", "...",
             ">", "<", ">=", "<=", "==", "!=", "!",
+            "M*", "M+", "M-",
         });
 
         private const char CommentPrefix = ';';

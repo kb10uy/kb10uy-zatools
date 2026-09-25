@@ -187,7 +187,7 @@ namespace KusakaFactory.Zatools.EditorExtension
             var variables = declared.Select((v) => v.ToVariable()).ToArray();
 
             _diagnostics.Clear();
-            if (!ZaxCompiler.TryCompile(source, variables, null, _diagnostics, out var program))
+            if (!ZaxCompiler.TryCompile(source, variables, (IReadOnlyList<ZaxValueType>)null, _diagnostics, out var program))
             {
                 SetStatus(ZatoolsLocalization.LocalizeZaxDiagnostic(_diagnostics[0]), true);
                 _result.text = string.Empty;
@@ -195,7 +195,7 @@ namespace KusakaFactory.Zatools.EditorExtension
                 return;
             }
 
-            SetStatus($"→ {program.ResultType.DisplayName()}", false);
+            SetStatus($"→ {program.ResultDisplayName}", false);
             var values = new ZaxValue[program.Variables.Length];
             for (var i = 0; i < values.Length; ++i)
             {
@@ -203,7 +203,9 @@ namespace KusakaFactory.Zatools.EditorExtension
                 var entry = declared.FirstOrDefault((v) => v.Name == referencedName);
                 values[i] = entry != null ? entry.ToValue() : default;
             }
-            _result.text = ZaxEvaluator.Evaluate(program, values).ToString();
+            var results = new ZaxValue[program.ResultCount];
+            ZaxEvaluator.Evaluate(program, values, results);
+            _result.text = string.Join("\n", results);
             _disassembly.SetValueWithoutNotify(program.Disassemble());
         }
 

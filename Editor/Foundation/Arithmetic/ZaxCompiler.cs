@@ -35,6 +35,17 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             List<ZaxDiagnostic> diagnostics,
             out ZaxProgram program)
         {
+            var expected = expectedResultType.HasValue ? new[] { expectedResultType.Value } : null;
+            return TryCompile(source, variables, expected, diagnostics, out program);
+        }
+
+        public static bool TryCompile(
+            string source,
+            IReadOnlyList<ZaxVariable> variables,
+            IReadOnlyList<ZaxValueType> expectedResultTypes,
+            List<ZaxDiagnostic> diagnostics,
+            out ZaxProgram program)
+        {
             program = null;
             var declaredVariables = variables != null ? variables.ToArray() : Array.Empty<ZaxVariable>();
 
@@ -98,9 +109,59 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 }
 
                 typeStack.RemoveRange(baseIndex, info.Arity);
-                instructions.Add(ZaxInstruction.Call(function, argumentType, resultType, info.Arity));
+                instructions.Add(info.Signature == ZaxSignature.Fixed
+                    ? ZaxInstruction.Quaternion(function, argumentType, resultType, info.Arity)
+                    : ZaxInstruction.Call(function, argumentType, resultType, info.Arity));
                 Push(resultType);
                 return true;
+            }
+
+            bool EmitMatrix(ZaxFunction function, ZaxToken token)
+            {
+                var stackTypes = typeStack.ToArray();
+                var inference = ZaxMatrixFunctions.Infer(function, stackTypes, out var effect, out var required, out var expectedShape);
+                switch (inference)
+                {
+                    case ZaxMatrixInference.NotEnoughOperands:
+                        diagnostics.Add(new ZaxDiagnostic(
+                            ZaxDiagnosticCode.NotEnoughOperands, token,
+                            token.Text, required.ToString(), typeStack.Count.ToString()));
+                        return false;
+                    case ZaxMatrixInference.ShapeMismatch:
+                    {
+                        var examined = Math.Min(required, stackTypes.Length);
+                        var actual = ZaxValueTypeEx.DisplayName(new ReadOnlySpan<ZaxValueType>(stackTypes, stackTypes.Length - examined, examined));
+                        diagnostics.Add(new ZaxDiagnostic(
+                            ZaxDiagnosticCode.MatrixShapeMismatch, token,
+                            token.Text, expectedShape, actual));
+                        return false;
+                    }
+                }
+
+                var baseIndex = typeStack.Count - effect.Consumed;
+                if (function == ZaxFunction.Mswap)
+                {
+                    var top = effect.Dimension;
+                    var below = effect.SecondDimension;
+                    var topType = typeStack[typeStack.Count - 1];
+                    var belowType = typeStack[baseIndex];
+                    for (var i = 0; i < top; ++i) typeStack[baseIndex + i] = topType;
+                    for (var i = 0; i < below; ++i) typeStack[baseIndex + top + i] = belowType;
+                }
+                else
+                {
+                    typeStack.RemoveRange(baseIndex, effect.Consumed);
+                    for (var i = 0; i < effect.Produced; ++i) Push(effect.ResultType);
+                }
+
+                instructions.Add(ZaxInstruction.Matrix(function, effect.ArgumentType, effect.ResultType, effect.Dimension, effect.SecondDimension));
+                return true;
+            }
+
+            bool EmitFunction(ZaxFunction function, ZaxToken token)
+            {
+                if (ZaxFunctions.IsMatrix(function)) return EmitMatrix(function, token);
+                return EmitCall(function, token);
             }
 
             bool EmitSwizzle(ZaxToken token)
@@ -239,7 +300,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                             diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownName, token, token.Text));
                             return false;
                         }
-                        if (!EmitCall(symbolFunction, token)) return false;
+                        if (!EmitFunction(symbolFunction, token)) return false;
                         break;
 
                     case ZaxTokenKind.Variable:
@@ -265,11 +326,11 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     case ZaxTokenKind.Identifier:
                         {
                             if (token.Text == UnpackName)
-                        {
-                            if (!EmitUnpack(token)) return false;
-                            break;
-                        }
-                        if (StackOperations.TryGetValue(token.Text, out var stackOperation))
+                            {
+                                if (!EmitUnpack(token)) return false;
+                                break;
+                            }
+                            if (StackOperations.TryGetValue(token.Text, out var stackOperation))
                             {
                                 if (!EmitStackOperation(stackOperation, token)) return false;
                                 break;
@@ -281,7 +342,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                             }
                             if (ZaxFunctions.TryLookup(token.Text, out var namedFunction))
                             {
-                                if (!EmitCall(namedFunction, token)) return false;
+                                if (!EmitFunction(namedFunction, token)) return false;
                                 break;
                             }
                             diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.UnknownName, token, token.Text));
@@ -295,28 +356,34 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 diagnostics.Add(new ZaxDiagnostic(ZaxDiagnosticCode.EmptyExpression, 0, source?.Length ?? 0));
                 return false;
             }
-            if (typeStack.Count > 1)
+
+            if (expectedResultTypes != null)
             {
                 var last = tokens[tokens.Count - 1];
-                diagnostics.Add(new ZaxDiagnostic(
-                    ZaxDiagnosticCode.ExtraOperands, last, last.Text, typeStack.Count.ToString()));
-                return false;
-            }
-
-            var producedType = typeStack[0];
-            if (expectedResultType.HasValue && expectedResultType.Value != producedType)
-            {
-                var expected = expectedResultType.Value;
-                if (!IsImplicitlyConvertible(producedType, expected))
+                if (typeStack.Count != expectedResultTypes.Count)
                 {
-                    var last = tokens[tokens.Count - 1];
                     diagnostics.Add(new ZaxDiagnostic(
-                        ZaxDiagnosticCode.ResultTypeMismatch, last.Offset, last.Length,
-                        expected.DisplayName(), producedType.DisplayName()));
+                        ZaxDiagnosticCode.ResultCountMismatch, last,
+                        expectedResultTypes.Count.ToString(), typeStack.Count.ToString()));
                     return false;
                 }
-                instructions.Add(ZaxInstruction.Convert(producedType, expected));
-                producedType = expected;
+
+                for (var i = 0; i < expectedResultTypes.Count; ++i)
+                {
+                    var expected = expectedResultTypes[i];
+                    var produced = typeStack[i];
+                    if (expected == produced) continue;
+                    if (!IsImplicitlyConvertible(produced, expected))
+                    {
+                        diagnostics.Add(new ZaxDiagnostic(
+                            ZaxDiagnosticCode.ResultTypeMismatch, last.Offset, last.Length,
+                            ZaxValueTypeEx.DisplayName(expectedResultTypes.ToArray()),
+                            ZaxValueTypeEx.DisplayName(typeStack.ToArray())));
+                        return false;
+                    }
+                    instructions.Add(ZaxInstruction.Convert(produced, expected, i));
+                    typeStack[i] = expected;
+                }
             }
 
             program = new ZaxProgram(
@@ -325,7 +392,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 constants.ToArray(),
                 referencedVariables.ToArray(),
                 maxStackSize,
-                producedType);
+                typeStack.ToArray());
             return true;
         }
 

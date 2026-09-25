@@ -14,7 +14,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         public NativeArray<ZaxValueType> VariableTypes;
         public int VariableCount;
         public int StackSize;
-        public ZaxValueType ResultType;
+        public int ResultCount;
 
         public bool IsCreated => Instructions.IsCreated;
 
@@ -44,13 +44,13 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 VariableTypes = variableTypes,
                 VariableCount = program.Variables.Length,
                 StackSize = program.StackSize,
-                ResultType = program.ResultType,
+                ResultCount = program.ResultCount,
             };
         }
 
-        public ZaxValue Evaluate(ZaxValue* variables, ZaxValue* stack)
+        public void Evaluate(ZaxValue* variables, ZaxValue* stack)
         {
-            return ZaxEvaluator.Execute(
+            ZaxEvaluator.Execute(
                 (ZaxInstruction*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(Instructions),
                 Instructions.Length,
                 (ZaxValue*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(Constants),

@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace KusakaFactory.Zatools.Foundation.Arithmetic
 {
-    public static unsafe class ZaxEvaluator
+    public static unsafe partial class ZaxEvaluator
     {
         public static ZaxValue Evaluate(ZaxProgram program)
         {
@@ -12,11 +12,29 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
 
         public static ZaxValue Evaluate(ZaxProgram program, ReadOnlySpan<ZaxValue> variables)
         {
+            if (program.ResultCount != 1)
+            {
+                throw new ArgumentException($"program produces {program.ResultCount} values; use the overload that takes a results span", nameof(program));
+            }
+
             Span<ZaxValue> stack = stackalloc ZaxValue[math.max(program.StackSize, 1)];
-            return Execute(program.Instructions, program.Constants, variables, stack);
+            Execute(program.Instructions, program.Constants, variables, stack);
+            return stack[0];
         }
 
-        public static ZaxValue Execute(
+        public static void Evaluate(ZaxProgram program, ReadOnlySpan<ZaxValue> variables, Span<ZaxValue> results)
+        {
+            if (results.Length < program.ResultCount)
+            {
+                throw new ArgumentException($"program produces {program.ResultCount} values but only {results.Length} slot(s) were given", nameof(results));
+            }
+
+            Span<ZaxValue> stack = stackalloc ZaxValue[math.max(program.StackSize, 1)];
+            Execute(program.Instructions, program.Constants, variables, stack);
+            stack.Slice(0, program.ResultCount).CopyTo(results);
+        }
+
+        public static void Execute(
             ReadOnlySpan<ZaxInstruction> instructions,
             ReadOnlySpan<ZaxValue> constants,
             ReadOnlySpan<ZaxValue> variables,
@@ -27,11 +45,11 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             fixed (ZaxValue* variablesPointer = variables)
             fixed (ZaxValue* stackPointer = stack)
             {
-                return Execute(instructionsPointer, instructions.Length, constantsPointer, variablesPointer, stackPointer);
+                Execute(instructionsPointer, instructions.Length, constantsPointer, variablesPointer, stackPointer);
             }
         }
 
-        public static ZaxValue Execute(
+        public static void Execute(
             ZaxInstruction* instructions,
             int instructionCount,
             ZaxValue* constants,
@@ -53,7 +71,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         break;
 
                     case ZaxOpCode.Convert:
-                        stack[pointer - 1] = stack[pointer - 1].ConvertTo(instruction.ResultType);
+                        stack[instruction.Operand] = stack[instruction.Operand].ConvertTo(instruction.ResultType);
                         break;
 
                     case ZaxOpCode.Swizzle:
@@ -114,10 +132,16 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         pointer = baseIndex + 1;
                         break;
                     }
+
+                    case ZaxOpCode.Matrix:
+                        pointer = ApplyMatrix(instruction, stack, pointer);
+                        break;
+
+                    case ZaxOpCode.Quaternion:
+                        pointer = ApplyQuaternion(instruction, stack, pointer);
+                        break;
                 }
             }
-
-            return stack[0];
         }
 
         private static float4 Boolean(bool4 mask) => math.select(float4.zero, new float4(1.0f), mask);

@@ -12,8 +12,9 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
         [ReadOnly] public NativeArray<ZaxInstruction> Instructions;
         [ReadOnly] public NativeArray<ZaxValue> Constants;
         [ReadOnly] public NativeArray<ZaxVariableBinding> Bindings;
-        [WriteOnly] public NativeArray<ZaxValue> Results;
+        [NativeDisableParallelForRestriction] [WriteOnly] public NativeArray<ZaxValue> Results;
         public int VariableCount;
+        public int ResultCount;
 
         public void Execute(int index)
         {
@@ -23,12 +24,15 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             var bindings = (ZaxVariableBinding*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(Bindings);
             for (var i = 0; i < VariableCount; ++i) variables[i] = bindings[i].Read(index);
 
-            Results[index] = ZaxEvaluator.Execute(
+            ZaxEvaluator.Execute(
                 (ZaxInstruction*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(Instructions),
                 Instructions.Length,
                 (ZaxValue*)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(Constants),
                 variables,
                 stack);
+
+            var resultBase = index * ResultCount;
+            for (var i = 0; i < ResultCount; ++i) Results[resultBase + i] = stack[i];
         }
 
         public static ZaxEvaluateJob Create(
@@ -45,6 +49,13 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                     $"expression declares {program.VariableCount} variable(s) but {bindings.Length} binding(s) were given",
                     nameof(bindings));
             }
+            if (results.Length % program.ResultCount != 0)
+            {
+                throw new ArgumentException(
+                    $"expression produces {program.ResultCount} value(s) per element but {results.Length} result slot(s) were given",
+                    nameof(results));
+            }
+            var elementCount = results.Length / program.ResultCount;
 
             for (var i = 0; i < bindings.Length; ++i)
             {
@@ -56,10 +67,10 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                         $"binding {i} is {binding.Type.DisplayName()} but the expression declares {declared.DisplayName()}",
                         nameof(bindings));
                 }
-                if (!binding.IsUniform && binding.Length < results.Length)
+                if (!binding.IsUniform && binding.Length < elementCount)
                 {
                     throw new ArgumentException(
-                        $"binding {i} holds {binding.Length} element(s) but {results.Length} are required",
+                        $"binding {i} holds {binding.Length} element(s) but {elementCount} are required",
                         nameof(bindings));
                 }
             }
@@ -71,6 +82,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
                 Bindings = bindings,
                 Results = results,
                 VariableCount = program.VariableCount,
+                ResultCount = program.ResultCount,
             };
         }
 
@@ -81,7 +93,7 @@ namespace KusakaFactory.Zatools.Foundation.Arithmetic
             int innerloopBatchCount = 64,
             JobHandle dependency = default)
         {
-            return Create(program, bindings, results).Schedule(results.Length, innerloopBatchCount, dependency);
+            return Create(program, bindings, results).Schedule(results.Length / program.ResultCount, innerloopBatchCount, dependency);
         }
     }
 }
