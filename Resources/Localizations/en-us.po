@@ -322,6 +322,12 @@ msgstr "Convex Depth Wrapper: mesh is not assigned"
 msgid "cdw.report.missing-mesh:description"
 msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
 
+msgid "cdw.report.mesh-assigned"
+msgstr "Convex Depth Wrapper: mesh is already assigned"
+
+msgid "cdw.report.mesh-assigned:description"
+msgstr "When Target Renderer is set, this component must be attached to a SkinnedMeshRenderer with no mesh assigned, so the component was skipped."
+
 msgid "cdw.report.missing-source-mesh"
 msgstr "Convex Depth Wrapper: target renderer has no mesh"
 

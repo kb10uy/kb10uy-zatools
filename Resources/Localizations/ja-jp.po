@@ -324,6 +324,12 @@ msgstr "Convex Depth Wrapper: メッシュが設定されていません"
 msgid "cdw.report.missing-mesh:description"
 msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
 
+msgid "cdw.report.mesh-assigned"
+msgstr "Convex Depth Wrapper: メッシュが既に設定されています"
+
+msgid "cdw.report.mesh-assigned:description"
+msgstr "生成対象を指定する場合、このコンポーネントは Mesh が空の SkinnedMeshRenderer に追加する必要があります。処理はスキップされました。"
+
 msgid "cdw.report.missing-source-mesh"
 msgstr "Convex Depth Wrapper: 生成対象にメッシュが設定されていません"
 

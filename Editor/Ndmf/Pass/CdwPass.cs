@@ -32,6 +32,13 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             if (fixedParameters.SeparateSmr)
             {
+                if (skinnedMeshRenderer.sharedMesh != null)
+                {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.mesh-assigned"));
+                    UnityObject.DestroyImmediate(component);
+                    return;
+                }
+
                 if (fixedParameters.SourceMeshRenderer.sharedMesh == null)
                 {
                     ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.missing-source-mesh"));
