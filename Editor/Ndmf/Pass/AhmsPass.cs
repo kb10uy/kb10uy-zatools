@@ -25,6 +25,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var originalMesh = skinnedMeshRenderer.sharedMesh;
             if (originalMesh == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahms.report.missing-mesh"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }
@@ -32,6 +33,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var fixedParameters = Ahms.FixedParameters.FixFromComponent(component);
             if (fixedParameters.SplitMaterial == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahms.report.missing-split-material"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }

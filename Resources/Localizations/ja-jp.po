@@ -162,6 +162,18 @@ msgstr "コピー先の正規表現"
 msgid "ahbsm.inspector.append-regex"
 msgstr "コピー元を打ち消す定義をコピー先に追加"
 
+msgid "ahbsm.report.missing-mesh"
+msgstr "Mix BlendShapes: メッシュが設定されていません"
+
+msgid "ahbsm.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "ahbsm.report.no-definitions"
+msgstr "Mix BlendShapes: 有効な定義がありません"
+
+msgid "ahbsm.report.no-definitions:description"
+msgstr "コピー先の BlendShape がメッシュに存在する定義がないため、処理をスキップしました。"
+
 msgid "anhb.inspector.direction"
 msgstr "法線方向"
 
@@ -173,6 +185,12 @@ msgstr "マスクテクスチャ"
 
 msgid "anhb.inspector.mask-mode"
 msgstr "マスクのサンプリング方法"
+
+msgid "anhb.report.missing-mesh"
+msgstr "Bend Normal: メッシュが設定されていません"
+
+msgid "anhb.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
 
 msgid "ahbss.inspector.targets"
 msgstr "分割する BlendShape"
@@ -186,6 +204,12 @@ msgstr "サフィックス(左側)"
 msgid "ahbss.inspector.right-suffix"
 msgstr "サフィックス(右側)"
 
+msgid "ahbss.report.missing-mesh"
+msgstr "Split BlendShape: メッシュが設定されていません"
+
+msgid "ahbss.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
 msgid "utmd.inspector.source"
 msgstr "ソース UV チャンネル"
 
@@ -198,6 +222,18 @@ msgstr "タイル情報テクスチャ"
 msgid "utmd.inspector.distribution"
 msgstr "タイル分配方法"
 
+msgid "utmd.report.missing-mesh"
+msgstr "Set UV Tile by Texture: メッシュが設定されていません"
+
+msgid "utmd.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "utmd.report.missing-tile-map"
+msgstr "Set UV Tile by Texture: タイル情報テクスチャが設定されていません"
+
+msgid "utmd.report.missing-tile-map:description"
+msgstr "タイル情報テクスチャが設定されていないため、処理をスキップしました。"
+
 msgid "ahms.inspector.mask-texture"
 msgstr "マスクテクスチャ"
 
@@ -209,6 +245,18 @@ msgstr "分割対象のマテリアル"
 
 msgid "ahms.inspector.split-material"
 msgstr "割り当てるマテリアル"
+
+msgid "ahms.report.missing-mesh"
+msgstr "Split Mesh: メッシュが設定されていません"
+
+msgid "ahms.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "ahms.report.missing-split-material"
+msgstr "Split Mesh: 割り当てるマテリアルが設定されていません"
+
+msgid "ahms.report.missing-split-material:description"
+msgstr "割り当てるマテリアルが設定されていないため、処理をスキップしました。"
 
 msgid "asv.inspector.ignored-armature-help"
 msgstr "この Armature は Avatar Status Validator で無視されます。"
@@ -252,6 +300,12 @@ msgstr "ConvexDepthWrapper の利用を推奨します"
 msgid "edw.report.deprecated:description"
 msgstr "生成されるメッシュ及びレンダリング結果の品質から、通常は ConvexDepthWrapper をご利用ください。"
 
+msgid "edw.report.missing-mesh"
+msgstr "Eyehole Depth Wrapper: メッシュが設定されていません"
+
+msgid "edw.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
 msgid "cdw.inspector.source"
 msgstr "生成対象"
 
@@ -263,6 +317,24 @@ msgstr "BlendShape オーバーライド"
 
 msgid "cdw.inspector.advanced"
 msgstr "上級者向け設定"
+
+msgid "cdw.report.missing-mesh"
+msgstr "Convex Depth Wrapper: メッシュが設定されていません"
+
+msgid "cdw.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "cdw.report.missing-source-mesh"
+msgstr "Convex Depth Wrapper: 生成対象にメッシュが設定されていません"
+
+msgid "cdw.report.missing-source-mesh:description"
+msgstr "生成対象の SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "cdw.report.degenerate-hull"
+msgstr "Convex Depth Wrapper: 凸包を生成できませんでした"
+
+msgid "cdw.report.degenerate-hull:description"
+msgstr "頂点が少ないか同一平面上にあるため立体的な凸包を生成できず、処理をスキップしました。"
 
 msgid "ahvdt.inspector.source-texture"
 msgstr "ソーステクスチャ"
@@ -281,6 +353,18 @@ msgstr "定数部"
 
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX 式"
+
+msgid "ahvdt.report.missing-mesh"
+msgstr "Transfer Vertex Data: メッシュが設定されていません"
+
+msgid "ahvdt.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
+
+msgid "ahvdt.report.missing-source-texture"
+msgstr "Transfer Vertex Data: ソーステクスチャが設定されていません"
+
+msgid "ahvdt.report.missing-source-texture:description"
+msgstr "ソーステクスチャが設定されていないため、処理をスキップしました。"
 
 msgid "ahamd.inspector.source"
 msgstr "複製対象"
@@ -330,6 +414,18 @@ msgstr "@mask: float4 - 選択マスクテクスチャのサンプル結果 (頂
 msgid "ahamd.inspector.variables-texture"
 msgstr "@texture: float4 - 追加テクスチャのサンプル結果 (改変ステップでのみ利用可)"
 
+msgid "ahamd.report.mesh-assigned"
+msgstr "Advanced Duplicate Mesh: メッシュが既に設定されています"
+
+msgid "ahamd.report.mesh-assigned:description"
+msgstr "このコンポーネントは Mesh が空の SkinnedMeshRenderer に追加する必要があるため、処理をスキップしました。"
+
+msgid "ahamd.report.missing-source"
+msgstr "Advanced Duplicate Mesh: 複製対象が設定されていません"
+
+msgid "ahamd.report.missing-source:description"
+msgstr "複製対象の SkinnedMeshRenderer が設定されていないため、処理をスキップしました。"
+
 msgid "ahabss.inspector.sources"
 msgstr "ソース BlendShape"
 
@@ -368,6 +464,12 @@ msgstr "Advanced BlendShape Synthesis: 同名の BlendShape が既に存在し�
 
 msgid "ahabss.report.duplicate-name:description"
 msgstr "BlendShape \"{0}\" はメッシュに既に存在するためスキップされました。既存の BlendShape は上書きされません。"
+
+msgid "ahabss.report.missing-mesh"
+msgstr "Advanced BlendShape Synthesis: メッシュが設定されていません"
+
+msgid "ahabss.report.missing-mesh:description"
+msgstr "SkinnedMeshRenderer に Mesh が設定されていないため、処理をスキップしました。"
 
 msgid "vsvc.report.incompatible-version"
 msgstr "非サポート VRCSDK バージョン"

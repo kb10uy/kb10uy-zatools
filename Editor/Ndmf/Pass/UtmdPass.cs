@@ -23,8 +23,16 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         private void ProcessFor(UtmdComponent component, SkinnedMeshRenderer skinnedMeshRenderer)
         {
             var originalMesh = skinnedMeshRenderer.sharedMesh;
-            if (originalMesh == null || component.TileMap == null)
+            if (originalMesh == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "utmd.report.missing-mesh"));
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
+            if (component.TileMap == null)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "utmd.report.missing-tile-map"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }

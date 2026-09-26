@@ -27,6 +27,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var originalMesh = skinnedMeshRenderer.sharedMesh;
             if (originalMesh == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahabss.report.missing-mesh"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }

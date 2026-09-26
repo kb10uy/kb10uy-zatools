@@ -32,8 +32,21 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             if (fixedParameters.SeparateSmr)
             {
+                if (fixedParameters.SourceMeshRenderer.sharedMesh == null)
+                {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.missing-source-mesh"));
+                    UnityObject.DestroyImmediate(component);
+                    return;
+                }
+
                 var generatedMesh = new Mesh { name = $"Convex Depth Wrapper for {fixedParameters.SourceMeshRenderer.name}" };
-                Cdw.ProcessSeparate(skinnedMeshRenderer, generatedMesh, fixedParameters, assigningMaterial);
+                if (!Cdw.ProcessSeparate(skinnedMeshRenderer, generatedMesh, fixedParameters, assigningMaterial))
+                {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.degenerate-hull"));
+                    UnityObject.DestroyImmediate(generatedMesh);
+                    UnityObject.DestroyImmediate(component);
+                    return;
+                }
 
                 skinnedMeshRenderer.sharedMesh = generatedMesh;
                 skinnedMeshRenderer.bones = fixedParameters.SourceMeshRenderer.bones;
@@ -46,12 +59,19 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 var originalMesh = skinnedMeshRenderer.sharedMesh;
                 if (originalMesh == null)
                 {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.missing-mesh"));
                     UnityObject.DestroyImmediate(component);
                     return;
                 }
 
                 var modifyingMesh = UnityObject.Instantiate(originalMesh);
-                Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial);
+                if (!Cdw.Process(skinnedMeshRenderer, modifyingMesh, fixedParameters, assigningMaterial))
+                {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "cdw.report.degenerate-hull"));
+                    UnityObject.DestroyImmediate(modifyingMesh);
+                    UnityObject.DestroyImmediate(component);
+                    return;
+                }
 
                 skinnedMeshRenderer.sharedMesh = modifyingMesh;
                 ObjectRegistry.RegisterReplacedObject(originalMesh, modifyingMesh);

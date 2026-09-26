@@ -27,8 +27,22 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         {
             var originalMesh = skinnedMeshRenderer.sharedMesh;
             var fixedParameters = Ahvdt.FixedParameters.FixFromComponent(component);
-            if (originalMesh == null || fixedParameters.SourceTexture == null || fixedParameters.TransferTarget == VertexDataTransferTarget.Disabled)
+            if (fixedParameters.TransferTarget == VertexDataTransferTarget.Disabled)
             {
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
+            if (originalMesh == null)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahvdt.report.missing-mesh"));
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
+            if (fixedParameters.SourceTexture == null)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahvdt.report.missing-source-texture"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }
