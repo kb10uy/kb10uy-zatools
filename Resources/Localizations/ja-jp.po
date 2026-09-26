@@ -300,6 +300,9 @@ msgstr "まつ毛を無視する距離"
 msgid "edw.inspector.advanced"
 msgstr "上級者向け設定"
 
+msgid "edw.inspector.warning-deprecated"
+msgstr "Eyehole Depth Wrapper は非推奨です。生成されるメッシュ及びレンダリング結果の品質から、ConvexDepthWrapper をご利用ください。"
+
 msgid "edw.report.deprecated"
 msgstr "ConvexDepthWrapper の利用を推奨します"
 
@@ -509,6 +512,9 @@ msgstr "Zatools がサポートしてないバージョンの VRCSDK が検出�
 
 msgid "pbit.inspector.info"
 msgstr "このオブジェクトは PhysBone の影響下に入った際に Ignored Transform に登録されます。"
+
+msgid "pbit.inspector.warning-deprecated"
+msgstr "Ignore Self from PB は非推奨です。Modular Avatar の PB Blocker が同等の機能を提供するため、そちらをご利用ください。"
 
 msgid "pbit.report.deprecated"
 msgstr "MA PB Blocker の利用を推奨します"

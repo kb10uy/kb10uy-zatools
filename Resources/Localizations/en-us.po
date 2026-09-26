@@ -298,6 +298,9 @@ msgstr "Eyelash Cut Distance"
 msgid "edw.inspector.advanced"
 msgstr "Advanced"
 
+msgid "edw.inspector.warning-deprecated"
+msgstr "Eyehole Depth Wrapper is deprecated. Use ConvexDepthWrapper instead, which generates more optimal mesh for this purpose."
+
 msgid "edw.report.deprecated"
 msgstr "ConvexDepthWrapper is recommended"
 
@@ -507,6 +510,9 @@ msgstr "Process aborted since incompatible version of VRCSDK that Zatools does n
 
 msgid "pbit.inspector.info"
 msgstr "This GameObject will be ignored from PhysBones when affected."
+
+msgid "pbit.inspector.warning-deprecated"
+msgstr "Ignore Self from PB is deprecated. Use MA PB Blocker instead, which provides the same functionality."
 
 msgid "pbit.report.deprecated"
 msgstr "MA PB Blocker is recommended"
