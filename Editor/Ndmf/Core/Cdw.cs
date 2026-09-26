@@ -18,14 +18,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         /// <param name="parameters">固定されたパラメーター</param>
         /// <param name="wrapperMaterial">割り当てるマテリアル</param>
         /// <exception cref="ArgumentException">頂点数が一致しない場合</exception>
-        internal static void Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
+        internal static bool Process(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
         {
             if (referencingRenderer.sharedMesh.vertexCount != modifyingMesh.vertexCount) throw new ArgumentException("different mesh vertex count");
 
             var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(modifyingMesh, referencingRenderer, parameters.Overrides);
 
             ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
-            if (hullTriangles.Length < 12) return;
+            if (hullTriangles.Length < 12) return false;
 
             var vertices = modifyingMesh.vertices;
             var normals = modifyingMesh.normals;
@@ -92,17 +92,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             originalMaterials.CopyTo(newMaterials, 0);
             newMaterials[originalMaterials.Length] = wrapperMaterial;
             referencingRenderer.sharedMaterials = newMaterials;
+            return true;
         }
 
-        internal static void ProcessSeparate(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
+        internal static bool ProcessSeparate(SkinnedMeshRenderer referencingRenderer, Mesh modifyingMesh, FixedParameters parameters, Material wrapperMaterial)
         {
-            if (!parameters.SeparateSmr || parameters.SourceMeshRenderer == null || parameters.SourceMeshRenderer.sharedMesh == null) return;
+            if (!parameters.SeparateSmr || parameters.SourceMeshRenderer == null || parameters.SourceMeshRenderer.sharedMesh == null) return false;
 
             var sourceMesh = parameters.SourceMeshRenderer.sharedMesh;
             var blendShapeAppliedVertices = MeshManipulation.ComputeBlendShapeAppliedVertices(sourceMesh, parameters.SourceMeshRenderer, parameters.Overrides);
 
             ImmutableArray<int> hullTriangles = ConvexHull.ComputeQuickHull3D(blendShapeAppliedVertices);
-            if (hullTriangles.Length < 12) return;
+            if (hullTriangles.Length < 12) return false;
 
             var sourceNormals = sourceMesh.normals;
             var sourceTangents = sourceMesh.tangents;
@@ -145,6 +146,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             modifyingMesh.RecalculateBounds();
 
             referencingRenderer.sharedMaterials = new Material[] { wrapperMaterial };
+            return true;
         }
 
         internal struct FixedParameters : IEquatable<FixedParameters>

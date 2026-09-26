@@ -34,5 +34,10 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             CreateInspectorGUI();
         }
+
+        protected static void SetDisplayed(VisualElement element, bool displayed)
+        {
+            element.style.display = displayed ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
 }

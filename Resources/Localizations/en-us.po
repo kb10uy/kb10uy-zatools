@@ -160,6 +160,18 @@ msgstr "Regex for From"
 msgid "ahbsm.inspector.append-regex"
 msgstr "Append canceling defintions according to Regices"
 
+msgid "ahbsm.report.missing-mesh"
+msgstr "Mix BlendShapes: mesh is not assigned"
+
+msgid "ahbsm.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
+msgid "ahbsm.report.no-definitions"
+msgstr "Mix BlendShapes: no applicable definitions"
+
+msgid "ahbsm.report.no-definitions:description"
+msgstr "No definition targets a BlendShape that exists on the mesh, so the component was skipped."
+
 msgid "anhb.inspector.direction"
 msgstr "Normal Direction"
 
@@ -171,6 +183,12 @@ msgstr "Mask Texture"
 
 msgid "anhb.inspector.mask-mode"
 msgstr "Mask Sampling"
+
+msgid "anhb.report.missing-mesh"
+msgstr "Bend Normal: mesh is not assigned"
+
+msgid "anhb.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
 
 msgid "ahbss.inspector.targets"
 msgstr "BlendShapes to Split"
@@ -184,6 +202,12 @@ msgstr "Left Suffix"
 msgid "ahbss.inspector.right-suffix"
 msgstr "Right Suffix"
 
+msgid "ahbss.report.missing-mesh"
+msgstr "Split BlendShape: mesh is not assigned"
+
+msgid "ahbss.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
 msgid "ahms.inspector.mask-texture"
 msgstr "Mask Texture"
 
@@ -196,6 +220,21 @@ msgstr "Material to Extract"
 msgid "ahms.inspector.split-material"
 msgstr "Material to Assign"
 
+msgid "ahms.inspector.warning-missing-split-material"
+msgstr "Material to Assign is not set, so this component will be skipped on build."
+
+msgid "ahms.report.missing-mesh"
+msgstr "Split Mesh: mesh is not assigned"
+
+msgid "ahms.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
+msgid "ahms.report.missing-split-material"
+msgstr "Split Mesh: material to assign is not set"
+
+msgid "ahms.report.missing-split-material:description"
+msgstr "Material to Assign is not set, so the component was skipped."
+
 msgid "utmd.inspector.source"
 msgstr "Source UV Channel"
 
@@ -207,6 +246,21 @@ msgstr "Tile Information Texture"
 
 msgid "utmd.inspector.distribution"
 msgstr "Tile Distribution Method"
+
+msgid "utmd.inspector.warning-missing-tile-map"
+msgstr "Tile Information Texture is not set, so this component will be skipped on build."
+
+msgid "utmd.report.missing-mesh"
+msgstr "Set UV Tile by Texture: mesh is not assigned"
+
+msgid "utmd.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
+msgid "utmd.report.missing-tile-map"
+msgstr "Set UV Tile by Texture: tile information texture is not set"
+
+msgid "utmd.report.missing-tile-map:description"
+msgstr "Tile Information Texture is not set, so the component was skipped."
 
 msgid "asv.inspector.ignored-armature-help"
 msgstr "This Armature will be ignored by Avatar Status Validator."
@@ -250,6 +304,12 @@ msgstr "ConvexDepthWrapper is recommended"
 msgid "edw.report.deprecated:description"
 msgstr "In general ConvexDepthWrapper generates more optimal mesh for this purpose."
 
+msgid "edw.report.missing-mesh"
+msgstr "Eyehole Depth Wrapper: mesh is not assigned"
+
+msgid "edw.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
 msgid "cdw.inspector.source"
 msgstr "Target Renderer"
 
@@ -261,6 +321,36 @@ msgstr "BlendShape Overrides"
 
 msgid "cdw.inspector.advanced"
 msgstr "Advanced Settings"
+
+msgid "cdw.inspector.warning-mesh-assigned"
+msgstr "Target Renderer is set, but this SkinnedMeshRenderer already has a mesh, so this component will be skipped on build. Remove the mesh to use Target Renderer, or clear Target Renderer otherwise."
+
+msgid "cdw.inspector.warning-missing-source-mesh"
+msgstr "Target Renderer has no mesh assigned, so this component will be skipped on build."
+
+msgid "cdw.report.missing-mesh"
+msgstr "Convex Depth Wrapper: mesh is not assigned"
+
+msgid "cdw.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
+msgid "cdw.report.mesh-assigned"
+msgstr "Convex Depth Wrapper: mesh is already assigned"
+
+msgid "cdw.report.mesh-assigned:description"
+msgstr "When Target Renderer is set, this component must be attached to a SkinnedMeshRenderer with no mesh assigned, so the component was skipped."
+
+msgid "cdw.report.missing-source-mesh"
+msgstr "Convex Depth Wrapper: target renderer has no mesh"
+
+msgid "cdw.report.missing-source-mesh:description"
+msgstr "The Target Renderer has no mesh assigned, so the component was skipped."
+
+msgid "cdw.report.degenerate-hull"
+msgstr "Convex Depth Wrapper: could not build a convex hull"
+
+msgid "cdw.report.degenerate-hull:description"
+msgstr "The vertices are too few or coplanar to form a solid convex hull, so the component was skipped."
 
 msgid "ahvdt.inspector.source-texture"
 msgstr "Source Texture"
@@ -279,6 +369,24 @@ msgstr "Constant"
 
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX Expression"
+
+msgid "ahvdt.inspector.info-disabled"
+msgstr "Transfer Target is Disabled, so this component does nothing."
+
+msgid "ahvdt.inspector.warning-missing-source-texture"
+msgstr "Source Texture is not set, so this component will be skipped on build."
+
+msgid "ahvdt.report.missing-mesh"
+msgstr "Transfer Vertex Data: mesh is not assigned"
+
+msgid "ahvdt.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
+msgid "ahvdt.report.missing-source-texture"
+msgstr "Transfer Vertex Data: source texture is not set"
+
+msgid "ahvdt.report.missing-source-texture:description"
+msgstr "Source Texture is not set, so the component was skipped."
 
 msgid "ahamd.inspector.source"
 msgstr "Source Renderer"
@@ -328,6 +436,24 @@ msgstr "@mask: float4 - sampled Selection Mask Texture (Vertex Selection only)"
 msgid "ahamd.inspector.variables-texture"
 msgstr "@texture: float4 - sampled Extra Texture (Modification Steps only)"
 
+msgid "ahamd.inspector.warning-mesh-assigned"
+msgstr "This component must be added to a SkinnedMeshRenderer without a mesh. A mesh is assigned, so this component will be skipped on build."
+
+msgid "ahamd.inspector.warning-missing-source"
+msgstr "Source Renderer is not set, so this component will be skipped on build."
+
+msgid "ahamd.report.mesh-assigned"
+msgstr "Advanced Duplicate Mesh: mesh is already assigned"
+
+msgid "ahamd.report.mesh-assigned:description"
+msgstr "This component must be attached to a SkinnedMeshRenderer with no mesh assigned, so the component was skipped."
+
+msgid "ahamd.report.missing-source"
+msgstr "Advanced Duplicate Mesh: source renderer is not set"
+
+msgid "ahamd.report.missing-source:description"
+msgstr "Source Renderer is not set, so the component was skipped."
+
 msgid "ahabss.inspector.sources"
 msgstr "Source BlendShapes"
 
@@ -367,6 +493,12 @@ msgstr "Save to JSON"
 msgid "ahabss.inspector.load-json"
 msgstr "Load from JSON"
 
+msgid "ahabss.report.missing-mesh"
+msgstr "Advanced BlendShape Synthesis: mesh is not assigned"
+
+msgid "ahabss.report.missing-mesh:description"
+msgstr "The SkinnedMeshRenderer has no mesh assigned, so the component was skipped."
+
 msgid "vsvc.report.incompatible-version"
 msgstr "Unsupported version of VRCSDK"
 
@@ -384,6 +516,9 @@ msgstr "Modular Avatar provides PB Blocker component which has the same function
 
 msgid "gwdo.inspector.mode"
 msgstr "Mode"
+
+msgid "gwdo.inspector.warning-placement"
+msgstr "Place exactly one Global WD Override on the avatar root. The second and subsequent ones will be ignored."
 
 msgid "gwdo.report.component-placement"
 msgstr "Inappropriate Global WD Override placement"

@@ -17,6 +17,20 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
+            var component = target as AdHocMeshSplit;
+            var missingSplitMaterialWarning = inspector.Q<HelpBox>("MissingSplitMaterialWarning");
+            void RefreshWarning()
+            {
+                if (component == null) return;
+                SetDisplayed(missingSplitMaterialWarning, component.SplitMaterial == null);
+            }
+            RefreshWarning();
+
+            missingSplitMaterialWarning.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(AdHocMeshSplit.SplitMaterial)),
+                (_) => RefreshWarning()
+            );
+
             return inspector;
         }
     }

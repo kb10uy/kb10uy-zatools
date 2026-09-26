@@ -22,6 +22,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var originalMesh = skinnedMeshRenderer.sharedMesh;
             if (originalMesh == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(mixComponent.gameObject, ErrorSeverity.NonFatal, "ahbsm.report.missing-mesh"));
                 UnityObject.DestroyImmediate(mixComponent);
                 return;
             }
@@ -30,6 +31,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var resolvedMixDefinitions = Ahbsm.AggregateDefinitions(mixComponent.MixDefinitions.FixSources(), blendShapeIndices);
             if (resolvedMixDefinitions.Count == 0)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(mixComponent.gameObject, ErrorSeverity.NonFatal, "ahbsm.report.no-definitions"));
                 UnityObject.DestroyImmediate(mixComponent);
                 return;
             }

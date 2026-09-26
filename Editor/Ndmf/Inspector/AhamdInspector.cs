@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -29,6 +30,30 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var modificationsList = inspector.Q<ListView>("FieldModifications");
             modificationsList.makeItem = () => MakeModificationItem(visualTreeItem);
             modificationsList.itemsAdded += ResetAddedModifications;
+
+            var component = target as AdHocAdvancedMeshDuplication;
+            var targetRenderer = component.GetComponent<SkinnedMeshRenderer>();
+            var meshAssignedWarning = inspector.Q<HelpBox>("MeshAssignedWarning");
+            var missingSourceWarning = inspector.Q<HelpBox>("MissingSourceWarning");
+            void RefreshWarnings()
+            {
+                if (component == null || targetRenderer == null) return;
+                SetDisplayed(meshAssignedWarning, targetRenderer.sharedMesh != null);
+                SetDisplayed(missingSourceWarning, component.Source == null);
+            }
+            RefreshWarnings();
+
+            missingSourceWarning.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(AdHocAdvancedMeshDuplication.Source)),
+                (_) => RefreshWarnings()
+            );
+
+            var smrSerializedObject = new SerializedObject(targetRenderer);
+            var sharedMeshProperty = smrSerializedObject.FindProperty("m_Mesh");
+            if (sharedMeshProperty != null)
+            {
+                meshAssignedWarning.TrackPropertyValue(sharedMeshProperty, (_) => RefreshWarnings());
+            }
 
             return inspector;
         }

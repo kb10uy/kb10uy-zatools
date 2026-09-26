@@ -27,6 +27,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var originalMesh = skinnedMeshRenderer.sharedMesh;
             if (originalMesh != null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahamd.report.mesh-assigned"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }
@@ -34,6 +35,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var fixedParameters = Ahamd.FixedParameters.FixFromComponent(component);
             if (fixedParameters.Source == null)
             {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahamd.report.missing-source"));
                 UnityObject.DestroyImmediate(component);
                 return;
             }

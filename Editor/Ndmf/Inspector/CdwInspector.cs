@@ -24,18 +24,24 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             var definitionsList = inspector.Q<ListView>("FieldOverrides");
             definitionsList.makeItem = () => MakeOverrideItem(visualTreeItem, blendShapeNames);
 
+            var component = target as ConvexDepthWrapper;
+            var targetRenderer = component.GetComponent<SkinnedMeshRenderer>();
             var sourceMeshRendererField = inspector.Q<ObjectField>("FieldSourceMeshRenderer");
-            var targetRenderer = (target as ConvexDepthWrapper)?.GetComponent<SkinnedMeshRenderer>();
-            UpdateSourceMeshRendererFieldVisibility(sourceMeshRendererField, targetRenderer);
+            var meshAssignedWarning = inspector.Q<HelpBox>("MeshAssignedWarning");
+            var missingSourceMeshWarning = inspector.Q<HelpBox>("MissingSourceMeshWarning");
+            void RefreshSourceState() => UpdateSourceState(component, targetRenderer, sourceMeshRendererField, meshAssignedWarning, missingSourceMeshWarning);
+            RefreshSourceState();
+
+            meshAssignedWarning.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(ConvexDepthWrapper.SourceMeshRenderer)),
+                (_) => RefreshSourceState()
+            );
 
             var smrSerializedObject = new SerializedObject(targetRenderer);
             var sharedMeshProperty = smrSerializedObject.FindProperty("m_Mesh");
             if (sharedMeshProperty != null)
             {
-                inspector.TrackPropertyValue(
-                    sharedMeshProperty,
-                    (_) => UpdateSourceMeshRendererFieldVisibility(sourceMeshRendererField, targetRenderer)
-                );
+                inspector.TrackPropertyValue(sharedMeshProperty, (_) => RefreshSourceState());
             }
 
             return inspector;
@@ -59,11 +65,22 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             return item;
         }
 
-        private static void UpdateSourceMeshRendererFieldVisibility(ObjectField sourceMeshRendererField, SkinnedMeshRenderer targetRenderer)
+        private static void UpdateSourceState(
+            ConvexDepthWrapper component,
+            SkinnedMeshRenderer targetRenderer,
+            ObjectField sourceMeshRendererField,
+            HelpBox meshAssignedWarning,
+            HelpBox missingSourceMeshWarning)
         {
-            sourceMeshRendererField.style.display = targetRenderer != null && targetRenderer.sharedMesh == null
-                ? DisplayStyle.Flex
-                : DisplayStyle.None;
+            if (component == null || targetRenderer == null) return;
+
+            var meshAssigned = targetRenderer.sharedMesh != null;
+            var source = component.SourceMeshRenderer;
+            var sourceMeshGeneratedOnBuild = source != null && source.TryGetComponent<AdHocAdvancedMeshDuplication>(out _);
+
+            SetDisplayed(sourceMeshRendererField, !meshAssigned || source != null);
+            SetDisplayed(meshAssignedWarning, meshAssigned && source != null);
+            SetDisplayed(missingSourceMeshWarning, !meshAssigned && source != null && source.sharedMesh == null && !sourceMeshGeneratedOnBuild);
         }
     }
 }
