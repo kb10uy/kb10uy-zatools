@@ -17,6 +17,20 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             ZatoolsLocalization.UILocalizer.ApplyLocalizationFor(inspector);
             inspector.Bind(serializedObject);
 
+            var component = target as UvTileMapDistribution;
+            var missingTileMapWarning = inspector.Q<HelpBox>("MissingTileMapWarning");
+            void RefreshWarning()
+            {
+                if (component == null) return;
+                SetDisplayed(missingTileMapWarning, component.TileMap == null);
+            }
+            RefreshWarning();
+
+            missingTileMapWarning.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(UvTileMapDistribution.TileMap)),
+                (_) => RefreshWarning()
+            );
+
             return inspector;
         }
     }

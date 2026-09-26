@@ -220,6 +220,9 @@ msgstr "Material to Extract"
 msgid "ahms.inspector.split-material"
 msgstr "Material to Assign"
 
+msgid "ahms.inspector.warning-missing-split-material"
+msgstr "Material to Assign is not set, so this component will be skipped on build."
+
 msgid "ahms.report.missing-mesh"
 msgstr "Split Mesh: mesh is not assigned"
 
@@ -243,6 +246,9 @@ msgstr "Tile Information Texture"
 
 msgid "utmd.inspector.distribution"
 msgstr "Tile Distribution Method"
+
+msgid "utmd.inspector.warning-missing-tile-map"
+msgstr "Tile Information Texture is not set, so this component will be skipped on build."
 
 msgid "utmd.report.missing-mesh"
 msgstr "Set UV Tile by Texture: mesh is not assigned"
@@ -316,6 +322,12 @@ msgstr "BlendShape Overrides"
 msgid "cdw.inspector.advanced"
 msgstr "Advanced Settings"
 
+msgid "cdw.inspector.warning-mesh-assigned"
+msgstr "Target Renderer is set, but this SkinnedMeshRenderer already has a mesh, so this component will be skipped on build. Remove the mesh to use Target Renderer, or clear Target Renderer otherwise."
+
+msgid "cdw.inspector.warning-missing-source-mesh"
+msgstr "Target Renderer has no mesh assigned, so this component will be skipped on build."
+
 msgid "cdw.report.missing-mesh"
 msgstr "Convex Depth Wrapper: mesh is not assigned"
 
@@ -357,6 +369,12 @@ msgstr "Constant"
 
 msgid "ahvdt.inspector.expression"
 msgstr "ZAX Expression"
+
+msgid "ahvdt.inspector.info-disabled"
+msgstr "Transfer Target is Disabled, so this component does nothing."
+
+msgid "ahvdt.inspector.warning-missing-source-texture"
+msgstr "Source Texture is not set, so this component will be skipped on build."
 
 msgid "ahvdt.report.missing-mesh"
 msgstr "Transfer Vertex Data: mesh is not assigned"
@@ -417,6 +435,12 @@ msgstr "@mask: float4 - sampled Selection Mask Texture (Vertex Selection only)"
 
 msgid "ahamd.inspector.variables-texture"
 msgstr "@texture: float4 - sampled Extra Texture (Modification Steps only)"
+
+msgid "ahamd.inspector.warning-mesh-assigned"
+msgstr "This component must be added to a SkinnedMeshRenderer without a mesh. A mesh is assigned, so this component will be skipped on build."
+
+msgid "ahamd.inspector.warning-missing-source"
+msgstr "Source Renderer is not set, so this component will be skipped on build."
 
 msgid "ahamd.report.mesh-assigned"
 msgstr "Advanced Duplicate Mesh: mesh is already assigned"
@@ -492,6 +516,9 @@ msgstr "Modular Avatar provides PB Blocker component which has the same function
 
 msgid "gwdo.inspector.mode"
 msgstr "Mode"
+
+msgid "gwdo.inspector.warning-placement"
+msgstr "Place exactly one Global WD Override on the avatar root. The second and subsequent ones will be ignored."
 
 msgid "gwdo.report.component-placement"
 msgstr "Inappropriate Global WD Override placement"

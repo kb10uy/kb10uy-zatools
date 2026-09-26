@@ -2,6 +2,8 @@
     <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
     <ui:VisualElement style="flex-grow: 1;">
         <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:HelpBox message-type="Info" text="ahvdt.inspector.info-disabled" name="DisabledInfo" class="ndmf-tr" />
+        <ui:HelpBox message-type="Warning" text="ahvdt.inspector.warning-missing-source-texture" name="MissingSourceTextureWarning" class="ndmf-tr" />
         <uie:ObjectField label="ahvdt.inspector.source-texture" name="FieldSourceTexture" type="UnityEngine.Texture2D, UnityEngine.CoreModule" binding-path="SourceTexture" class="ndmf-tr" />
         <ui:EnumField label="ahvdt.inspector.source-uv" type="KusakaFactory.Zatools.Runtime.UvChannel, org.kb10uy.zatools.runtime" binding-path="SourceUv" name="FieldSourceUv" class="ndmf-tr" />
         <ui:EnumField label="ahvdt.inspector.transfer-target" type="KusakaFactory.Zatools.Runtime.VertexDataTransferTarget, org.kb10uy.zatools.runtime" name="FieldTransferTarget" binding-path="TransferTarget" value="VertexColor" class="ndmf-tr" />

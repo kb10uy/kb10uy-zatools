@@ -35,6 +35,27 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             });
             OnTransferModeChanged((serializedObject.targetObject as AdHocVertexDataTransfer).TransferMode);
 
+            var component = target as AdHocVertexDataTransfer;
+            var disabledInfo = inspector.Q<HelpBox>("DisabledInfo");
+            var missingSourceTextureWarning = inspector.Q<HelpBox>("MissingSourceTextureWarning");
+            void RefreshMessages()
+            {
+                if (component == null) return;
+                var disabled = component.TransferTarget == VertexDataTransferTarget.Disabled;
+                SetDisplayed(disabledInfo, disabled);
+                SetDisplayed(missingSourceTextureWarning, !disabled && component.SourceTexture == null);
+            }
+            RefreshMessages();
+
+            disabledInfo.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(AdHocVertexDataTransfer.TransferTarget)),
+                (_) => RefreshMessages()
+            );
+            missingSourceTextureWarning.TrackPropertyValue(
+                serializedObject.FindProperty(nameof(AdHocVertexDataTransfer.SourceTexture)),
+                (_) => RefreshMessages()
+            );
+
             return inspector;
         }
 
