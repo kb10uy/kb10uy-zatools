@@ -16,6 +16,10 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v4"
 
+      - name: "Exclude Tests"
+        shell: "bash"
+        run: "rm -rf Tests Tests.meta"
+
       - name: "Build"
         id: "build"
         uses: "docker://ghcr.io/rerigferl/vpm-packager:latest"

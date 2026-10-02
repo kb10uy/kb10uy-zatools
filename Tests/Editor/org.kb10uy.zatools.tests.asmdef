@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "Unity.Burst",
         "Unity.Mathematics",
-        "org.kb10uy.zatools"
+        "org.kb10uy.zatools",
+        "org.kb10uy.zatools.runtime"
     ],
     "includePlatforms": [
         "Editor"

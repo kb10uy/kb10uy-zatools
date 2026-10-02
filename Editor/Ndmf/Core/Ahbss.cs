@@ -55,6 +55,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var influentBones = new HashSet<int>();
             var boneWeights = new List<BoneWeight>(modifyingMesh.vertexCount);
             modifyingMesh.GetBoneWeights(boneWeights);
+            var hasBoneWeights = boneWeights.Count == vertexCount;
             var nativeDeltaVertices = new NativeArray<bool>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeInfluentBones = new NativeArray<int4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -63,7 +64,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 for (var i = 0; i < vertexCount; ++i)
                 {
                     nativeDeltaVertices[i] = false;
-                    nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+                    nativeBoneWeights[i] = hasBoneWeights ? InlinedBoneWeight.FromBoneWeight(boneWeights[i]) : default;
                     nativeInfluentBones[i] = -1;
                 }
 
