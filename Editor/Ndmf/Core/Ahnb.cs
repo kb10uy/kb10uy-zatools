@@ -12,6 +12,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 {
     internal static class Ahnb
     {
+        private static readonly InlinedBoneWeight RendererSpaceWeight = new InlinedBoneWeight
+        {
+            Indices = int4.zero,
+            Weights = new float4(1.0f, 0.0f, 0.0f, 0.0f),
+        };
+
         /// <summary>
         /// メイン処理
         /// </summary>
@@ -34,6 +40,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var bones = referencingRenderer.bones;
 
             var vertexCount = normals.Count;
+            var hasBoneWeights = boneWeights.Count == vertexCount;
             while (uvs.Count < vertexCount) uvs.Add(Vector2.zero);
             var maskMode = parameters.MaskMode switch
             {
@@ -48,7 +55,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             var nativeMaskValues = new NativeArray<float>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeBoneWeights = new NativeArray<InlinedBoneWeight>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var nativeInfluentBones = new NativeArray<int4>(vertexCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var nativeBoneDeforms = new NativeArray<float4x4>(bones.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var nativeBoneDeforms = new NativeArray<float4x4>(hasBoneWeights ? bones.Length : 1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             var influentBones = new HashSet<int>();
             try
             {
@@ -56,14 +63,21 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     nativeNormals[i] = new float3(normals[i].x, normals[i].y, normals[i].z);
                     nativeMaskUvs[i] = new float4(uvs[i].x, uvs[i].y, 0.0f, 0.0f);
-                    nativeBoneWeights[i] = InlinedBoneWeight.FromBoneWeight(boneWeights[i]);
+                    nativeBoneWeights[i] = hasBoneWeights ? InlinedBoneWeight.FromBoneWeight(boneWeights[i]) : RendererSpaceWeight;
                     nativeInfluentBones[i] = -1;
                 }
                 NativeTextureSampler.SampleMaskByComputeShader(parameters.MaskTexture, maskMode, ref nativeMaskUvs, ref nativeMaskValues);
-                for (var i = 0; i < bones.Length; ++i)
+                if (hasBoneWeights)
                 {
-                    var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
-                    nativeBoneDeforms[i] = bd;
+                    for (var i = 0; i < bones.Length; ++i)
+                    {
+                        var bd = bones[i] != null ? bones[i].localToWorldMatrix * bindposes[i] : Matrix4x4.identity;
+                        nativeBoneDeforms[i] = bd;
+                    }
+                }
+                else
+                {
+                    nativeBoneDeforms[0] = referencingRenderer.transform.localToWorldMatrix;
                 }
 
                 // 実行
@@ -85,13 +99,16 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 modifyingMesh.SetNormals(nativeNormals);
                 modifyingMesh.RecalculateTangents();
 
-                foreach (var ib in nativeInfluentBones)
+                if (hasBoneWeights)
                 {
-                    // Add が重いので弾く
-                    if (ib.x != -1) influentBones.Add(ib.x);
-                    if (ib.y != -1) influentBones.Add(ib.y);
-                    if (ib.z != -1) influentBones.Add(ib.z);
-                    if (ib.w != -1) influentBones.Add(ib.w);
+                    foreach (var ib in nativeInfluentBones)
+                    {
+                        // Add が重いので弾く
+                        if (ib.x != -1) influentBones.Add(ib.x);
+                        if (ib.y != -1) influentBones.Add(ib.y);
+                        if (ib.z != -1) influentBones.Add(ib.z);
+                        if (ib.w != -1) influentBones.Add(ib.w);
+                    }
                 }
             }
             finally

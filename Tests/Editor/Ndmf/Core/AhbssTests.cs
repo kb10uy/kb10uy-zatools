@@ -135,6 +135,21 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
+        public void SplitsMeshWithoutBoneWeights()
+        {
+            var mesh = CreateQuadStrip(3);
+            AddShape(mesh, "smile", (i) => new Vector3(0, i + 1, 0));
+            var renderer = CreateRenderer(mesh);
+            var modifying = Track(UnityEngine.Object.Instantiate(mesh));
+
+            var influent = Ahbss.AddSplitShapes(renderer, modifying, Parameters(renderer.transform, new[] { "smile" }));
+
+            Assert.That(influent, Is.Empty);
+            AssertVectors(Masked((i) => new Vector3(0, i + 1, 0), IsLeft), ShapeDeltas(modifying, "smile_L").Vertices);
+            AssertVectors(Masked((i) => new Vector3(0, i + 1, 0), (i) => !IsLeft(i)), ShapeDeltas(modifying, "smile_R").Vertices);
+        }
+
+        [Test]
         public void RejectsVertexCountMismatch()
         {
             var (renderer, _) = CreateShapedStrip();

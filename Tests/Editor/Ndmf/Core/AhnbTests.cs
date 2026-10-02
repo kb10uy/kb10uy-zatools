@@ -82,6 +82,20 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
+        public void BendsMeshWithoutBoneWeightsInRendererSpace()
+        {
+            var mesh = CreateQuadStrip(1);
+            mesh.normals = Enumerable.Repeat(new Vector3(0, 0, -1), mesh.vertexCount).ToArray();
+            var renderer = CreateRenderer(mesh);
+            renderer.transform.rotation = Quaternion.Euler(0, 90, 0);
+
+            var influent = Ahnb.Process(renderer, mesh, Parameters(new Vector3(0, 0, 1), 1.0f));
+
+            foreach (var normal in mesh.normals) AssertVector(new Vector3(-1, 0, 0), normal);
+            Assert.That(influent, Is.Empty);
+        }
+
+        [Test]
         [Category("GPU")]
         public void MaskLimitsAffectedVertices()
         {
