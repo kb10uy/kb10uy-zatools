@@ -144,25 +144,31 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             {
                 var weight = set.DefaultWeight.HasValue ? set.DefaultWeight.Value.ToString("0.###") : "-";
                 var counts = Format("ftdi.inspector.summary-set-counts", set.TrackingKeys.Count.ToString(), set.Visemes.Count.ToString());
-                _summaryContainer.Add(SummaryLabel($"{set.Name}    weight {weight}    {counts}"));
+                _summaryContainer.Add(SummaryRow(false, SummaryCell(set.Name, 1), SummaryCell($"weight {weight}", 1), SummaryCell(counts, 4)));
             }
 
             _summaryContainer.Add(SummaryHeading("ParameterBehaviors", definition.ParameterBehaviors.Count.ToString()));
             for (var i = 0; i < definition.ParameterBehaviors.Count; ++i)
             {
                 var behavior = definition.ParameterBehaviors[i];
-                var line = new StringBuilder($"#{i + 1}  {behavior.Operation} → {behavior.Target}");
+                var target = $"→ {behavior.Target}";
                 if (behavior.Operation == TargetMode.ApplyBlendSetWeight && !localSets.Contains(behavior.Target))
                 {
-                    line.Append(Localized("ftdi.inspector.summary-external"));
+                    target += Localized("ftdi.inspector.summary-external");
                 }
+                var index = SummaryCell($"#{i + 1}", 0);
+                index.AddToClassList("ftdi-summary__index");
+                _summaryContainer.Add(SummaryRow(false, index, SummaryCell(behavior.Operation.ToString(), 1), SummaryCell(target, 1)));
+
+                var detail = DescribeExpression(behavior);
                 if (behavior.Weight != null)
                 {
-                    line.Append($" × {behavior.Weight}");
-                    if (!localSets.Contains(behavior.Weight)) line.Append(Localized("ftdi.inspector.summary-external"));
+                    detail += $"  × {behavior.Weight}";
+                    if (!localSets.Contains(behavior.Weight)) detail += Localized("ftdi.inspector.summary-external");
                 }
-                line.Append("    ").Append(DescribeExpression(behavior));
-                _summaryContainer.Add(SummaryLabel(line.ToString()));
+                var detailCell = SummaryCell(detail, 1);
+                detailCell.AddToClassList("ftdi-summary__cell--wrap");
+                _summaryContainer.Add(SummaryRow(true, detailCell));
             }
         }
 
@@ -254,7 +260,24 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             return heading;
         }
 
-        private static Label SummaryLabel(string text, string className = "ftdi-summary__line")
+        private static VisualElement SummaryRow(bool continuation, params VisualElement[] cells)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("ftdi-summary__row");
+            if (continuation) row.AddToClassList("ftdi-summary__row--continuation");
+            foreach (var cell in cells) row.Add(cell);
+            return row;
+        }
+
+        private static Label SummaryCell(string text, float grow)
+        {
+            var cell = SummaryLabel(text, "ftdi-summary__cell");
+            cell.style.flexGrow = grow;
+            cell.tooltip = text;
+            return cell;
+        }
+
+        private static Label SummaryLabel(string text, string className)
         {
             var label = new Label(text);
             label.AddToClassList(className);

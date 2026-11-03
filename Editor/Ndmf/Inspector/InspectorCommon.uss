@@ -81,8 +81,30 @@
     margin-left: 6px;
 }
 
-.ftdi-summary__line {
-    white-space: normal;
+.ftdi-summary__row {
+    flex-direction: row;
     margin-left: 8px;
     opacity: 0.6;
+}
+
+.ftdi-summary__row--continuation {
+    padding-left: 32px;
+    margin-bottom: 2px;
+}
+
+.ftdi-summary__cell {
+    flex-basis: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ftdi-summary__cell--wrap {
+    white-space: normal;
+}
+
+.ftdi-summary__index {
+    flex-basis: 32px;
+    flex-shrink: 0;
 }
