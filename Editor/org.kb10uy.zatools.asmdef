@@ -8,7 +8,8 @@
         "nadena.dev.ndmf",
         "nadena.dev.ndmf.runtime",
         "nadena.dev.ndmf.vrchat",
-        "nadena.dev.modular-avatar.core"
+        "nadena.dev.modular-avatar.core",
+        "VRC.SDK3A.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -34,6 +35,11 @@
             "name": "com.vrchat.avatars",
             "expression": "3.10.0",
             "define": "ZATOOLS_HAS_VRCSDK"
+        },
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "3.10.6",
+            "define": "ZATOOLS_HAS_VRCSDK_FACE_TRACKING"
         },
         {
             "name": "com.vrchat.avatars",
