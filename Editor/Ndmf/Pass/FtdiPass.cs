@@ -1,7 +1,7 @@
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
 using System.Collections.Generic;
-using nadena.dev.ndmf;
 using VRC.SDK3.Avatars.Components;
+using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Ndmf.Core;
 using UnityObject = UnityEngine.Object;
 using FtdiComponent = KusakaFactory.Zatools.Runtime.FaceTrackingDataInstaller;
@@ -75,19 +75,10 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private static void Report(FtdiDiagnostic diagnostic)
         {
-            var location = DefinitionName(diagnostic.Context);
+            var location = diagnostic.Context is FtdiComponent component && component.Definition != null ? component.Definition.name : "";
             if (diagnostic.Location.IsKnown) location += $":{diagnostic.Location.Line}:{diagnostic.Location.Column}";
             var message = diagnostic.Localize();
-            ErrorReport.ReportError(new ZatoolsNdmfError(
-                diagnostic.Context,
-                ErrorSeverity.Error,
-                "ftdi.report.invalid-definition",
-                location.Length > 0 ? $"{location}: {message}" : message));
-        }
-
-        private static string DefinitionName(UnityObject context)
-        {
-            return context is FtdiComponent component && component.Definition != null ? component.Definition.name : "";
+            ErrorReport.ReportError(new ZatoolsNdmfError(diagnostic.Context, ErrorSeverity.Error, "ftdi.report.invalid-definition", location.Length > 0 ? $"{location}: {message}" : message));
         }
     }
 }
