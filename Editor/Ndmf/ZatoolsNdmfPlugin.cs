@@ -58,6 +58,14 @@ namespace KusakaFactory.Zatools.Ndmf
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .Run(new PbitTransforming());
 
+#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
+            // Transforming after MA, before AAO
+            InPhase(BuildPhase.Transforming)
+                .AfterPlugin("nadena.dev.modular-avatar")
+                .BeforePlugin("com.anatawa12.avatar-optimizer")
+                .Run(new FtdiTransforming());
+#endif
+
             // Transforming after MA, APS
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")

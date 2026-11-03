@@ -749,3 +749,29 @@ msgstr "At most {0} BlendShapeSets are allowed"
 
 msgid "ftdi.diagnostic.too-many-parameter-behaviors"
 msgstr "At most {0} ParameterBehaviors are allowed"
+
+msgid "ftdi.report.existing-configuration"
+msgstr "Face Tracking Data Installer: The Avatar Descriptor already has settings"
+
+msgid "ftdi.report.existing-configuration:description"
+msgstr ""
+"Face Tracking Data Installer cannot be applied because the Avatar Descriptor still has Face Tracking settings.\n"
+"Save the current settings to JSON from the Face Tracking Data Installer inspector."
+
+msgid "ftdi.report.missing-definition"
+msgstr "Face Tracking Data Installer: No definition JSON"
+
+msgid "ftdi.report.missing-definition:description"
+msgstr "Face Tracking settings cannot be applied because no definition JSON is assigned."
+
+msgid "ftdi.report.invalid-definition"
+msgstr "Face Tracking Data Installer: Definition error"
+
+msgid "ftdi.report.invalid-definition:description"
+msgstr "{0}"
+
+msgid "ftdi.report.sdk-warning"
+msgstr "Face Tracking Data Installer: Warning from VRChat SDK"
+
+msgid "ftdi.report.sdk-warning:description"
+msgstr "{0}"
