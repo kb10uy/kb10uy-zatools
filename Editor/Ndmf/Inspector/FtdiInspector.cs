@@ -173,12 +173,22 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (descriptor == null || !Ftdi.HasExistingConfiguration(descriptor) || _component.Definition != null) return;
 
             var title = Localized("ftdi.inspector.save-title");
+            var diagnostics = new List<FtdiDiagnostic>();
+            var text = FtdiJson.Write(Ftdi.Export(descriptor, diagnostics));
+            if (diagnostics.Count == 0) FtdiJson.Parse(text, diagnostics);
+            if (diagnostics.Count > 0)
+            {
+                var lines = string.Join("\n", diagnostics.Select(ZatoolsLocalization.LocalizeFtdiDiagnostic));
+                EditorUtility.DisplayDialog(title, Format("ftdi.inspector.save-invalid", lines), Localized("ftdi.inspector.save-confirm-cancel"));
+                return;
+            }
+
             if (!EditorUtility.DisplayDialog(title, Localized("ftdi.inspector.save-confirm"), Localized("ftdi.inspector.save-confirm-ok"), Localized("ftdi.inspector.save-confirm-cancel"))) return;
 
             var path = EditorUtility.SaveFilePanelInProject(title, $"{descriptor.gameObject.name}-FaceTracking", "json", Localized("ftdi.inspector.save-message"));
             if (string.IsNullOrEmpty(path)) return;
 
-            File.WriteAllText(path, FtdiJson.Write(Ftdi.Export(descriptor)), new UTF8Encoding(false));
+            File.WriteAllText(path, text, new UTF8Encoding(false));
             AssetDatabase.ImportAsset(path);
             var asset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 

@@ -833,3 +833,10 @@ msgstr "キャンセル"
 
 msgid "ftdi.inspector.save-message"
 msgstr "定義 JSON の保存先を選択してください。"
+
+msgid "ftdi.inspector.save-invalid"
+msgstr ""
+"Avatar Descriptor の Face Tracking 設定はビルド時に受け付けられない内容を含んでいるため、定義 JSON に保存できません。\n"
+"Avatar Descriptor 側で以下を修正してからやり直してください。\n"
+"\n"
+"{0}"

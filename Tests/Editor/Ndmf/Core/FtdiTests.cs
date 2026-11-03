@@ -455,11 +455,12 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
                 },
             };
 
-            var exported = FtdiJson.Write(Ftdi.Export(sets, behaviors, true, new Ftdi.VisemeDampen(VisemeDampenMode.DampenTracking, 0.5f)));
+            var diagnostics = new List<FtdiDiagnostic>();
+            var exported = FtdiJson.Write(Ftdi.Export(sets, behaviors, true, new Ftdi.VisemeDampen(VisemeDampenMode.DampenTracking, 0.5f), diagnostics));
+            Assert.That(Codes(diagnostics), Is.Empty);
             Assert.That(exported, Does.Not.Contain("\r"));
             Assert.That(exported, Does.Contain("\"JawOpen\""));
 
-            var diagnostics = new List<FtdiDiagnostic>();
             var definition = FtdiJson.Parse(exported, diagnostics);
             Assert.That(Codes(diagnostics), Is.Empty);
             var configuration = Ftdi.Merge(new[] { new Ftdi.Source { Definition = definition } }, false, diagnostics);
@@ -484,6 +485,65 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             Assert.That(forward.weightBlendSetName, Is.EqualTo("Face"));
             Assert.That(forward.customExpression, Is.EqualTo("JawOpen * 2"));
             Assert.That(forward.inputTrackingKeys, Is.Empty);
+        }
+
+        [Test]
+        public void ExportReportsUnresolvableInputs()
+        {
+            var behaviors = new[]
+            {
+                new SdkParameterBehavior
+                {
+                    targetMode = TargetMode.ForwardToAnimator,
+                    outputParameterName = "Param",
+                    inputTrackingKeys = new[] { 999, 998, (int)FaceTrackingKey.JawOpen },
+                    inputTrackingKeyNames = new[] { "Voicee", "" },
+                    inputInverted = new[] { false, false, true },
+                    combineMode = CombineMode.Max,
+                },
+            };
+
+            var diagnostics = new List<FtdiDiagnostic>();
+            var definition = Ftdi.Export(new SdkBlendShapeSet[0], behaviors, true, new Ftdi.VisemeDampen(VisemeDampenMode.None, 0.0f), diagnostics);
+
+            Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.UnknownInputKey, FtdiDiagnosticCode.UnknownInputKey }));
+            Assert.That(diagnostics.Select((d) => d.Arguments[0]), Is.EqualTo(new[] { "Voicee", "998" }));
+            Assert.That(diagnostics.Select((d) => d.Suggestion), Is.EqualTo(new[] { "Voice", null }));
+            Assert.That(definition.ParameterBehaviors.Single().Inputs.Select((i) => (i.Index, i.Invert)), Is.EqualTo(new[] { ((int)FaceTrackingKey.JawOpen, true) }));
+        }
+
+        [Test]
+        public void ExportedIncompleteEntriesFailToParse()
+        {
+            var sets = new[] { new SdkBlendShapeSet { setName = "" } };
+            var behaviors = new[]
+            {
+                new SdkParameterBehavior
+                {
+                    targetMode = TargetMode.ApplyToBlendshape,
+                    targetBlendshapeName = "",
+                    inputTrackingKeys = new[] { (int)FaceTrackingKey.JawOpen },
+                    inputTrackingKeyNames = new[] { "JawOpen" },
+                    inputInverted = new[] { false },
+                    combineMode = CombineMode.Max,
+                },
+                new SdkParameterBehavior
+                {
+                    targetMode = TargetMode.ForwardToAnimator,
+                    outputParameterName = "Param",
+                    combineMode = CombineMode.Custom,
+                    customExpression = "",
+                },
+            };
+
+            var diagnostics = new List<FtdiDiagnostic>();
+            var exported = FtdiJson.Write(Ftdi.Export(sets, behaviors, true, new Ftdi.VisemeDampen(VisemeDampenMode.None, 0.0f), diagnostics));
+            Assert.That(Codes(diagnostics), Is.Empty);
+
+            FtdiJson.Parse(exported, diagnostics);
+            Assert.That(Codes(diagnostics), Is.EqualTo(Enumerable.Repeat(FtdiDiagnosticCode.EmptyValue, 3)));
+            Assert.That(diagnostics.Select((d) => d.Arguments[0]), Is.EqualTo(new[] { "Name", "Target", "Expression" }));
+            Assert.That(diagnostics.Select((d) => d.Location.IsKnown), Has.All.True);
         }
     }
 }

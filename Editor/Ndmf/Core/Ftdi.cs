@@ -91,20 +91,22 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             descriptor.faceTrackingParameterBehaviors = configuration.ParameterBehaviors.ToList();
         }
 
-        internal static Definition Export(VRCAvatarDescriptor descriptor)
+        internal static Definition Export(VRCAvatarDescriptor descriptor, List<FtdiDiagnostic> diagnostics)
         {
             return Export(
                 descriptor.faceTrackingBlendshapesSetList ?? new List<SdkBlendShapeSet>(),
                 descriptor.faceTrackingParameterBehaviors ?? new List<SdkParameterBehavior>(),
                 descriptor.useAllTrackingKeys,
-                new VisemeDampen(descriptor.visemeDampenMode, descriptor.visemeDampenAmount));
+                new VisemeDampen(descriptor.visemeDampenMode, descriptor.visemeDampenAmount),
+                diagnostics);
         }
 
         internal static Definition Export(
             IEnumerable<SdkBlendShapeSet> sets,
             IEnumerable<SdkParameterBehavior> behaviors,
             bool useAllTrackingKeys,
-            VisemeDampen visemeDampen)
+            VisemeDampen visemeDampen,
+            List<FtdiDiagnostic> diagnostics)
         {
             var definition = new Definition
             {
@@ -135,7 +137,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 }
                 else
                 {
-                    exported.Inputs.AddRange(ExportInputs(behavior));
+                    exported.Inputs.AddRange(ExportInputs(behavior, diagnostics));
                 }
                 definition.ParameterBehaviors.Add(exported);
             }
@@ -211,7 +213,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
         }
 
-        private static IEnumerable<BehaviorInput> ExportInputs(SdkParameterBehavior behavior)
+        private static IEnumerable<BehaviorInput> ExportInputs(SdkParameterBehavior behavior, List<FtdiDiagnostic> diagnostics)
         {
             var keys = behavior.inputTrackingKeys ?? Array.Empty<int>();
             var names = behavior.inputTrackingKeyNames ?? Array.Empty<string>();
@@ -221,7 +223,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 var index = keys[i];
                 if (InputName(index) == null)
                 {
-                    if (i >= names.Length || names[i] == null || !InputIndices.TryGetValue(names[i], out index)) continue;
+                    var name = i < names.Length ? names[i] : null;
+                    if (string.IsNullOrEmpty(name) || !InputIndices.TryGetValue(name, out index))
+                    {
+                        var value = string.IsNullOrEmpty(name) ? keys[i].ToString() : name;
+                        diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, SourceLocation.None, value)
+                            .WithSuggestion(string.IsNullOrEmpty(name) ? null : Suggest(name, InputIndices.Keys)));
+                        continue;
+                    }
                 }
                 yield return new BehaviorInput(index, i < inverted.Length && inverted[i], SourceLocation.None);
             }

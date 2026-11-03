@@ -831,3 +831,10 @@ msgstr "Cancel"
 
 msgid "ftdi.inspector.save-message"
 msgstr "Choose where to save the definition JSON."
+
+msgid "ftdi.inspector.save-invalid"
+msgstr ""
+"The Face Tracking configuration on the Avatar Descriptor cannot be saved as a definition JSON because it would not be accepted at build time.\n"
+"Fix the following in the Avatar Descriptor and try again.\n"
+"\n"
+"{0}"
