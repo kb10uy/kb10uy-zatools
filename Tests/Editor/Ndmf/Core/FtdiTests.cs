@@ -283,7 +283,7 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void RecordsBehaviorOriginsInMergeOrder()
+        public void KeepsBehaviorsInMergeOrder()
         {
             const string two = "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'A', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }, { 'Operation': 'ForwardToAnimator', 'Target': 'B', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }] }";
             const string one = "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'C', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }] }";
@@ -297,12 +297,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
 
             Assert.That(Codes(diagnostics), Is.Empty);
             Assert.That(configuration.ParameterBehaviors.Select((b) => b.outputParameterName), Is.EqualTo(new[] { "A", "B", "C" }));
-            Assert.That(configuration.ParameterBehaviorOrigins.Select((o) => (o.Context, o.Index)), Is.EqualTo(new[]
-            {
-                ((UnityObject)first, 0),
-                ((UnityObject)first, 1),
-                ((UnityObject)second, 0),
-            }));
         }
 
         [Test]

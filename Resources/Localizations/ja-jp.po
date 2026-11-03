@@ -772,12 +772,6 @@ msgstr "Face Tracking Data Installer: 定義エラー"
 msgid "ftdi.report.invalid-definition:description"
 msgstr "{0}"
 
-msgid "ftdi.report.sdk-warning"
-msgstr "Face Tracking Data Installer: VRChat SDK の警告"
-
-msgid "ftdi.report.sdk-warning:description"
-msgstr "{0}"
-
 msgid "ftdi.inspector.warning-existing"
 msgstr "Avatar Descriptor に Face Tracking の設定が残っています。このままではビルド時にエラーになります。"
 
