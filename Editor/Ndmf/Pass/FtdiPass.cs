@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using nadena.dev.ndmf;
 using VRC.SDK3.Avatars.Components;
-using KusakaFactory.Zatools.Localization;
 using KusakaFactory.Zatools.Ndmf.Core;
 using UnityObject = UnityEngine.Object;
 using FtdiComponent = KusakaFactory.Zatools.Runtime.FaceTrackingDataInstaller;
@@ -85,7 +84,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         {
             var location = DefinitionName(diagnostic.Context);
             if (diagnostic.Location.IsKnown) location += $":{diagnostic.Location.Line}:{diagnostic.Location.Column}";
-            var message = ZatoolsLocalization.LocalizeFtdiDiagnostic(diagnostic);
+            var message = diagnostic.Localize();
             ErrorReport.ReportError(new ZatoolsNdmfError(
                 diagnostic.Context,
                 ErrorSeverity.Error,

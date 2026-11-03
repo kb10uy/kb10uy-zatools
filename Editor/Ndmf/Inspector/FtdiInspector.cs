@@ -192,7 +192,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (diagnostics.Count == 0) FtdiJson.Parse(text, diagnostics);
             if (diagnostics.Count > 0)
             {
-                var lines = string.Join("\n", diagnostics.Select(ZatoolsLocalization.LocalizeFtdiDiagnostic));
+                var lines = string.Join("\n", diagnostics.Select((d) => d.Localize()));
                 EditorUtility.DisplayDialog(title, Format("ftdi.inspector.save-invalid", lines), Localized("ftdi.inspector.save-confirm-cancel"));
                 return;
             }
@@ -237,7 +237,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         private static Label DiagnosticLabel(TextAsset asset, FtdiDiagnostic diagnostic)
         {
-            var message = ZatoolsLocalization.LocalizeFtdiDiagnostic(diagnostic);
+            var message = diagnostic.Localize();
             var location = diagnostic.Location;
             var label = new Label(location.IsKnown ? $"L{location.Line}:{location.Column}  {message}" : message);
             label.AddToClassList("ftdi-diagnostic");

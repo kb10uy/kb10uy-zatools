@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEditor;
 using nadena.dev.ndmf.localization;
 using KusakaFactory.Zatools.Foundation.Arithmetic;
-using KusakaFactory.Zatools.Ndmf.Core;
 
 namespace KusakaFactory.Zatools.Localization
 {
@@ -45,15 +44,6 @@ namespace KusakaFactory.Zatools.Localization
         {
             return FormatLocalized(diagnostic.LocalizationKey, diagnostic.Arguments);
         }
-
-#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
-        internal static string LocalizeFtdiDiagnostic(FtdiDiagnostic diagnostic)
-        {
-            var message = FormatLocalized(diagnostic.LocalizationKey, diagnostic.Arguments);
-            if (diagnostic.Suggestion == null) return message;
-            return message + FormatLocalized("ftdi.diagnostic.suggestion", diagnostic.Suggestion);
-        }
-#endif
 
         internal static string FormatLocalized(string key, params string[] arguments)
         {
