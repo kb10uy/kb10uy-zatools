@@ -344,6 +344,19 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal ImmutableArray<SkinnedMeshRenderer> Meshes;
             internal ImmutableArray<SdkBlendShapeSet> BlendShapeSets;
             internal ImmutableArray<SdkParameterBehavior> ParameterBehaviors;
+            internal ImmutableArray<BehaviorOrigin> ParameterBehaviorOrigins;
+        }
+
+        internal readonly struct BehaviorOrigin
+        {
+            internal readonly UnityObject Context;
+            internal readonly int Index;
+
+            internal BehaviorOrigin(UnityObject context, int index)
+            {
+                Context = context;
+                Index = index;
+            }
         }
 
         private sealed class Merger
@@ -353,7 +366,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             private readonly HashSet<SkinnedMeshRenderer> _meshSet = new HashSet<SkinnedMeshRenderer>();
             private readonly List<MergedSet> _sets = new List<MergedSet>();
             private readonly Dictionary<string, MergedSet> _setsByName = new Dictionary<string, MergedSet>(StringComparer.Ordinal);
-            private readonly List<(UnityObject Context, ParameterBehavior Behavior)> _behaviors = new List<(UnityObject, ParameterBehavior)>();
+            private readonly List<(BehaviorOrigin Origin, ParameterBehavior Behavior)> _behaviors = new List<(BehaviorOrigin, ParameterBehavior)>();
             private readonly Dictionary<(TargetMode, string), UnityObject> _outputs = new Dictionary<(TargetMode, string), UnityObject>();
             private (bool Value, UnityObject Context)? _useAllTrackingKeys;
             private (VisemeDampen Value, UnityObject Context)? _visemeDampen;
@@ -401,8 +414,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
                 foreach (var set in definition.BlendShapeSets) AddSet(set, context);
 
-                foreach (var behavior in definition.ParameterBehaviors)
+                for (var i = 0; i < definition.ParameterBehaviors.Count; ++i)
                 {
+                    var behavior = definition.ParameterBehaviors[i];
                     if (HasExclusiveOutput(behavior.Operation))
                     {
                         var key = (behavior.Operation, behavior.Target);
@@ -415,7 +429,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                             _outputs.Add(key, context);
                         }
                     }
-                    _behaviors.Add((context, behavior));
+                    _behaviors.Add((new BehaviorOrigin(context, i), behavior));
                 }
             }
 
@@ -424,15 +438,15 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 var useAllTrackingKeys = _useAllTrackingKeys?.Value ?? fallbackUseAllTrackingKeys;
                 if (!useAllTrackingKeys) CheckNonBasicKeys();
 
-                foreach (var (context, behavior) in _behaviors)
+                foreach (var (origin, behavior) in _behaviors)
                 {
                     if (behavior.Operation == TargetMode.ApplyBlendSetWeight && !_setsByName.ContainsKey(behavior.Target))
                     {
-                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.TargetLocation, context, behavior.Target);
+                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.TargetLocation, origin.Context, behavior.Target);
                     }
                     if (behavior.Weight != null && !_setsByName.ContainsKey(behavior.Weight))
                     {
-                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.WeightLocation, context, behavior.Weight);
+                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.WeightLocation, origin.Context, behavior.Weight);
                     }
                 }
 
@@ -447,6 +461,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     Meshes = _meshes.ToImmutableArray(),
                     BlendShapeSets = _sets.Select((s) => s.ToSdk()).ToImmutableArray(),
                     ParameterBehaviors = _behaviors.Select((b) => ToSdk(b.Behavior)).ToImmutableArray(),
+                    ParameterBehaviorOrigins = _behaviors.Select((b) => b.Origin).ToImmutableArray(),
                 };
             }
 
@@ -501,11 +516,11 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         }
                     }
                 }
-                foreach (var (context, behavior) in _behaviors)
+                foreach (var (origin, behavior) in _behaviors)
                 {
                     foreach (var input in behavior.Inputs.Where((i) => !IsBasicInput(i.Index)))
                     {
-                        Report(FtdiDiagnosticCode.NonBasicTrackingKey, input.Location, context, InputName(input.Index));
+                        Report(FtdiDiagnosticCode.NonBasicTrackingKey, input.Location, origin.Context, InputName(input.Index));
                     }
                 }
             }

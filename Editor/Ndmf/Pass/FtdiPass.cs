@@ -1,5 +1,6 @@
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using nadena.dev.ndmf;
 using VRC.SDK3.Avatars.Components;
 using KusakaFactory.Zatools.Localization;
@@ -12,6 +13,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class FtdiTransforming : ZatoolsPass<FtdiTransforming>
     {
+        private static readonly Regex BehaviorNumberPattern = new Regex(@"parameter behavior #(\d+)", RegexOptions.CultureInvariant);
+
         protected override string ZatoolsPassName => nameof(FtdiTransforming);
         protected override string ZatoolsPassDescription => "Install face tracking data";
 
@@ -74,15 +77,13 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             Ftdi.Apply(descriptor, configuration);
             foreach (var warning in FaceTrackingExpressionValidator.CollectWarnings(descriptor))
             {
-                ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.NonFatal, "ftdi.report.sdk-warning", warning));
+                ReportSdkWarning(descriptor, configuration, warning);
             }
         }
 
         private static void Report(FtdiDiagnostic diagnostic)
         {
-            var location = diagnostic.Context is FtdiComponent component && component.Definition != null
-                ? component.Definition.name
-                : "";
+            var location = DefinitionName(diagnostic.Context);
             if (diagnostic.Location.IsKnown) location += $":{diagnostic.Location.Line}:{diagnostic.Location.Column}";
             var message = ZatoolsLocalization.LocalizeFtdiDiagnostic(diagnostic);
             ErrorReport.ReportError(new ZatoolsNdmfError(
@@ -90,6 +91,36 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 ErrorSeverity.Error,
                 "ftdi.report.invalid-definition",
                 location.Length > 0 ? $"{location}: {message}" : message));
+        }
+
+        private static void ReportSdkWarning(VRCAvatarDescriptor descriptor, Ftdi.Configuration configuration, string warning)
+        {
+            var match = BehaviorNumberPattern.Match(warning);
+            var origins = configuration.ParameterBehaviorOrigins;
+            if (!match.Success
+                || !int.TryParse(match.Groups[1].Value, out var number)
+                || number < 1
+                || number > origins.Length
+                || origins[number - 1].Context == null)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.NonFatal, "ftdi.report.sdk-warning", warning));
+                return;
+            }
+
+            var origin = origins[number - 1];
+            var group = match.Groups[1];
+            var rewritten = warning.Substring(0, group.Index) + (origin.Index + 1) + warning.Substring(group.Index + group.Length);
+            var location = DefinitionName(origin.Context);
+            ErrorReport.ReportError(new ZatoolsNdmfError(
+                origin.Context,
+                ErrorSeverity.NonFatal,
+                "ftdi.report.sdk-warning",
+                location.Length > 0 ? $"{location}: {rewritten}" : rewritten));
+        }
+
+        private static string DefinitionName(UnityObject context)
+        {
+            return context is FtdiComponent component && component.Definition != null ? component.Definition.name : "";
         }
     }
 }

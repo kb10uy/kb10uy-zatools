@@ -59,7 +59,6 @@ namespace KusakaFactory.Zatools.Ndmf
                 .Run(new PbitTransforming());
 
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
-            // Transforming after MA, before AAO
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
                 .BeforePlugin("com.anatawa12.avatar-optimizer")

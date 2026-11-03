@@ -194,6 +194,12 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             Assert.That(Parse("{ 'Version': 2 }", out var version), Is.Null);
             Assert.That(Codes(version), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
 
+            Assert.That(Parse("{ 'Version': 99999999999999999999 }", out var huge), Is.Null);
+            Assert.That(Codes(huge), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
+
+            Assert.That(Parse("{ 'Version': 1.0 }", out var fractional), Is.Null);
+            Assert.That(Codes(fractional), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
+
             Assert.That(Parse("[]", out var array), Is.Null);
             Assert.That(Codes(array), Is.EqualTo(new[] { FtdiDiagnosticCode.RootNotObject }));
         }
@@ -273,6 +279,29 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
                 FtdiDiagnosticCode.DefaultWeightConflict,
                 FtdiDiagnosticCode.TrackingKeyConflict,
                 FtdiDiagnosticCode.VisemeConflict,
+            }));
+        }
+
+        [Test]
+        public void RecordsBehaviorOriginsInMergeOrder()
+        {
+            const string two = "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'A', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }, { 'Operation': 'ForwardToAnimator', 'Target': 'B', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }] }";
+            const string one = "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'C', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['EyeClosedLeft'] } }] }";
+            var first = CreateRenderer();
+            var second = CreateRenderer();
+
+            var configuration = Merge(
+                out var diagnostics,
+                new Ftdi.Source { Context = first, Definition = ParseValid(two) },
+                new Ftdi.Source { Context = second, Definition = ParseValid(one) });
+
+            Assert.That(Codes(diagnostics), Is.Empty);
+            Assert.That(configuration.ParameterBehaviors.Select((b) => b.outputParameterName), Is.EqualTo(new[] { "A", "B", "C" }));
+            Assert.That(configuration.ParameterBehaviorOrigins.Select((o) => (o.Context, o.Index)), Is.EqualTo(new[]
+            {
+                ((UnityObject)first, 0),
+                ((UnityObject)first, 1),
+                ((UnityObject)second, 0),
             }));
         }
 

@@ -54,9 +54,18 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             _saveButton.clicked += SaveExistingConfiguration;
             inspector.TrackSerializedObjectValue(serializedObject, (_) => Refresh(false));
-            inspector.RegisterCallback<AttachToPanelEvent>((_) => EditorApplication.projectChanged += OnProjectChanged);
-            inspector.RegisterCallback<DetachFromPanelEvent>((_) => EditorApplication.projectChanged -= OnProjectChanged);
-            inspector.schedule.Execute(RefreshExistingConfiguration).Every(1000);
+            inspector.RegisterCallback<AttachToPanelEvent>((_) =>
+            {
+                EditorApplication.projectChanged += OnProjectChanged;
+                ObjectChangeEvents.changesPublished += OnObjectChanged;
+                Undo.undoRedoPerformed += RefreshExistingConfiguration;
+            });
+            inspector.RegisterCallback<DetachFromPanelEvent>((_) =>
+            {
+                EditorApplication.projectChanged -= OnProjectChanged;
+                ObjectChangeEvents.changesPublished -= OnObjectChanged;
+                Undo.undoRedoPerformed -= RefreshExistingConfiguration;
+            });
 
             Refresh(true);
             return inspector;
@@ -65,6 +74,11 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private void OnProjectChanged()
         {
             Refresh(false);
+        }
+
+        private void OnObjectChanged(ref ObjectChangeEventStream stream)
+        {
+            RefreshExistingConfiguration();
         }
 
         private void Refresh(bool force)

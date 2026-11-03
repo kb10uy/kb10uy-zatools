@@ -155,7 +155,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 CheckProperties(root, RootProperties);
 
                 if (!TryRequired(root, "Version", out var versionToken)) return null;
-                if (versionToken.Type != JTokenType.Integer || versionToken.Value<long>() != CurrentVersion)
+                if (!(versionToken is JValue versionValue && versionValue.Value is long version && version == CurrentVersion))
                 {
                     Report(FtdiDiagnosticCode.UnsupportedVersion, versionToken, versionToken.ToString(Formatting.None));
                     return null;
