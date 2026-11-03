@@ -144,7 +144,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             {
                 var weight = set.DefaultWeight.HasValue ? set.DefaultWeight.Value.ToString("0.###") : "-";
                 var counts = Format("ftdi.inspector.summary-set-counts", set.TrackingKeys.Count.ToString(), set.Visemes.Count.ToString());
-                _summaryContainer.Add(SummaryRow(false, SummaryCell(set.Name, 1), SummaryCell($"weight {weight}", 1), SummaryCell(counts, 4)));
+                _summaryContainer.Add(SummaryEntry(SummaryRow(false, SummaryCell(set.Name, 1), SummaryCell($"weight {weight}", 1), SummaryCell(counts, 4))));
             }
 
             _summaryContainer.Add(SummaryHeading("ParameterBehaviors", definition.ParameterBehaviors.Count.ToString()));
@@ -158,7 +158,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 }
                 var index = SummaryCell($"#{i + 1}", 0);
                 index.AddToClassList("ftdi-summary__index");
-                _summaryContainer.Add(SummaryRow(false, index, SummaryCell(behavior.Operation.ToString(), 1), SummaryCell(target, 1)));
+                var header = SummaryRow(false, index, SummaryCell(behavior.Operation.ToString(), 1), SummaryCell(target, 1));
 
                 var detail = DescribeExpression(behavior);
                 if (behavior.Weight != null)
@@ -168,7 +168,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 }
                 var detailCell = SummaryCell(detail, 1);
                 detailCell.AddToClassList("ftdi-summary__cell--wrap");
-                _summaryContainer.Add(SummaryRow(true, detailCell));
+                _summaryContainer.Add(SummaryEntry(header, SummaryRow(true, detailCell)));
             }
         }
 
@@ -260,6 +260,14 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             return heading;
         }
 
+        private static VisualElement SummaryEntry(params VisualElement[] rows)
+        {
+            var entry = new VisualElement();
+            entry.AddToClassList("ftdi-summary__entry");
+            foreach (var row in rows) entry.Add(row);
+            return entry;
+        }
+
         private static VisualElement SummaryRow(bool continuation, params VisualElement[] cells)
         {
             var row = new VisualElement();
@@ -273,7 +281,6 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var cell = SummaryLabel(text, "ftdi-summary__cell");
             cell.style.flexGrow = grow;
-            cell.tooltip = text;
             return cell;
         }
 
