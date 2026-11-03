@@ -775,3 +775,59 @@ msgstr "Face Tracking Data Installer: Warning from VRChat SDK"
 
 msgid "ftdi.report.sdk-warning:description"
 msgstr "{0}"
+
+msgid "ftdi.inspector.warning-existing"
+msgstr "The Avatar Descriptor still has Face Tracking settings. The build will fail while they remain."
+
+msgid "ftdi.inspector.save-existing"
+msgstr "Save Current Settings to JSON and Move Them Here"
+
+msgid "ftdi.inspector.save-disabled"
+msgstr "This component already has a definition JSON. Add another Face Tracking Data Installer to save the settings."
+
+msgid "ftdi.inspector.definition"
+msgstr "Definition JSON"
+
+msgid "ftdi.inspector.summary"
+msgstr "Summary"
+
+msgid "ftdi.inspector.meshes"
+msgstr "Face Tracking Meshes"
+
+msgid "ftdi.inspector.status-no-definition"
+msgstr "Assign a definition JSON."
+
+msgid "ftdi.inspector.status-failed"
+msgstr "The definition JSON has {0} error(s)."
+
+msgid "ftdi.inspector.status-parsed"
+msgstr "BlendShapeSet {0} / ParameterBehavior {1} / UseAllTrackingKeys: {2}"
+
+msgid "ftdi.inspector.unspecified"
+msgstr "unspecified"
+
+msgid "ftdi.inspector.summary-set-counts"
+msgstr "{0} keys / {1} visemes"
+
+msgid "ftdi.inspector.summary-external"
+msgstr " (external)"
+
+msgid "ftdi.inspector.open-location"
+msgstr "Click to open this location in the editor"
+
+msgid "ftdi.inspector.save-title"
+msgstr "Save Face Tracking Settings"
+
+msgid "ftdi.inspector.save-confirm"
+msgstr ""
+"The Face Tracking settings of the Avatar Descriptor (meshes, BlendShapeSets and ParameterBehaviors) will be saved to a JSON file, moved to this component, and removed from the Avatar Descriptor.\n"
+"You can undo this, but the saved JSON file will remain."
+
+msgid "ftdi.inspector.save-confirm-ok"
+msgstr "Save and Move"
+
+msgid "ftdi.inspector.save-confirm-cancel"
+msgstr "Cancel"
+
+msgid "ftdi.inspector.save-message"
+msgstr "Choose where to save the definition JSON."

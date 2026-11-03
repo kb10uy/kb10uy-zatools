@@ -56,3 +56,24 @@
 .zatools-foldout--flush > .unity-foldout__content {
     margin-left: 4px;
 }
+
+.ftdi-note {
+    white-space: normal;
+    opacity: 0.6;
+}
+
+.ftdi-diagnostic {
+    white-space: normal;
+    margin-left: 4px;
+    color: var(--unity-colors-error-text);
+}
+
+.ftdi-summary__heading {
+    margin-top: 2px;
+    -unity-font-style: bold;
+}
+
+.ftdi-summary__line {
+    white-space: normal;
+    margin-left: 8px;
+}

@@ -777,3 +777,59 @@ msgstr "Face Tracking Data Installer: VRChat SDK の警告"
 
 msgid "ftdi.report.sdk-warning:description"
 msgstr "{0}"
+
+msgid "ftdi.inspector.warning-existing"
+msgstr "Avatar Descriptor に Face Tracking の設定が残っています。このままではビルド時にエラーになります。"
+
+msgid "ftdi.inspector.save-existing"
+msgstr "現在の設定を JSON に保存して移す"
+
+msgid "ftdi.inspector.save-disabled"
+msgstr "このコンポーネントには既に定義 JSON が割り当てられています。保存するには別の Face Tracking Data Installer を追加してください。"
+
+msgid "ftdi.inspector.definition"
+msgstr "定義 JSON"
+
+msgid "ftdi.inspector.summary"
+msgstr "概略"
+
+msgid "ftdi.inspector.meshes"
+msgstr "Face Tracking メッシュ"
+
+msgid "ftdi.inspector.status-no-definition"
+msgstr "定義 JSON を割り当ててください。"
+
+msgid "ftdi.inspector.status-failed"
+msgstr "定義 JSON にエラーが {0} 件あります。"
+
+msgid "ftdi.inspector.status-parsed"
+msgstr "BlendShapeSet {0} / ParameterBehavior {1} / UseAllTrackingKeys: {2}"
+
+msgid "ftdi.inspector.unspecified"
+msgstr "未指定"
+
+msgid "ftdi.inspector.summary-set-counts"
+msgstr "キー {0} / Viseme {1}"
+
+msgid "ftdi.inspector.summary-external"
+msgstr "（外部参照）"
+
+msgid "ftdi.inspector.open-location"
+msgstr "クリックするとエディタで該当箇所を開きます"
+
+msgid "ftdi.inspector.save-title"
+msgstr "Face Tracking 設定の保存"
+
+msgid "ftdi.inspector.save-confirm"
+msgstr ""
+"Avatar Descriptor の Face Tracking 設定（メッシュ・BlendShapeSet・ParameterBehavior）を JSON に保存してこのコンポーネントに移し、Avatar Descriptor からは削除します。\n"
+"この操作は Undo できますが、保存した JSON ファイルは残ります。"
+
+msgid "ftdi.inspector.save-confirm-ok"
+msgstr "保存して移す"
+
+msgid "ftdi.inspector.save-confirm-cancel"
+msgstr "キャンセル"
+
+msgid "ftdi.inspector.save-message"
+msgstr "定義 JSON の保存先を選択してください。"
