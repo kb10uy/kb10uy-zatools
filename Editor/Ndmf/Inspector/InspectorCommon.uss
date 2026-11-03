@@ -84,4 +84,5 @@
 .ftdi-summary__line {
     white-space: normal;
     margin-left: 8px;
+    opacity: 0.6;
 }
