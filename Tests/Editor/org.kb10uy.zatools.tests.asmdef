@@ -17,12 +17,20 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "System.Collections.Immutable.dll"
+        "System.Collections.Immutable.dll",
+        "VRCSDKBase.dll",
+        "VRCSDK3A.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "3.10.6",
+            "define": "ZATOOLS_HAS_VRCSDK_FACE_TRACKING"
+        }
+    ],
     "noEngineReferences": false
 }
