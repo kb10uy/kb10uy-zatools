@@ -790,9 +790,6 @@ msgstr "このコンポーネントには既に定義 JSON が割り当てられ
 msgid "ftdi.inspector.definition"
 msgstr "定義 JSON"
 
-msgid "ftdi.inspector.summary"
-msgstr "概略"
-
 msgid "ftdi.inspector.meshes"
 msgstr "Face Tracking メッシュ"
 
@@ -801,9 +798,6 @@ msgstr "定義 JSON を割り当ててください。"
 
 msgid "ftdi.inspector.status-failed"
 msgstr "定義 JSON にエラーが {0} 件あります。"
-
-msgid "ftdi.inspector.status-parsed"
-msgstr "BlendShapeSet {0} / ParameterBehavior {1} / UseAllTrackingKeys: {2}"
 
 msgid "ftdi.inspector.unspecified"
 msgstr "未指定"

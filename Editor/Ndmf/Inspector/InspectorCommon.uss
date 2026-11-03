@@ -69,8 +69,16 @@
 }
 
 .ftdi-summary__heading {
+    flex-direction: row;
     margin-top: 2px;
+}
+
+.ftdi-summary__heading-title {
     -unity-font-style: bold;
+}
+
+.ftdi-summary__heading-value {
+    margin-left: 6px;
 }
 
 .ftdi-summary__line {

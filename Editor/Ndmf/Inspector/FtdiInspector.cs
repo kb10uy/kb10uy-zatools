@@ -28,7 +28,6 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private Label _saveDisabledLabel;
         private HelpBox _statusBox;
         private VisualElement _diagnosticsContainer;
-        private Foldout _summaryFoldout;
         private VisualElement _summaryContainer;
 
         private bool _parsed;
@@ -49,7 +48,6 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _saveDisabledLabel = inspector.Q<Label>("LabelSaveDisabled");
             _statusBox = inspector.Q<HelpBox>("BoxStatus");
             _diagnosticsContainer = inspector.Q<VisualElement>("ContainerDiagnostics");
-            _summaryFoldout = inspector.Q<Foldout>("FoldoutSummary");
             _summaryContainer = inspector.Q<VisualElement>("ContainerSummary");
 
             _saveButton.clicked += SaveExistingConfiguration;
@@ -113,7 +111,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (asset == null)
             {
                 SetStatus(HelpBoxMessageType.Info, Localized("ftdi.inspector.status-no-definition"));
-                SetDisplayed(_summaryFoldout, false);
+                SetDisplayed(_summaryContainer, false);
                 return;
             }
 
@@ -123,27 +121,25 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             {
                 SetStatus(HelpBoxMessageType.Error, Format("ftdi.inspector.status-failed", diagnostics.Count.ToString()));
                 foreach (var diagnostic in diagnostics) _diagnosticsContainer.Add(DiagnosticLabel(asset, diagnostic));
-                SetDisplayed(_summaryFoldout, false);
+                SetDisplayed(_summaryContainer, false);
                 return;
             }
 
-            var useAllTrackingKeys = definition.UseAllTrackingKeys.HasValue
-                ? definition.UseAllTrackingKeys.Value.ToString()
-                : Localized("ftdi.inspector.unspecified");
-            SetStatus(HelpBoxMessageType.Info, Format(
-                "ftdi.inspector.status-parsed",
-                definition.BlendShapeSets.Count.ToString(),
-                definition.ParameterBehaviors.Count.ToString(),
-                useAllTrackingKeys));
+            SetDisplayed(_statusBox, false);
             BuildSummary(definition);
-            SetDisplayed(_summaryFoldout, true);
+            SetDisplayed(_summaryContainer, true);
         }
 
         private void BuildSummary(Ftdi.Definition definition)
         {
             var localSets = new HashSet<string>(definition.BlendShapeSets.Select((s) => s.Name));
 
-            _summaryContainer.Add(SummaryLabel("BlendShapeSets", "ftdi-summary__heading"));
+            var useAllTrackingKeys = definition.UseAllTrackingKeys.HasValue
+                ? (definition.UseAllTrackingKeys.Value ? "true" : "false")
+                : Localized("ftdi.inspector.unspecified");
+            _summaryContainer.Add(SummaryHeading("UseAllTrackingKeys", useAllTrackingKeys));
+
+            _summaryContainer.Add(SummaryHeading("BlendShapeSets", definition.BlendShapeSets.Count.ToString()));
             foreach (var set in definition.BlendShapeSets)
             {
                 var weight = set.DefaultWeight.HasValue ? set.DefaultWeight.Value.ToString("0.###") : "-";
@@ -151,7 +147,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 _summaryContainer.Add(SummaryLabel($"{set.Name}    weight {weight}    {counts}"));
             }
 
-            _summaryContainer.Add(SummaryLabel("ParameterBehaviors", "ftdi-summary__heading"));
+            _summaryContainer.Add(SummaryHeading("ParameterBehaviors", definition.ParameterBehaviors.Count.ToString()));
             for (var i = 0; i < definition.ParameterBehaviors.Count; ++i)
             {
                 var behavior = definition.ParameterBehaviors[i];
@@ -249,6 +245,15 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             return label;
         }
 
+        private static VisualElement SummaryHeading(string title, string value)
+        {
+            var heading = new VisualElement();
+            heading.AddToClassList("ftdi-summary__heading");
+            heading.Add(SummaryLabel(title, "ftdi-summary__heading-title"));
+            heading.Add(SummaryLabel(value, "ftdi-summary__heading-value"));
+            return heading;
+        }
+
         private static Label SummaryLabel(string text, string className = "ftdi-summary__line")
         {
             var label = new Label(text);
@@ -258,6 +263,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         private void SetStatus(HelpBoxMessageType type, string message)
         {
+            SetDisplayed(_statusBox, true);
             _statusBox.messageType = type;
             _statusBox.text = message;
         }

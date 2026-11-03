@@ -788,9 +788,6 @@ msgstr "This component already has a definition JSON. Add another Face Tracking 
 msgid "ftdi.inspector.definition"
 msgstr "Definition JSON"
 
-msgid "ftdi.inspector.summary"
-msgstr "Summary"
-
 msgid "ftdi.inspector.meshes"
 msgstr "Face Tracking Meshes"
 
@@ -799,9 +796,6 @@ msgstr "Assign a definition JSON."
 
 msgid "ftdi.inspector.status-failed"
 msgstr "The definition JSON has {0} error(s)."
-
-msgid "ftdi.inspector.status-parsed"
-msgstr "BlendShapeSet {0} / ParameterBehavior {1} / UseAllTrackingKeys: {2}"
 
 msgid "ftdi.inspector.unspecified"
 msgstr "unspecified"

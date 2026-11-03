@@ -10,9 +10,7 @@
         <uie:ObjectField label="ftdi.inspector.definition" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Definition" name="FieldDefinition" allow-scene-objects="false" class="ndmf-tr" />
         <ui:HelpBox name="BoxStatus" message-type="Info" style="margin-top: 4px; margin-bottom: 4px;" />
         <ui:VisualElement name="ContainerDiagnostics" style="margin-bottom: 4px;" />
-        <ui:Foldout name="FoldoutSummary" text="ftdi.inspector.summary" value="true" class="ndmf-tr zatools-foldout--flush">
-            <ui:VisualElement name="ContainerSummary" />
-        </ui:Foldout>
+        <ui:VisualElement name="ContainerSummary" style="margin-top: 4px; margin-bottom: 4px;" />
         <ui:Label tabindex="-1" text="ftdi.inspector.meshes" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-top: 8px;" />
         <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="Meshes" reorderable="true" virtualization-method="DynamicHeight" name="FieldMeshes" show-border="true" reorder-mode="Animated" style="margin-bottom: 4px;" />
     </ui:VisualElement>
