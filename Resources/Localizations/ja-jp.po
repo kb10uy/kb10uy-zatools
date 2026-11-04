@@ -751,6 +751,15 @@ msgstr "Face Tracking Data Installer: 定義エラー"
 msgid "ftdi.report.invalid-definition:description"
 msgstr "{0}"
 
+msgid "ftdi.diagnostic.inactive-gaze-mappings"
+msgstr "Eye Gaze Mode が Bone Rotation のため、この定義の EyeLook のマッピングは無効です。"
+
+msgid "ftdi.diagnostic.inactive-blink-mappings"
+msgstr "Eyelid Type が Bones または Blendshapes のため、この定義の EyeClosed のマッピングは無効です。"
+
+msgid "ftdi.diagnostic.inactive-visemes"
+msgstr "Lip Sync が Viseme BlendShape Face Tracking ではないため、この定義の Viseme 関連の設定は無効です。"
+
 msgid "ftdi.inspector.warning-existing"
 msgstr "Avatar Descriptor に Face Tracking の設定が残っています。このままではビルド時にエラーになります。"
 

@@ -12,6 +12,9 @@ using TargetMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.ParameterBeha
 using CombineMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.ParameterBehaviorCombineMode;
 using VisemeDampenMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.VisemeDampenMode;
 using Viseme = VRC.SDKBase.VRC_AvatarDescriptor.Viseme;
+using LipSyncStyle = VRC.SDKBase.VRC_AvatarDescriptor.LipSyncStyle;
+using EyelidType = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.EyelidType;
+using EyeGazeMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.CustomEyeLookSettings.EyeGazeMode;
 using SdkBlendShapeSet = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.FaceTrackingBlendshapesSet;
 using SdkParameterBehavior = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.FaceTrackingParameterBehavior;
 
@@ -68,6 +71,42 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return (descriptor.faceTrackingMeshes?.Any((m) => m != null) ?? false)
                 || (descriptor.faceTrackingBlendshapesSetList?.Count ?? 0) > 0
                 || (descriptor.faceTrackingParameterBehaviors?.Count ?? 0) > 0;
+        }
+
+        internal static IEnumerable<FtdiDiagnostic> CheckDescriptorSettings(VRCAvatarDescriptor descriptor, Definition definition)
+        {
+            var eyeLook = descriptor.customEyeLookSettings;
+            return CheckDescriptorSettings(
+                definition,
+                descriptor.enableEyeLook && eyeLook.eyeGazeMode == EyeGazeMode.BoneRotation,
+                descriptor.enableEyeLook && eyeLook.eyelidType != EyelidType.None && eyeLook.eyelidType != EyelidType.FaceTracking,
+                descriptor.lipSync == LipSyncStyle.VisemeBlendShapeFaceTracking);
+        }
+
+        internal static IEnumerable<FtdiDiagnostic> CheckDescriptorSettings(Definition definition, bool gazeDisabled, bool blinkDisabled, bool visemesAvailable)
+        {
+            var keys = definition.BlendShapeSets.SelectMany((s) => s.TrackingKeys).Select((m) => m.Index).ToList();
+            if (gazeDisabled && keys.Any(IsGazeKey)) yield return new FtdiDiagnostic(FtdiDiagnosticCode.InactiveGazeMappings);
+            if (blinkDisabled && keys.Any(IsBlinkKey)) yield return new FtdiDiagnostic(FtdiDiagnosticCode.InactiveBlinkMappings);
+            if (!visemesAvailable && UsesVisemes(definition)) yield return new FtdiDiagnostic(FtdiDiagnosticCode.InactiveVisemes);
+        }
+
+        private static bool IsGazeKey(int index)
+        {
+            return index >= (int)FaceTrackingKey.EyeLookOutRight && index <= (int)FaceTrackingKey.EyeLookDownLeft;
+        }
+
+        private static bool IsBlinkKey(int index)
+        {
+            return index == (int)FaceTrackingKey.EyeClosedRight || index == (int)FaceTrackingKey.EyeClosedLeft;
+        }
+
+        private static bool UsesVisemes(Definition definition)
+        {
+            return definition.BlendShapeSets.Any((s) => s.Visemes.Count > 0)
+                || (definition.VisemeDampen.HasValue && definition.VisemeDampen.Value.Mode != VisemeDampenMode.None)
+                || definition.ParameterBehaviors.Any((b) => b.Inputs.Any((i) => i.Index >= VRCAvatarDescriptor.FaceTrackingVisemeInputStart)
+                    || (b.CustomExpression != null && b.CustomExpression.Contains("Viseme_")));
         }
 
         internal static Configuration Merge(IEnumerable<Source> sources, bool fallbackUseAllTrackingKeys, List<FtdiDiagnostic> diagnostics)
@@ -546,6 +585,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         TooManyMeshes,
         TooManyBlendShapeSets,
         TooManyParameterBehaviors,
+        InactiveGazeMappings,
+        InactiveBlinkMappings,
+        InactiveVisemes,
     }
 
     internal readonly struct FtdiDiagnostic

@@ -12,6 +12,7 @@
         <uie:ObjectField label="ftdi.inspector.definition" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Definition" name="FieldDefinition" allow-scene-objects="false" class="ndmf-tr" />
         <ui:HelpBox name="BoxStatus" message-type="Info" style="margin-top: 4px; margin-bottom: 4px;" />
         <ui:VisualElement name="ContainerDiagnostics" style="margin-bottom: 4px;" />
+        <ui:VisualElement name="ContainerWarnings" />
         <ui:VisualElement name="ContainerSummary" style="margin-top: 4px; margin-bottom: 4px;" />
     </ui:VisualElement>
 </ui:UXML>

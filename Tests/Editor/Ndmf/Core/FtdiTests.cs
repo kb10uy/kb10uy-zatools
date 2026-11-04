@@ -237,6 +237,43 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
+        public void WarnsAboutMappingsDisabledByDescriptorSettings()
+        {
+            var eyes = ParseValid("{ 'Version': 1, 'BlendShapeSets': [{ 'Name': 'S', 'TrackingKeys': { 'EyeLookUpLeft': 'a', 'EyeClosedRight': 'b' } }] }");
+            var mouth = ParseValid("{ 'Version': 1, 'BlendShapeSets': [{ 'Name': 'S', 'TrackingKeys': { 'JawOpen': 'a' } }] }");
+
+            Assert.That(Codes(Ftdi.CheckDescriptorSettings(eyes, true, true, true)), Is.EqualTo(new[]
+            {
+                FtdiDiagnosticCode.InactiveGazeMappings,
+                FtdiDiagnosticCode.InactiveBlinkMappings,
+            }));
+            Assert.That(Codes(Ftdi.CheckDescriptorSettings(eyes, false, false, false)), Is.Empty);
+            Assert.That(Codes(Ftdi.CheckDescriptorSettings(mouth, true, true, false)), Is.Empty);
+        }
+
+        [Test]
+        public void WarnsAboutVisemesWithoutFaceTrackingLipSync()
+        {
+            string[] definitions =
+            {
+                "{ 'Version': 1, 'BlendShapeSets': [{ 'Name': 'S', 'Visemes': { 'aa': 'a' } }] }",
+                "{ 'Version': 1, 'VisemeDampen': { 'Mode': 'DampenTracking', 'Amount': 0.5 } }",
+                "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['Viseme_aa'] } }] }",
+                "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Custom', 'Expression': 'Viseme_aa * 0.5' } }] }",
+            };
+
+            foreach (var text in definitions)
+            {
+                var definition = ParseValid(text);
+                Assert.That(Codes(Ftdi.CheckDescriptorSettings(definition, false, false, false)), Is.EqualTo(new[] { FtdiDiagnosticCode.InactiveVisemes }), text);
+                Assert.That(Codes(Ftdi.CheckDescriptorSettings(definition, false, false, true)), Is.Empty, text);
+            }
+
+            var voice = ParseValid("{ 'Version': 1, 'VisemeDampen': { 'Mode': 'None', 'Amount': 0 }, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['Voice'] } }] }");
+            Assert.That(Codes(Ftdi.CheckDescriptorSettings(voice, false, false, false)), Is.Empty);
+        }
+
+        [Test]
         public void MergesSameNamedSetsByKey()
         {
             var configuration = Merge(

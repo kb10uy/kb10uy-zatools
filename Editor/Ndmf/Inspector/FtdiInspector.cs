@@ -28,11 +28,13 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private Label _saveDisabledLabel;
         private HelpBox _statusBox;
         private VisualElement _diagnosticsContainer;
+        private VisualElement _warningsContainer;
         private VisualElement _summaryContainer;
 
         private bool _parsed;
         private TextAsset _parsedAsset;
         private string _parsedText;
+        private Ftdi.Definition _parsedDefinition;
 
         protected override VisualElement CreateInspectorGUIImpl()
         {
@@ -48,6 +50,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _saveDisabledLabel = inspector.Q<Label>("LabelSaveDisabled");
             _statusBox = inspector.Q<HelpBox>("BoxStatus");
             _diagnosticsContainer = inspector.Q<VisualElement>("ContainerDiagnostics");
+            _warningsContainer = inspector.Q<VisualElement>("ContainerWarnings");
             _summaryContainer = inspector.Q<VisualElement>("ContainerSummary");
 
             _saveButton.clicked += SaveExistingConfiguration;
@@ -56,13 +59,13 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             {
                 EditorApplication.projectChanged += OnProjectChanged;
                 ObjectChangeEvents.changesPublished += OnObjectChanged;
-                Undo.undoRedoPerformed += RefreshExistingConfiguration;
+                Undo.undoRedoPerformed += RefreshDescriptorState;
             });
             inspector.RegisterCallback<DetachFromPanelEvent>((_) =>
             {
                 EditorApplication.projectChanged -= OnProjectChanged;
                 ObjectChangeEvents.changesPublished -= OnObjectChanged;
-                Undo.undoRedoPerformed -= RefreshExistingConfiguration;
+                Undo.undoRedoPerformed -= RefreshDescriptorState;
             });
 
             Refresh(true);
@@ -76,13 +79,31 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
         private void OnObjectChanged(ref ObjectChangeEventStream stream)
         {
-            RefreshExistingConfiguration();
+            RefreshDescriptorState();
         }
 
         private void Refresh(bool force)
         {
-            RefreshExistingConfiguration();
             RefreshDefinition(force);
+            RefreshDescriptorState();
+        }
+
+        private void RefreshDescriptorState()
+        {
+            RefreshExistingConfiguration();
+            RefreshWarnings();
+        }
+
+        private void RefreshWarnings()
+        {
+            if (_component == null) return;
+            _warningsContainer.Clear();
+            var descriptor = FindDescriptor();
+            if (descriptor == null || _parsedDefinition == null) return;
+            foreach (var warning in Ftdi.CheckDescriptorSettings(descriptor, _parsedDefinition))
+            {
+                _warningsContainer.Add(new HelpBox(warning.Localize(), HelpBoxMessageType.Warning));
+            }
         }
 
         private void RefreshExistingConfiguration()
@@ -105,6 +126,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _parsed = true;
             _parsedAsset = asset;
             _parsedText = text;
+            _parsedDefinition = null;
 
             _diagnosticsContainer.Clear();
             _summaryContainer.Clear();
@@ -125,6 +147,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
                 return;
             }
 
+            _parsedDefinition = definition;
             SetDisplayed(_statusBox, false);
             BuildSummary(definition);
             SetDisplayed(_summaryContainer, true);
