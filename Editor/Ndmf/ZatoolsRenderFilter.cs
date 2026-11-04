@@ -56,7 +56,7 @@ namespace KusakaFactory.Zatools.Ndmf
 
             var node = CreateNode();
             var components = group.GetData<TComponent[]>();
-            await node.Initialize(original, proxyed, components, context);
+            await node.InitializeWithDependencies(original, proxyed, components, context);
             return node;
         }
 
@@ -78,7 +78,21 @@ namespace KusakaFactory.Zatools.Ndmf
     /// </remarks>
     public abstract class ZatoolsRenderFilterNode<TComponent> : IRenderFilterNode
     {
+        private ComputeContext _selfContext;
+
         public abstract RenderAspects WhatChanged { get; }
+
+        internal async ValueTask InitializeWithDependencies(
+            SkinnedMeshRenderer original,
+            SkinnedMeshRenderer proxyed,
+            TComponent[] components,
+            ComputeContext context
+        )
+        {
+            _selfContext = new ComputeContext(GetType().Name);
+            _selfContext.Invalidates(context);
+            await Initialize(original, proxyed, components, _selfContext);
+        }
 
         protected internal abstract ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -101,8 +115,13 @@ namespace KusakaFactory.Zatools.Ndmf
             RenderAspects updatedAspects
         )
         {
-            if (updatedAspects == 0) return Task.FromResult<IRenderFilterNode>(null);
-            var refreshed = ZatoolsRefresh(proxyPairs, context, updatedAspects);
+            if (_selfContext.IsInvalidated) return Task.FromResult<IRenderFilterNode>(null);
+
+            var refreshed = ZatoolsRefresh(proxyPairs, _selfContext, updatedAspects);
+            if (refreshed == this)
+            {
+                _selfContext.Invalidates(context);
+            }
             return Task.FromResult<IRenderFilterNode>(refreshed);
         }
 
