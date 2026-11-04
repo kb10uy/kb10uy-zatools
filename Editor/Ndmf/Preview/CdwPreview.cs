@@ -29,7 +29,18 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private SkinnedMeshRenderer _separateSource = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
-        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects
+        {
+            get
+            {
+                var aspects = RenderAspects.Mesh | RenderAspects.Material;
+                if (_separateMesh)
+                {
+                    aspects |= RenderAspects.Shapes;
+                }
+                return aspects;
+            }
+        }
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

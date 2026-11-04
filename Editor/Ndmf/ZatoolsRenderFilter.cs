@@ -126,7 +126,9 @@ namespace KusakaFactory.Zatools.Ndmf
             var (original, proxy) = proxyPairs.Single();
             var next = await Create(
                 (SkinnedMeshRenderer)original, (SkinnedMeshRenderer)proxy, _components, context);
-            next.WhatChanged = next.WrittenAspects;
+
+            // Removing a previous effect also needs to invalidate downstream nodes.
+            next.WhatChanged = WrittenAspects | next.WrittenAspects;
             return next;
         }
 
