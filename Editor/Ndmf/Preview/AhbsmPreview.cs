@@ -10,21 +10,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhbsmRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeMix>
+    internal sealed class AhbsmRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeMix, AhbsmRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc BlendShape Mix", "ad-hoc-blendshape-mix");
 
-        protected override ZatoolsRenderFilterNode<AdHocBlendShapeMix> CreateNode() => new AhbsmRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhbsmRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeMix>
+    internal sealed class AhbsmRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeMix, AhbsmRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

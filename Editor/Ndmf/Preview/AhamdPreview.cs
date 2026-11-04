@@ -11,23 +11,22 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhamdRenderFilter : ZatoolsRenderFilter<AdHocAdvancedMeshDuplication>
+    internal sealed class AhamdRenderFilter : ZatoolsRenderFilter<AdHocAdvancedMeshDuplication, AhamdRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-hoc Advanced Mesh Duplication", "ad-hoc-advanced-mesh-duplication", false);
 
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication> CreateNode() => new AhamdRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhamdRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication>
+    internal sealed class AhamdRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication, AhamdRenderFilterNode>
     {
         private Mesh _generatedMesh = null;
         private List<Material> _materials = null;
         private SkinnedMeshRenderer _source = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

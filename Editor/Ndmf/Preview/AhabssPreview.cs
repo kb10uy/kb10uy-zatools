@@ -11,22 +11,21 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhabssRenderFilter : ZatoolsRenderFilter<AdHocAdvancedBlendShapeSynthesis>
+    internal sealed class AhabssRenderFilter : ZatoolsRenderFilter<AdHocAdvancedBlendShapeSynthesis, AhabssRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-hoc Advanced BlendShape Synthesis", "ad-hoc-advanced-blendshape-synthesis", false);
 
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis> CreateNode() => new AhabssRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhabssRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis>
+    internal sealed class AhabssRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis, AhabssRenderFilterNode>
     {
         private Mesh _synthesizedMesh = null;
         private ImmutableArray<(int Index, float Weight)> _weights = ImmutableArray<(int Index, float Weight)>.Empty;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

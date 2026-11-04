@@ -9,21 +9,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhvdtRenderFilter : ZatoolsRenderFilter<AdHocVertexDataTransfer>
+    internal sealed class AhvdtRenderFilter : ZatoolsRenderFilter<AdHocVertexDataTransfer, AhvdtRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Vertex Data Transfer", "vertex-data-transfer");
 
-        protected override ZatoolsRenderFilterNode<AdHocVertexDataTransfer> CreateNode() => new AhvdtRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhvdtRenderFilterNode : ZatoolsRenderFilterNode<AdHocVertexDataTransfer>
+    internal sealed class AhvdtRenderFilterNode : ZatoolsRenderFilterNode<AdHocVertexDataTransfer, AhvdtRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

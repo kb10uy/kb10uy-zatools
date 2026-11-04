@@ -9,21 +9,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class UtmdRenderFilter : ZatoolsRenderFilter<UvTileMapDistribution>
+    internal sealed class UtmdRenderFilter : ZatoolsRenderFilter<UvTileMapDistribution, UtmdRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("UV Tile Map Distribution", "uv-tile-map-distribution");
 
-        protected override ZatoolsRenderFilterNode<UvTileMapDistribution> CreateNode() => new UtmdRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class UtmdRenderFilterNode : ZatoolsRenderFilterNode<UvTileMapDistribution>
+    internal sealed class UtmdRenderFilterNode : ZatoolsRenderFilterNode<UvTileMapDistribution, UtmdRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,

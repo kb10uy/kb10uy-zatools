@@ -11,16 +11,15 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class CdwRenderFilter : ZatoolsRenderFilter<ConvexDepthWrapper>
+    internal sealed class CdwRenderFilter : ZatoolsRenderFilter<ConvexDepthWrapper, CdwRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Convex Depth Wrapper", "convex-depth-wrapper", false);
 
-        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> CreateNode() => new CdwRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class CdwRenderFilterNode : ZatoolsRenderFilterNode<ConvexDepthWrapper>
+    internal sealed class CdwRenderFilterNode : ZatoolsRenderFilterNode<ConvexDepthWrapper, CdwRenderFilterNode>
     {
         internal static readonly string WrapperPreviewMaterialGuid = "c9f88a305477a2f4ea542f4d5700daaf";
 
@@ -30,7 +29,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private SkinnedMeshRenderer _separateSource = null;
 
         protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
