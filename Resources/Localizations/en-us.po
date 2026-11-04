@@ -666,9 +666,6 @@ msgstr "Result"
 msgid "zaxp.disassembly"
 msgstr "Disassembly"
 
-msgid "ftdi.diagnostic.suggestion"
-msgstr " (did you mean {0}?)"
-
 msgid "ftdi.diagnostic.syntax-error"
 msgstr "JSON syntax error: {0}"
 

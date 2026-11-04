@@ -266,7 +266,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     if (!indices.TryGetValue(property.Name, out var index))
                     {
-                        ReportUnknown(unknownCode, property, property.Name, indices.Keys);
+                        Report(unknownCode, property, property.Name);
                         succeeded = false;
                         continue;
                     }
@@ -394,7 +394,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryString(keyToken, "Key", out var key)) return false;
                 if (!Ftdi.InputIndices.TryGetValue(key, out var index))
                 {
-                    ReportUnknown(FtdiDiagnosticCode.UnknownInputKey, keyToken, key, Ftdi.InputIndices.Keys);
+                    Report(FtdiDiagnosticCode.UnknownInputKey, keyToken, key);
                     return false;
                 }
 
@@ -407,7 +407,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 foreach (var property in obj.Properties())
                 {
                     if (allowed.Contains(property.Name)) continue;
-                    ReportUnknown(FtdiDiagnosticCode.UnknownProperty, property, property.Name, allowed);
+                    Report(FtdiDiagnosticCode.UnknownProperty, property, property.Name);
                 }
             }
 
@@ -494,7 +494,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 var names = Enum.GetNames(typeof(T));
                 if (!names.Contains(text, StringComparer.Ordinal))
                 {
-                    ReportUnknown(FtdiDiagnosticCode.InvalidEnumValue, token, text, names, name);
+                    Report(FtdiDiagnosticCode.InvalidEnumValue, token, name, text);
                     return false;
                 }
                 value = (T)Enum.Parse(typeof(T), text);
@@ -504,12 +504,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             private void Report(FtdiDiagnosticCode code, JToken token, params string[] arguments)
             {
                 _diagnostics.Add(new FtdiDiagnostic(code, LocationOf(token), arguments));
-            }
-
-            private void ReportUnknown(FtdiDiagnosticCode code, JToken token, string value, IEnumerable<string> candidates, params string[] leadingArguments)
-            {
-                var arguments = leadingArguments.Append(value).ToArray();
-                _diagnostics.Add(new FtdiDiagnostic(code, LocationOf(token), arguments).WithSuggestion(Ftdi.Suggest(value, candidates)));
             }
         }
     }

@@ -129,7 +129,7 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void ReportsUnknownKeysWithSuggestionAndLocation()
+        public void ReportsUnknownKeysWithLocation()
         {
             Parse(@"{
                 'Version': 1,
@@ -140,12 +140,11 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             }", out var diagnostics);
 
             Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.UnknownTrackingKey, FtdiDiagnosticCode.UnknownInputKey }));
-            Assert.That(diagnostics.Select((d) => d.Suggestion), Is.EqualTo(new[] { "EyeClosedLeft", "EyeClosedLeft" }));
             Assert.That(diagnostics.Select((d) => d.Location.Line), Is.EqualTo(new[] { 3, 5 }));
         }
 
         [Test]
-        public void ReportsInvalidEnumValueWithSuggestion()
+        public void ReportsInvalidEnumValue()
         {
             Parse(@"{
                 'Version': 1,
@@ -156,7 +155,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
 
             Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.InvalidEnumValue }));
             Assert.That(diagnostics[0].Arguments, Is.EqualTo(new[] { "Operation", "ApplyBlendShapeSetWeight" }));
-            Assert.That(diagnostics[0].Suggestion, Is.EqualTo("ApplyBlendSetWeight"));
         }
 
         [Test]
@@ -531,7 +529,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
 
             Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.UnknownInputKey, FtdiDiagnosticCode.UnknownInputKey }));
             Assert.That(diagnostics.Select((d) => d.Arguments[0]), Is.EqualTo(new[] { "Voicee", "998" }));
-            Assert.That(diagnostics.Select((d) => d.Suggestion), Is.EqualTo(new[] { "Voice", null }));
             Assert.That(definition.ParameterBehaviors.Single().Inputs.Select((i) => (i.Index, i.Invert)), Is.EqualTo(new[] { ((int)FaceTrackingKey.JawOpen, true) }));
         }
 

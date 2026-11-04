@@ -668,9 +668,6 @@ msgstr "結果"
 msgid "zaxp.disassembly"
 msgstr "逆アセンブル"
 
-msgid "ftdi.diagnostic.suggestion"
-msgstr "（もしかして: {0}）"
-
 msgid "ftdi.diagnostic.syntax-error"
 msgstr "JSON の構文エラー: {0}"
 

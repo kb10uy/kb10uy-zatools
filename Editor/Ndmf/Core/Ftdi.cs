@@ -167,41 +167,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 || operation == TargetMode.ApplyToBlendshape;
         }
 
-        internal static string Suggest(string value, IEnumerable<string> candidates)
-        {
-            string best = null;
-            var bestDistance = Math.Max(2, value.Length / 3) + 1;
-            foreach (var candidate in candidates)
-            {
-                if (string.Equals(candidate, value, StringComparison.OrdinalIgnoreCase)) return candidate;
-                var distance = EditDistance(value, candidate);
-                if (distance < bestDistance)
-                {
-                    best = candidate;
-                    bestDistance = distance;
-                }
-            }
-            return best;
-        }
-
-        private static int EditDistance(string lhs, string rhs)
-        {
-            var previous = new int[rhs.Length + 1];
-            var current = new int[rhs.Length + 1];
-            for (var j = 0; j <= rhs.Length; ++j) previous[j] = j;
-            for (var i = 1; i <= lhs.Length; ++i)
-            {
-                current[0] = i;
-                for (var j = 1; j <= rhs.Length; ++j)
-                {
-                    var substitution = previous[j - 1] + (lhs[i - 1] == rhs[j - 1] ? 0 : 1);
-                    current[j] = Math.Min(substitution, Math.Min(previous[j], current[j - 1]) + 1);
-                }
-                (previous, current) = (current, previous);
-            }
-            return previous[rhs.Length];
-        }
-
         private static IEnumerable<ShapeMapping> ExportMappings(string[] names, float[] multipliers, int count)
         {
             if (names == null) yield break;
@@ -227,8 +192,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     if (string.IsNullOrEmpty(name) || !InputIndices.TryGetValue(name, out index))
                     {
                         var value = string.IsNullOrEmpty(name) ? keys[i].ToString() : name;
-                        diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, SourceLocation.None, value)
-                            .WithSuggestion(string.IsNullOrEmpty(name) ? null : Suggest(name, InputIndices.Keys)));
+                        diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, SourceLocation.None, value));
                         continue;
                     }
                 }
@@ -621,25 +585,22 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         internal readonly FtdiDiagnosticCode Code;
         internal readonly Ftdi.SourceLocation Location;
         internal readonly string[] Arguments;
-        internal readonly string Suggestion;
         internal readonly UnityObject Context;
 
         internal FtdiDiagnostic(FtdiDiagnosticCode code, Ftdi.SourceLocation location, params string[] arguments)
-            : this(code, location, arguments ?? Array.Empty<string>(), null, null)
+            : this(code, location, arguments ?? Array.Empty<string>(), null)
         {
         }
 
-        private FtdiDiagnostic(FtdiDiagnosticCode code, Ftdi.SourceLocation location, string[] arguments, string suggestion, UnityObject context)
+        private FtdiDiagnostic(FtdiDiagnosticCode code, Ftdi.SourceLocation location, string[] arguments, UnityObject context)
         {
             Code = code;
             Location = location;
             Arguments = arguments;
-            Suggestion = suggestion;
             Context = context;
         }
 
-        internal FtdiDiagnostic WithSuggestion(string suggestion) => new FtdiDiagnostic(Code, Location, Arguments, suggestion, Context);
-        internal FtdiDiagnostic WithContext(UnityObject context) => new FtdiDiagnostic(Code, Location, Arguments, Suggestion, context);
+        internal FtdiDiagnostic WithContext(UnityObject context) => new FtdiDiagnostic(Code, Location, Arguments, context);
 
         internal string LocalizationKey
         {

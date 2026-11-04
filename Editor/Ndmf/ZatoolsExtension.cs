@@ -14,10 +14,8 @@ namespace KusakaFactory.Zatools.Ndmf
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
         internal static string Localize(this Core.FtdiDiagnostic diagnostic)
         {
-            var message = Localization.ZatoolsLocalization.FormatLocalized(diagnostic.LocalizationKey, diagnostic.Arguments);
-            if (diagnostic.Suggestion == null) return message;
-            return message + Localization.ZatoolsLocalization.FormatLocalized("ftdi.diagnostic.suggestion", diagnostic.Suggestion);
+            return Localization.ZatoolsLocalization.FormatLocalized(diagnostic.LocalizationKey, diagnostic.Arguments);
         }
-    }
 #endif
+    }
 }
