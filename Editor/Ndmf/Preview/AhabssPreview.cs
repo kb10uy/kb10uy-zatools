@@ -11,23 +11,21 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhabssRenderFilter : ZatoolsRenderFilter<AdHocAdvancedBlendShapeSynthesis>
+    internal sealed class AhabssRenderFilter : ZatoolsRenderFilter<AdHocAdvancedBlendShapeSynthesis, AhabssRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-hoc Advanced BlendShape Synthesis", "ad-hoc-advanced-blendshape-synthesis", false);
 
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis> CreateNode() => new AhabssRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhabssRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis>
+    internal sealed class AhabssRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis, AhabssRenderFilterNode>
     {
         private Mesh _synthesizedMesh = null;
         private ImmutableArray<(int Index, float Weight)> _weights = ImmutableArray<(int Index, float Weight)>.Empty;
-        private AdHocAdvancedBlendShapeSynthesis[] _components = null;
-        private List<Ahabss.FixedParameters> _observedParameters = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -36,9 +34,9 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ComputeContext context
         )
         {
-            _components = components;
-            _observedParameters = ObserveParameters(context, components);
-            var observedParameters = _observedParameters;
+            var observedParameters = components
+                .Select((c) => context.Observe(c, Ahabss.FixedParameters.FixFromComponent, (op, np) => op == np))
+                .ToList();
 
             if (proxyed == null || proxyed.sharedMesh == null) return default;
 
@@ -67,28 +65,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, currentMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) != 0) return null;
-
-            // Refresh には新しい ComputeContext が渡されるので、this を返すなら監視を登録し直す必要がある
-            if (_components == null || _components.Any((c) => c == null)) return null;
-            var currentParameters = ObserveParameters(context, _components);
-            if (!currentParameters.SequenceEqual(_observedParameters)) return null;
-            return this;
-        }
-
-        private static List<Ahabss.FixedParameters> ObserveParameters(ComputeContext context, AdHocAdvancedBlendShapeSynthesis[] components)
-        {
-            return components
-                .Select((c) => context.Observe(c, Ahabss.FixedParameters.FixFromComponent, (op, np) => op == np))
-                .ToList();
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

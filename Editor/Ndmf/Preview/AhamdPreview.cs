@@ -11,22 +11,22 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhamdRenderFilter : ZatoolsRenderFilter<AdHocAdvancedMeshDuplication>
+    internal sealed class AhamdRenderFilter : ZatoolsRenderFilter<AdHocAdvancedMeshDuplication, AhamdRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-hoc Advanced Mesh Duplication", "ad-hoc-advanced-mesh-duplication", false);
 
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication> CreateNode() => new AhamdRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhamdRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication>
+    internal sealed class AhamdRenderFilterNode : ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication, AhamdRenderFilterNode>
     {
         private Mesh _generatedMesh = null;
         private List<Material> _materials = null;
         private SkinnedMeshRenderer _source = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -57,16 +57,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             proxyed.sharedMesh = generatedMesh;
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes)) == 0) return this;
-            return null;
         }
 
         private static (int Width, int Height, Hash128 ContentsHash) ObserveTextureContents(Texture2D texture) =>

@@ -11,16 +11,15 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class CdwRenderFilter : ZatoolsRenderFilter<ConvexDepthWrapper>
+    internal sealed class CdwRenderFilter : ZatoolsRenderFilter<ConvexDepthWrapper, CdwRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Convex Depth Wrapper", "convex-depth-wrapper", false);
 
-        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> CreateNode() => new CdwRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class CdwRenderFilterNode : ZatoolsRenderFilterNode<ConvexDepthWrapper>
+    internal sealed class CdwRenderFilterNode : ZatoolsRenderFilterNode<ConvexDepthWrapper, CdwRenderFilterNode>
     {
         internal static readonly string WrapperPreviewMaterialGuid = "c9f88a305477a2f4ea542f4d5700daaf";
 
@@ -29,7 +28,19 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private bool _separateMesh = false;
         private SkinnedMeshRenderer _separateSource = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
+        protected override RenderAspects WrittenAspects
+        {
+            get
+            {
+                var aspects = RenderAspects.Mesh | RenderAspects.Material;
+                if (_separateMesh)
+                {
+                    aspects |= RenderAspects.Shapes;
+                }
+                return aspects;
+            }
+        }
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -72,16 +83,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             }
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes)) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

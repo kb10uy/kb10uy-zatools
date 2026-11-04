@@ -11,23 +11,23 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class EdwRenderFilter : ZatoolsRenderFilter<EyeholeDepthWrapper>
+    internal sealed class EdwRenderFilter : ZatoolsRenderFilter<EyeholeDepthWrapper, EdwRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Eyehole Depth Wrapper", "eyehole-depth-wrapper", false);
 
-        protected override ZatoolsRenderFilterNode<EyeholeDepthWrapper> CreateNode() => new EdwRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class EdwRenderFilterNode : ZatoolsRenderFilterNode<EyeholeDepthWrapper>
+    internal sealed class EdwRenderFilterNode : ZatoolsRenderFilterNode<EyeholeDepthWrapper, EdwRenderFilterNode>
     {
         internal static readonly string WrapperPreviewMaterialGuid = "c9f88a305477a2f4ea542f4d5700daaf";
 
         private Mesh _duplicatedMesh = null;
         private List<Material> _reassignedMaterials = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Material;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -62,16 +62,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<EyeholeDepthWrapper> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material)) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

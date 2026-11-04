@@ -10,20 +10,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhnbRenderFilter : ZatoolsRenderFilter<AdHocNormalBending>
+    internal sealed class AhnbRenderFilter : ZatoolsRenderFilter<AdHocNormalBending, AhnbRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc Normal Bending", "ad-hoc-normal-bending");
 
-        protected override ZatoolsRenderFilterNode<AdHocNormalBending> CreateNode() => new AhnbRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhnbRenderFilterNode : ZatoolsRenderFilterNode<AdHocNormalBending>
+    internal sealed class AhnbRenderFilterNode : ZatoolsRenderFilterNode<AdHocNormalBending, AhnbRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -68,16 +68,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocNormalBending> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

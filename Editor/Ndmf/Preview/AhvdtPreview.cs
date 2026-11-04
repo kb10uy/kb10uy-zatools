@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,20 +9,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhvdtRenderFilter : ZatoolsRenderFilter<AdHocVertexDataTransfer>
+    internal sealed class AhvdtRenderFilter : ZatoolsRenderFilter<AdHocVertexDataTransfer, AhvdtRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Vertex Data Transfer", "vertex-data-transfer");
 
-        protected override ZatoolsRenderFilterNode<AdHocVertexDataTransfer> CreateNode() => new AhvdtRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhvdtRenderFilterNode : ZatoolsRenderFilterNode<AdHocVertexDataTransfer>
+    internal sealed class AhvdtRenderFilterNode : ZatoolsRenderFilterNode<AdHocVertexDataTransfer, AhvdtRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -54,16 +53,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocVertexDataTransfer> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

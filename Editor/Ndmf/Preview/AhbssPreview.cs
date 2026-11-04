@@ -10,20 +10,20 @@ using UnityObject = UnityEngine.Object;
 
 namespace KusakaFactory.Zatools.Ndmf.Preview
 {
-    internal sealed class AhbssRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeSplit>
+    internal sealed class AhbssRenderFilter : ZatoolsRenderFilter<AdHocBlendShapeSplit, AhbssRenderFilterNode>
     {
         private static readonly TogglablePreviewNode _previewNode = CreateTogglablePreviewNode("Ad-Hoc BlendShape Split", "ad-hoc-blendshape-split", false);
 
-        protected override ZatoolsRenderFilterNode<AdHocBlendShapeSplit> CreateNode() => new AhbssRenderFilterNode();
         protected override TogglablePreviewNode PreviewNode => _previewNode;
         internal static TogglablePreviewNode SwitchingPreviewNode => _previewNode;
     }
 
-    internal sealed class AhbssRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeSplit>
+    internal sealed class AhbssRenderFilterNode : ZatoolsRenderFilterNode<AdHocBlendShapeSplit, AhbssRenderFilterNode>
     {
         private Mesh _duplicatedMesh = null;
 
-        public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
+        protected override RenderAspects WrittenAspects => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
             SkinnedMeshRenderer original,
@@ -67,16 +67,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocBlendShapeSplit> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)
