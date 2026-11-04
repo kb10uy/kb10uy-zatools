@@ -666,26 +666,14 @@ msgstr "Result"
 msgid "zaxp.disassembly"
 msgstr "Disassembly"
 
-msgid "ftdi.diagnostic.syntax-error"
-msgstr "JSON syntax error: {0}"
+msgid "ftdi.diagnostic.invalid-json"
+msgstr "Failed to read the JSON: {0}"
 
 msgid "ftdi.diagnostic.root-not-object"
 msgstr "The root value must be an object"
 
 msgid "ftdi.diagnostic.unsupported-version"
 msgstr "Unsupported Version: {0}"
-
-msgid "ftdi.diagnostic.unknown-property"
-msgstr "Unknown property \"{0}\""
-
-msgid "ftdi.diagnostic.missing-property"
-msgstr "Required property \"{0}\" is missing"
-
-msgid "ftdi.diagnostic.type-mismatch"
-msgstr "\"{0}\" must be {1}"
-
-msgid "ftdi.diagnostic.invalid-enum-value"
-msgstr "\"{1}\" is not a valid value for \"{0}\""
 
 msgid "ftdi.diagnostic.empty-value"
 msgstr "\"{0}\" cannot be empty"
@@ -707,12 +695,6 @@ msgstr "TrackingKeys needs at least one input"
 
 msgid "ftdi.diagnostic.too-many-inputs"
 msgstr "At most {0} inputs are allowed"
-
-msgid "ftdi.diagnostic.duplicate-blend-shape-set"
-msgstr "BlendShapeSet \"{0}\" is defined more than once"
-
-msgid "ftdi.diagnostic.duplicate-output"
-msgstr "Multiple {0} behaviors output to \"{1}\""
 
 msgid "ftdi.diagnostic.output-conflict"
 msgstr "{0} output \"{1}\" is also used by {2}"

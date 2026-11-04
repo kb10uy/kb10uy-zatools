@@ -143,62 +143,57 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void ReportsInvalidEnumValue()
+        public void RejectsDefinitionsThatDoNotDeserialize()
         {
-            Parse(@"{
-                'Version': 1,
-                'ParameterBehaviors': [
-                    { 'Operation': 'ApplyBlendShapeSetWeight', 'Target': 'S', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['JawOpen'] } }
-                ]
-            }", out var diagnostics);
-
-            Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.InvalidEnumValue }));
-            Assert.That(diagnostics[0].Arguments, Is.EqualTo(new[] { "Operation", "ApplyBlendShapeSetWeight" }));
-        }
-
-        [Test]
-        public void RejectsUnknownPropertiesAndMissingRequiredOnes()
-        {
-            Parse(@"{
-                'Version': 1,
-                'Extra': 0,
-                'BlendShapeSets': [{ 'TrackingKeys': {} }],
-                'ParameterBehaviors': [
-                    { 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Custom', 'Expression': 'JawOpen', 'TrackingKeys': [] } }
-                ]
-            }", out var diagnostics);
-
-            Assert.That(Codes(diagnostics), Is.EquivalentTo(new[]
+            string[] invalid =
             {
-                FtdiDiagnosticCode.UnknownProperty,
-                FtdiDiagnosticCode.MissingProperty,
-                FtdiDiagnosticCode.UnknownProperty,
-            }));
+                "{ 'Version': 1,",
+                "{ 'Version': 1 } {}",
+                "[]",
+                "{ 'BlendShapeSets': [] }",
+                "{ 'Version': 1, 'Extra': 0 }",
+                "{ 'Version': 1, 'BlendShapeSets': [{ 'TrackingKeys': {} }] }",
+                "{ 'Version': 1, 'BlendShapeSets': [{ 'Name': 'S', 'TrackingKeys': { 'JawOpen': 1 } }] }",
+                "{ 'Version': 1, 'BlendShapeSets': [{ 'Name': 'S', 'TrackingKeys': { 'JawOpen': { 'Multiplier': 0.5 } } }] }",
+                "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ApplyBlendShapeSetWeight', 'Target': 'S', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['JawOpen'] } }] }",
+                "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 0 } }] }",
+                "{ 'Version': 1, 'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Max', 'TrackingKeys': [null] } }] }",
+                "{ 'Version': 99999999999999999999 }",
+                "{ 'Version': 1.5 }",
+            };
+
+            foreach (var text in invalid)
+            {
+                Assert.That(Parse(text, out var diagnostics), Is.Null, text);
+                Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.InvalidJson }), text);
+            }
         }
 
         [Test]
-        public void RejectsSyntaxErrorsDuplicatePropertiesAndUnsupportedVersions()
+        public void RejectsEmptyTextAndUnsupportedVersions()
         {
-            Assert.That(Parse("{ 'Version': 1,", out var truncated), Is.Null);
-            Assert.That(Codes(truncated), Is.EqualTo(new[] { FtdiDiagnosticCode.SyntaxError }));
-
-            Assert.That(Parse("{ 'Version': 1, 'Version': 1 }", out var duplicated), Is.Null);
-            Assert.That(Codes(duplicated), Is.EqualTo(new[] { FtdiDiagnosticCode.SyntaxError }));
-
-            Assert.That(Parse("{ 'Version': 1 } {}", out var trailing), Is.Null);
-            Assert.That(Codes(trailing), Is.EqualTo(new[] { FtdiDiagnosticCode.SyntaxError }));
+            Assert.That(Parse("", out var empty), Is.Null);
+            Assert.That(Codes(empty), Is.EqualTo(new[] { FtdiDiagnosticCode.RootNotObject }));
 
             Assert.That(Parse("{ 'Version': 2 }", out var version), Is.Null);
             Assert.That(Codes(version), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
+        }
 
-            Assert.That(Parse("{ 'Version': 99999999999999999999 }", out var huge), Is.Null);
-            Assert.That(Codes(huge), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
+        [Test]
+        public void IgnoresNullEntriesAndComments()
+        {
+            var definition = ParseValid(@"{
+                // comment
+                '$schema': 'schema.json',
+                'Version': 1,
+                'VisemeDampen': null,
+                'BlendShapeSets': [null, { 'Name': 'S', 'Visemes': null }],
+                'ParameterBehaviors': null
+            }");
 
-            Assert.That(Parse("{ 'Version': 1.0 }", out var fractional), Is.Null);
-            Assert.That(Codes(fractional), Is.EqualTo(new[] { FtdiDiagnosticCode.UnsupportedVersion }));
-
-            Assert.That(Parse("[]", out var array), Is.Null);
-            Assert.That(Codes(array), Is.EqualTo(new[] { FtdiDiagnosticCode.RootNotObject }));
+            Assert.That(definition.VisemeDampen, Is.Null);
+            Assert.That(definition.BlendShapeSets.Single().Name, Is.EqualTo("S"));
+            Assert.That(definition.ParameterBehaviors, Is.Empty);
         }
 
         [Test]
@@ -224,10 +219,11 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void ReportsDuplicateSetsAndExclusiveOutputsInOneDefinition()
+        public void ReportsDuplicateExclusiveOutputsInOneDefinition()
         {
-            Parse(@"{
+            Merge(out var diagnostics, Source(@"{
                 'Version': 1,
+                'UseAllTrackingKeys': true,
                 'BlendShapeSets': [{ 'Name': 'S' }, { 'Name': 'S' }],
                 'ParameterBehaviors': [
                     { 'Operation': 'ForwardToAnimator', 'Target': 'P', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['JawOpen'] } },
@@ -235,9 +231,9 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
                     { 'Operation': 'LimitBlendshapeMax', 'Target': 'shape', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['JawOpen'] } },
                     { 'Operation': 'LimitBlendshapeMax', 'Target': 'shape', 'Expression': { 'Type': 'Min', 'TrackingKeys': ['JawOpen'] } }
                 ]
-            }", out var diagnostics);
+            }"));
 
-            Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.DuplicateBlendShapeSet, FtdiDiagnosticCode.DuplicateOutput }));
+            Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.OutputConflict }));
         }
 
         [Test]

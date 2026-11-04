@@ -668,26 +668,14 @@ msgstr "結果"
 msgid "zaxp.disassembly"
 msgstr "逆アセンブル"
 
-msgid "ftdi.diagnostic.syntax-error"
-msgstr "JSON の構文エラー: {0}"
+msgid "ftdi.diagnostic.invalid-json"
+msgstr "JSON を読み込めません: {0}"
 
 msgid "ftdi.diagnostic.root-not-object"
 msgstr "ルートはオブジェクトである必要があります"
 
 msgid "ftdi.diagnostic.unsupported-version"
 msgstr "対応していない Version です: {0}"
-
-msgid "ftdi.diagnostic.unknown-property"
-msgstr "不明なプロパティ \"{0}\""
-
-msgid "ftdi.diagnostic.missing-property"
-msgstr "必須プロパティ \"{0}\" がありません"
-
-msgid "ftdi.diagnostic.type-mismatch"
-msgstr "\"{0}\" は {1} である必要があります"
-
-msgid "ftdi.diagnostic.invalid-enum-value"
-msgstr "\"{0}\" の値 \"{1}\" は不正です"
 
 msgid "ftdi.diagnostic.empty-value"
 msgstr "\"{0}\" は空にできません"
@@ -709,12 +697,6 @@ msgstr "TrackingKeys には少なくとも 1 つの入力が必要です"
 
 msgid "ftdi.diagnostic.too-many-inputs"
 msgstr "入力は {0} 個までです"
-
-msgid "ftdi.diagnostic.duplicate-blend-shape-set"
-msgstr "BlendShapeSet \"{0}\" が重複しています"
-
-msgid "ftdi.diagnostic.duplicate-output"
-msgstr "{0} の出力先 \"{1}\" が重複しています"
 
 msgid "ftdi.diagnostic.output-conflict"
 msgstr "{0} の出力先 \"{1}\" が {2} と重複しています"

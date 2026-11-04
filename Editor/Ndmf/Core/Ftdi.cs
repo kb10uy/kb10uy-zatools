@@ -525,13 +525,9 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
     internal enum FtdiDiagnosticCode
     {
-        SyntaxError,
+        InvalidJson,
         RootNotObject,
         UnsupportedVersion,
-        UnknownProperty,
-        MissingProperty,
-        TypeMismatch,
-        InvalidEnumValue,
         EmptyValue,
         ValueTooLong,
         UnknownTrackingKey,
@@ -539,8 +535,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         UnknownInputKey,
         NoInputs,
         TooManyInputs,
-        DuplicateBlendShapeSet,
-        DuplicateOutput,
         OutputConflict,
         TrackingKeyConflict,
         VisemeConflict,

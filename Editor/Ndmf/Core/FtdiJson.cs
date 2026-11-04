@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using TargetMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.ParameterBehaviorTargetMode;
 using CombineMode = VRC.SDK3.Avatars.Components.VRCAvatarDescriptor.ParameterBehaviorCombineMode;
@@ -16,51 +17,38 @@ namespace KusakaFactory.Zatools.Ndmf.Core
     {
         internal const int CurrentVersion = 1;
 
-        private static readonly ImmutableArray<string> RootProperties = ImmutableArray.Create(
-            "$schema", "Version", "UseAllTrackingKeys", "VisemeDampen", "BlendShapeSets", "ParameterBehaviors");
-        private static readonly ImmutableArray<string> VisemeDampenProperties = ImmutableArray.Create("Mode", "Amount");
-        private static readonly ImmutableArray<string> SetProperties = ImmutableArray.Create("Name", "DefaultWeight", "TrackingKeys", "Visemes");
-        private static readonly ImmutableArray<string> MappingProperties = ImmutableArray.Create("Shape", "Multiplier");
-        private static readonly ImmutableArray<string> BehaviorProperties = ImmutableArray.Create("Operation", "Target", "Weight", "Expression");
-        private static readonly ImmutableArray<string> CombineExpressionProperties = ImmutableArray.Create("Type", "TrackingKeys");
-        private static readonly ImmutableArray<string> CustomExpressionProperties = ImmutableArray.Create("Type", "Expression");
-        private static readonly ImmutableArray<string> InputProperties = ImmutableArray.Create("Key", "Invert");
+        private static readonly JsonSerializerSettings ParseSettings = new JsonSerializerSettings
+        {
+            MissingMemberHandling = MissingMemberHandling.Error,
+            NullValueHandling = NullValueHandling.Ignore,
+            Converters = new List<JsonConverter> { new StringEnumConverter { AllowIntegerValues = false } },
+        };
 
         internal static Ftdi.Definition Parse(string text, List<FtdiDiagnostic> diagnostics)
         {
-            JToken root;
+            RootDto root;
             try
             {
-                using (var reader = new JsonTextReader(new StringReader(text ?? "")))
-                {
-                    var settings = new JsonLoadSettings
-                    {
-                        CommentHandling = CommentHandling.Ignore,
-                        LineInfoHandling = LineInfoHandling.Ignore,
-                        DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error,
-                    };
-                    root = JToken.ReadFrom(reader, settings);
-                    while (reader.Read())
-                    {
-                        if (reader.TokenType == JsonToken.Comment) continue;
-                        throw new JsonReaderException("Additional text found after the root value.", reader.Path, reader.LineNumber, reader.LinePosition, null);
-                    }
-                }
+                root = JsonConvert.DeserializeObject<RootDto>(text ?? "", ParseSettings);
             }
-            catch (JsonReaderException e)
+            catch (JsonException e)
             {
-                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.SyntaxError, e.Message));
+                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.InvalidJson, e.Message));
                 return null;
             }
 
-            if (!(root is JObject rootObject))
+            if (root == null)
             {
                 diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.RootNotObject));
                 return null;
             }
+            if (root.Version != CurrentVersion)
+            {
+                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnsupportedVersion, root.Version.ToString()));
+                return null;
+            }
 
-            var parser = new Parser(diagnostics);
-            return parser.ParseRoot(rootObject);
+            return new DefinitionBuilder(diagnostics).Build(root);
         }
 
         internal static string Write(Ftdi.Definition definition)
@@ -135,364 +123,181 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return written;
         }
 
-        private sealed class Parser
+        private sealed class DefinitionBuilder
         {
             private readonly List<FtdiDiagnostic> _diagnostics;
 
-            internal Parser(List<FtdiDiagnostic> diagnostics)
+            internal DefinitionBuilder(List<FtdiDiagnostic> diagnostics)
             {
                 _diagnostics = diagnostics;
             }
 
-            internal Ftdi.Definition ParseRoot(JObject root)
+            internal Ftdi.Definition Build(RootDto root)
             {
-                CheckProperties(root, RootProperties);
-
-                if (!TryRequired(root, "Version", out var versionToken)) return null;
-                if (!(versionToken is JValue versionValue && versionValue.Value is long version && version == CurrentVersion))
-                {
-                    Report(FtdiDiagnosticCode.UnsupportedVersion, versionToken.ToString(Formatting.None));
-                    return null;
-                }
-
-                var definition = new Ftdi.Definition();
-                if (root.TryGetValue("UseAllTrackingKeys", out var useAllToken) && TryBoolean(useAllToken, "UseAllTrackingKeys", out var useAll))
-                {
-                    definition.UseAllTrackingKeys = useAll;
-                }
-                if (root.TryGetValue("VisemeDampen", out var dampenToken) && TryVisemeDampen(dampenToken, out var dampen))
-                {
-                    definition.VisemeDampen = dampen;
-                }
-
-                if (root.TryGetValue("BlendShapeSets", out var setsToken) && TryArray(setsToken, "BlendShapeSets", out var sets))
-                {
-                    var names = new HashSet<string>(StringComparer.Ordinal);
-                    foreach (var setToken in sets)
-                    {
-                        var set = ParseSet(setToken);
-                        if (set == null) continue;
-                        if (!names.Add(set.Name))
-                        {
-                            Report(FtdiDiagnosticCode.DuplicateBlendShapeSet, set.Name);
-                            continue;
-                        }
-                        definition.BlendShapeSets.Add(set);
-                    }
-                }
-
-                if (root.TryGetValue("ParameterBehaviors", out var behaviorsToken) && TryArray(behaviorsToken, "ParameterBehaviors", out var behaviors))
-                {
-                    var outputs = new HashSet<(TargetMode, string)>();
-                    foreach (var behaviorToken in behaviors)
-                    {
-                        var behavior = ParseBehavior(behaviorToken);
-                        if (behavior == null) continue;
-                        if (Ftdi.HasExclusiveOutput(behavior.Operation) && !outputs.Add((behavior.Operation, behavior.Target)))
-                        {
-                            _diagnostics.Add(new FtdiDiagnostic(
-                                FtdiDiagnosticCode.DuplicateOutput,
-                                behavior.Operation.ToString(),
-                                behavior.Target));
-                        }
-                        definition.ParameterBehaviors.Add(behavior);
-                    }
-                }
-
+                var definition = new Ftdi.Definition { UseAllTrackingKeys = root.UseAllTrackingKeys };
+                if (root.VisemeDampen != null) definition.VisemeDampen = new Ftdi.VisemeDampen(root.VisemeDampen.Mode, root.VisemeDampen.Amount);
+                definition.BlendShapeSets.AddRange(root.BlendShapeSets.Where((s) => s != null).Select(BuildSet));
+                definition.ParameterBehaviors.AddRange(root.ParameterBehaviors.Where((b) => b != null).Select(BuildBehavior));
                 return definition;
             }
 
-            private bool TryVisemeDampen(JToken token, out Ftdi.VisemeDampen dampen)
+            private Ftdi.BlendShapeSet BuildSet(SetDto dto)
             {
-                dampen = default;
-                if (!TryObject(token, "VisemeDampen", out var obj)) return false;
-                CheckProperties(obj, VisemeDampenProperties);
+                CheckName(dto.Name, "Name", Ftdi.MaxSetNameLength);
 
-                var succeeded = TryRequired(obj, "Mode", out var modeToken) & TryRequired(obj, "Amount", out var amountToken);
-                if (!succeeded) return false;
-                succeeded = TryEnum<VisemeDampenMode>(modeToken, "Mode", out var mode) & TryNumber(amountToken, "Amount", out var amount);
-                if (!succeeded) return false;
-
-                dampen = new Ftdi.VisemeDampen(mode, amount);
-                return true;
+                var set = new Ftdi.BlendShapeSet { Name = dto.Name, DefaultWeight = dto.DefaultWeight };
+                BuildMappings(dto.TrackingKeys, Ftdi.TrackingKeyIndices, FtdiDiagnosticCode.UnknownTrackingKey, set.TrackingKeys);
+                BuildMappings(dto.Visemes, Ftdi.VisemeIndices, FtdiDiagnosticCode.UnknownViseme, set.Visemes);
+                return set;
             }
 
-            private Ftdi.BlendShapeSet ParseSet(JToken token)
-            {
-                if (!TryObject(token, "BlendShapeSets", out var obj)) return null;
-                CheckProperties(obj, SetProperties);
-
-                var set = new Ftdi.BlendShapeSet();
-                var succeeded = TryRequired(obj, "Name", out var nameToken) && TryName(nameToken, "Name", Ftdi.MaxSetNameLength, out set.Name);
-
-                if (obj.TryGetValue("DefaultWeight", out var weightToken))
-                {
-                    if (TryNumber(weightToken, "DefaultWeight", out var weight)) set.DefaultWeight = weight;
-                    else succeeded = false;
-                }
-
-                if (obj.TryGetValue("TrackingKeys", out var keysToken))
-                {
-                    succeeded &= TryMappings(keysToken, "TrackingKeys", Ftdi.TrackingKeyIndices, FtdiDiagnosticCode.UnknownTrackingKey, set.TrackingKeys);
-                }
-                if (obj.TryGetValue("Visemes", out var visemesToken))
-                {
-                    succeeded &= TryMappings(visemesToken, "Visemes", Ftdi.VisemeIndices, FtdiDiagnosticCode.UnknownViseme, set.Visemes);
-                }
-
-                return succeeded ? set : null;
-            }
-
-            private bool TryMappings(
-                JToken token,
-                string name,
+            private void BuildMappings(
+                Dictionary<string, MappingDto> source,
                 ImmutableDictionary<string, int> indices,
                 FtdiDiagnosticCode unknownCode,
                 List<Ftdi.ShapeMapping> mappings)
             {
-                if (!TryObject(token, name, out var obj)) return false;
-
-                var succeeded = true;
-                foreach (var property in obj.Properties())
+                foreach (var pair in source)
                 {
-                    if (!indices.TryGetValue(property.Name, out var index))
+                    CheckName(pair.Value.Shape, "Shape", int.MaxValue);
+                    if (indices.TryGetValue(pair.Key, out var index))
                     {
-                        Report(unknownCode, property.Name);
-                        succeeded = false;
-                        continue;
-                    }
-
-                    if (TryMapping(property.Value, out var shape, out var multiplier))
-                    {
-                        mappings.Add(new Ftdi.ShapeMapping(index, shape, multiplier));
+                        mappings.Add(new Ftdi.ShapeMapping(index, pair.Value.Shape, pair.Value.Multiplier));
                     }
                     else
                     {
-                        succeeded = false;
+                        _diagnostics.Add(new FtdiDiagnostic(unknownCode, pair.Key));
                     }
                 }
-                return succeeded;
             }
 
-            private bool TryMapping(JToken token, out string shape, out float multiplier)
+            private Ftdi.ParameterBehavior BuildBehavior(BehaviorDto dto)
             {
-                shape = null;
-                multiplier = 1.0f;
-                if (token.Type == JTokenType.String) return TryName(token, "Shape", int.MaxValue, out shape);
-                if (token.Type != JTokenType.Object)
+                CheckName(dto.Target, "Target", dto.Operation == TargetMode.ForwardToAnimator ? Ftdi.MaxParameterNameLength : int.MaxValue);
+                if (dto.Weight != null) CheckName(dto.Weight, "Weight", Ftdi.MaxSetNameLength);
+
+                var expression = dto.Expression;
+                var behavior = new Ftdi.ParameterBehavior { Operation = dto.Operation, Target = dto.Target, Weight = dto.Weight, Combine = expression.Type };
+                if (expression.Type == CombineMode.Custom)
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, "Shape", "string | object");
-                    return false;
+                    CheckName(expression.Expression, "Expression", Ftdi.MaxExpressionLength);
+                    behavior.CustomExpression = expression.Expression;
                 }
-
-                var obj = (JObject)token;
-                CheckProperties(obj, MappingProperties);
-                var succeeded = TryRequired(obj, "Shape", out var shapeToken) && TryName(shapeToken, "Shape", int.MaxValue, out shape);
-                if (obj.TryGetValue("Multiplier", out var multiplierToken)) succeeded &= TryNumber(multiplierToken, "Multiplier", out multiplier);
-                return succeeded;
-            }
-
-            private Ftdi.ParameterBehavior ParseBehavior(JToken token)
-            {
-                if (!TryObject(token, "ParameterBehaviors", out var obj)) return null;
-                CheckProperties(obj, BehaviorProperties);
-
-                var behavior = new Ftdi.ParameterBehavior();
-                var succeeded = TryRequired(obj, "Operation", out var operationToken) && TryEnum(operationToken, "Operation", out behavior.Operation);
-
-                if (TryRequired(obj, "Target", out var targetToken))
+                else if (expression.TrackingKeys.Count == 0)
                 {
-                    var maxLength = succeeded && behavior.Operation == TargetMode.ForwardToAnimator ? Ftdi.MaxParameterNameLength : int.MaxValue;
-                    succeeded &= TryName(targetToken, "Target", maxLength, out behavior.Target);
+                    _diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.NoInputs));
+                }
+                else if (expression.TrackingKeys.Count > Ftdi.MaxInputs)
+                {
+                    _diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.TooManyInputs, Ftdi.MaxInputs.ToString()));
                 }
                 else
                 {
-                    succeeded = false;
+                    foreach (var input in expression.TrackingKeys)
+                    {
+                        if (Ftdi.InputIndices.TryGetValue(input.Key, out var index))
+                        {
+                            behavior.Inputs.Add(new Ftdi.BehaviorInput(index, input.Invert));
+                        }
+                        else
+                        {
+                            _diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, input.Key));
+                        }
+                    }
                 }
-
-                if (obj.TryGetValue("Weight", out var weightToken))
-                {
-                    succeeded &= TryName(weightToken, "Weight", Ftdi.MaxSetNameLength, out behavior.Weight);
-                }
-
-                succeeded &= TryRequired(obj, "Expression", out var expressionToken) && TryExpression(expressionToken, behavior);
-                return succeeded ? behavior : null;
+                return behavior;
             }
 
-            private bool TryExpression(JToken token, Ftdi.ParameterBehavior behavior)
+            private void CheckName(string value, string name, int maxLength)
             {
-                if (!TryObject(token, "Expression", out var obj)) return false;
-                if (!TryRequired(obj, "Type", out var typeToken) || !TryEnum(typeToken, "Type", out behavior.Combine))
+                if (string.IsNullOrEmpty(value))
                 {
-                    CheckProperties(obj, CombineExpressionProperties.AddRange(CustomExpressionProperties));
-                    return false;
+                    _diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.EmptyValue, name));
                 }
-
-                if (behavior.Combine == CombineMode.Custom)
+                else if (value.Length > maxLength)
                 {
-                    CheckProperties(obj, CustomExpressionProperties);
-                    if (!TryRequired(obj, "Expression", out var sourceToken)) return false;
-                    if (!TryName(sourceToken, "Expression", Ftdi.MaxExpressionLength, out behavior.CustomExpression)) return false;
-                    return true;
-                }
-
-                CheckProperties(obj, CombineExpressionProperties);
-                if (!TryRequired(obj, "TrackingKeys", out var keysToken) || !TryArray(keysToken, "TrackingKeys", out var keys)) return false;
-                if (keys.Count == 0)
-                {
-                    Report(FtdiDiagnosticCode.NoInputs);
-                    return false;
-                }
-                if (keys.Count > Ftdi.MaxInputs)
-                {
-                    Report(FtdiDiagnosticCode.TooManyInputs, Ftdi.MaxInputs.ToString());
-                    return false;
-                }
-
-                var succeeded = true;
-                foreach (var keyToken in keys)
-                {
-                    if (TryInput(keyToken, out var input)) behavior.Inputs.Add(input);
-                    else succeeded = false;
-                }
-                return succeeded;
-            }
-
-            private bool TryInput(JToken token, out Ftdi.BehaviorInput input)
-            {
-                input = default;
-                JToken keyToken;
-                var invert = false;
-                if (token.Type == JTokenType.String)
-                {
-                    keyToken = token;
-                }
-                else if (token.Type == JTokenType.Object)
-                {
-                    var obj = (JObject)token;
-                    CheckProperties(obj, InputProperties);
-                    if (!TryRequired(obj, "Key", out keyToken)) return false;
-                    if (obj.TryGetValue("Invert", out var invertToken) && !TryBoolean(invertToken, "Invert", out invert)) return false;
-                }
-                else
-                {
-                    Report(FtdiDiagnosticCode.TypeMismatch, "TrackingKeys", "string | object");
-                    return false;
-                }
-
-                if (!TryString(keyToken, "Key", out var key)) return false;
-                if (!Ftdi.InputIndices.TryGetValue(key, out var index))
-                {
-                    Report(FtdiDiagnosticCode.UnknownInputKey, key);
-                    return false;
-                }
-
-                input = new Ftdi.BehaviorInput(index, invert);
-                return true;
-            }
-
-            private void CheckProperties(JObject obj, ImmutableArray<string> allowed)
-            {
-                foreach (var property in obj.Properties())
-                {
-                    if (allowed.Contains(property.Name)) continue;
-                    Report(FtdiDiagnosticCode.UnknownProperty, property.Name);
+                    _diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.ValueTooLong, name, maxLength.ToString()));
                 }
             }
+        }
 
-            private bool TryRequired(JObject obj, string name, out JToken token)
+        private sealed class RootDto
+        {
+            [JsonProperty("$schema")] public string Schema;
+            [JsonProperty(Required = Required.Always)] public int Version;
+            public bool? UseAllTrackingKeys;
+            public VisemeDampenDto VisemeDampen;
+            public List<SetDto> BlendShapeSets = new List<SetDto>();
+            public List<BehaviorDto> ParameterBehaviors = new List<BehaviorDto>();
+        }
+
+        private sealed class VisemeDampenDto
+        {
+            [JsonProperty(Required = Required.Always)] public VisemeDampenMode Mode;
+            [JsonProperty(Required = Required.Always)] public float Amount;
+        }
+
+        private sealed class SetDto
+        {
+            [JsonProperty(Required = Required.Always)] public string Name;
+            public float? DefaultWeight;
+            public Dictionary<string, MappingDto> TrackingKeys = new Dictionary<string, MappingDto>();
+            public Dictionary<string, MappingDto> Visemes = new Dictionary<string, MappingDto>();
+        }
+
+        [JsonConverter(typeof(ShorthandConverter<MappingDto>))]
+        private sealed class MappingDto : IShorthand
+        {
+            [JsonProperty(Required = Required.Always)] public string Shape;
+            public float Multiplier = 1.0f;
+
+            void IShorthand.Assign(string value) => Shape = value;
+        }
+
+        private sealed class BehaviorDto
+        {
+            [JsonProperty(Required = Required.Always)] public TargetMode Operation;
+            [JsonProperty(Required = Required.Always)] public string Target;
+            public string Weight;
+            [JsonProperty(Required = Required.Always)] public ExpressionDto Expression;
+        }
+
+        private sealed class ExpressionDto
+        {
+            [JsonProperty(Required = Required.Always)] public CombineMode Type;
+            public List<InputDto> TrackingKeys = new List<InputDto>();
+            public string Expression;
+        }
+
+        [JsonConverter(typeof(ShorthandConverter<InputDto>))]
+        private sealed class InputDto : IShorthand
+        {
+            [JsonProperty(Required = Required.Always)] public string Key;
+            public bool Invert;
+
+            void IShorthand.Assign(string value) => Key = value;
+        }
+
+        private interface IShorthand
+        {
+            void Assign(string value);
+        }
+
+        private sealed class ShorthandConverter<T> : JsonConverter<T> where T : IShorthand, new()
+        {
+            public override bool CanWrite => false;
+
+            public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
             {
-                if (obj.TryGetValue(name, out token)) return true;
-                Report(FtdiDiagnosticCode.MissingProperty, name);
-                return false;
+                var value = new T();
+                if (reader.TokenType == JsonToken.String) value.Assign((string)reader.Value);
+                else serializer.Populate(reader, value);
+                return value;
             }
 
-            private bool TryObject(JToken token, string name, out JObject obj)
+            public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer)
             {
-                obj = token as JObject;
-                if (obj != null) return true;
-                Report(FtdiDiagnosticCode.TypeMismatch, name, "object");
-                return false;
-            }
-
-            private bool TryArray(JToken token, string name, out JArray array)
-            {
-                array = token as JArray;
-                if (array != null) return true;
-                Report(FtdiDiagnosticCode.TypeMismatch, name, "array");
-                return false;
-            }
-
-            private bool TryString(JToken token, string name, out string value)
-            {
-                value = null;
-                if (token.Type != JTokenType.String)
-                {
-                    Report(FtdiDiagnosticCode.TypeMismatch, name, "string");
-                    return false;
-                }
-                value = token.Value<string>();
-                return true;
-            }
-
-            private bool TryName(JToken token, string name, int maxLength, out string value)
-            {
-                if (!TryString(token, name, out value)) return false;
-                if (value.Length == 0)
-                {
-                    Report(FtdiDiagnosticCode.EmptyValue, name);
-                    return false;
-                }
-                if (value.Length > maxLength)
-                {
-                    Report(FtdiDiagnosticCode.ValueTooLong, name, maxLength.ToString());
-                    return false;
-                }
-                return true;
-            }
-
-            private bool TryNumber(JToken token, string name, out float value)
-            {
-                value = 0.0f;
-                if (token.Type != JTokenType.Integer && token.Type != JTokenType.Float)
-                {
-                    Report(FtdiDiagnosticCode.TypeMismatch, name, "number");
-                    return false;
-                }
-                value = token.Value<float>();
-                return true;
-            }
-
-            private bool TryBoolean(JToken token, string name, out bool value)
-            {
-                value = false;
-                if (token.Type != JTokenType.Boolean)
-                {
-                    Report(FtdiDiagnosticCode.TypeMismatch, name, "boolean");
-                    return false;
-                }
-                value = token.Value<bool>();
-                return true;
-            }
-
-            private bool TryEnum<T>(JToken token, string name, out T value) where T : struct, Enum
-            {
-                value = default;
-                if (!TryString(token, name, out var text)) return false;
-
-                var names = Enum.GetNames(typeof(T));
-                if (!names.Contains(text, StringComparer.Ordinal))
-                {
-                    Report(FtdiDiagnosticCode.InvalidEnumValue, name, text);
-                    return false;
-                }
-                value = (T)Enum.Parse(typeof(T), text);
-                return true;
-            }
-
-            private void Report(FtdiDiagnosticCode code, params string[] arguments)
-            {
-                _diagnostics.Add(new FtdiDiagnostic(code, arguments));
+                throw new NotSupportedException();
             }
         }
     }
