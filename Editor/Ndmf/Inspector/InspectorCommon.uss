@@ -56,3 +56,61 @@
 .zatools-foldout--flush > .unity-foldout__content {
     margin-left: 4px;
 }
+
+.ftdi-note {
+    white-space: normal;
+    opacity: 0.6;
+}
+
+.ftdi-diagnostic {
+    white-space: normal;
+    margin-left: 4px;
+    color: var(--unity-colors-error-text);
+}
+
+.ftdi-summary__heading {
+    flex-direction: row;
+    margin-top: 2px;
+}
+
+.ftdi-summary__heading-title {
+    -unity-font-style: bold;
+}
+
+.ftdi-summary__heading-value {
+    margin-left: 6px;
+}
+
+.ftdi-summary__entry {
+    padding: 3px 0 3px 8px;
+}
+
+.ftdi-summary__entry:hover {
+    background-color: var(--unity-colors-highlight-background-hover);
+}
+
+.ftdi-summary__row {
+    flex-direction: row;
+}
+
+.ftdi-summary__row--continuation {
+    padding-left: 32px;
+}
+
+.ftdi-summary__cell {
+    opacity: 0.6;
+    flex-basis: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ftdi-summary__cell--wrap {
+    white-space: normal;
+}
+
+.ftdi-summary__index {
+    flex-basis: 32px;
+    flex-shrink: 0;
+}

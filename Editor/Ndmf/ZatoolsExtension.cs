@@ -10,5 +10,12 @@ namespace KusakaFactory.Zatools.Ndmf
         {
             return Enumerable.Range(0, parent.childCount).Select(parent.GetChild);
         }
+
+#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
+        internal static string Localize(this Core.FtdiDiagnostic diagnostic)
+        {
+            return Localization.ZatoolsLocalization.FormatLocalized(diagnostic.LocalizationKey, diagnostic.Arguments);
+        }
+#endif
     }
 }

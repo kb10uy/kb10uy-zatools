@@ -56,7 +56,11 @@ namespace KusakaFactory.Zatools.Ndmf
             // Transforming after MA (only)
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
-                .Run(new PbitTransforming());
+                .Run(new PbitTransforming())
+#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
+                .Then.Run(new FtdiTransforming())
+#endif
+                ;
 
             // Transforming after MA, APS
             InPhase(BuildPhase.Transforming)

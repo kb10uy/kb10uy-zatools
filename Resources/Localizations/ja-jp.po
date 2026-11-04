@@ -667,3 +667,143 @@ msgstr "結果"
 
 msgid "zaxp.disassembly"
 msgstr "逆アセンブル"
+
+msgid "ftdi.diagnostic.invalid-json"
+msgstr "不正な JSON : {0}"
+
+msgid "ftdi.diagnostic.root-not-object"
+msgstr "JSON ルートの値はオブジェクトである必要があります"
+
+msgid "ftdi.diagnostic.unsupported-version"
+msgstr "非対応 Version: {0}"
+
+msgid "ftdi.diagnostic.empty-value"
+msgstr "\"{0}\" は空にできません"
+
+msgid "ftdi.diagnostic.value-too-long"
+msgstr "\"{0}\" は長さ {1} 文字以内である必要があります"
+
+msgid "ftdi.diagnostic.unknown-tracking-key"
+msgstr "不明な Tracking Key \"{0}\""
+
+msgid "ftdi.diagnostic.unknown-viseme"
+msgstr "不明な Viseme \"{0}\""
+
+msgid "ftdi.diagnostic.unknown-input-key"
+msgstr "不明な Input Key \"{0}\""
+
+msgid "ftdi.diagnostic.no-inputs"
+msgstr "TrackingKeys には少なくとも 1 つの入力が必要です"
+
+msgid "ftdi.diagnostic.too-many-inputs"
+msgstr "入力は {0} 項目までです"
+
+msgid "ftdi.diagnostic.output-conflict"
+msgstr "{0} の出力先 \"{1}\" が {2} と重複しています"
+
+msgid "ftdi.diagnostic.tracking-key-conflict"
+msgstr "BlendShapeSet \"{0}\" のキー {1} の割り当てが {2} と競合しています"
+
+msgid "ftdi.diagnostic.viseme-conflict"
+msgstr "BlendShapeSet \"{0}\" の Viseme {1} の割り当てが {2} と競合しています"
+
+msgid "ftdi.diagnostic.default-weight-conflict"
+msgstr "BlendShapeSet \"{0}\" の DefaultWeight が {1} と異なっています"
+
+msgid "ftdi.diagnostic.use-all-tracking-keys-conflict"
+msgstr "UseAllTrackingKeys が {0} と異なっています"
+
+msgid "ftdi.diagnostic.viseme-dampen-conflict"
+msgstr "VisemeDampen が {0} と異なっています"
+
+msgid "ftdi.diagnostic.unknown-blend-shape-set"
+msgstr "BlendShapeSet \"{0}\" が見つかりません"
+
+msgid "ftdi.diagnostic.non-basic-tracking-key"
+msgstr "UseAllTrackingKeys が無効なため、キー {0} は使用できません"
+
+msgid "ftdi.diagnostic.too-many-meshes"
+msgstr "Face Tracking 対象 Mesh は {0} 個までです"
+
+msgid "ftdi.diagnostic.too-many-blend-shape-sets"
+msgstr "BlendShapeSet は {0} 個までです"
+
+msgid "ftdi.diagnostic.too-many-parameter-behaviors"
+msgstr "ParameterBehavior は {0} 個までです"
+
+msgid "ftdi.report.existing-configuration"
+msgstr "Face Tracking Data Installer: Avatar Descriptor に既存の設定があります"
+
+msgid "ftdi.report.existing-configuration:description"
+msgstr ""
+"Avatar Descriptor に Face Tracking の設定が残っているため、Face Tracking Data Installer を適用できません。\n"
+"Face Tracking Data Installer の Inspector から現在の設定を JSON に保存してください。"
+
+msgid "ftdi.report.invalid-definition"
+msgstr "Face Tracking Data Installer: 定義エラー"
+
+msgid "ftdi.report.invalid-definition:description"
+msgstr "{0}"
+
+msgid "ftdi.diagnostic.inactive-gaze-mappings"
+msgstr "Eye Gaze Mode が Bone Rotation のため、この定義の EyeLook のマッピングは無効です。"
+
+msgid "ftdi.diagnostic.inactive-blink-mappings"
+msgstr "Eyelid Type が Bones または Blendshapes のため、この定義の EyeClosed のマッピングは無効です。"
+
+msgid "ftdi.diagnostic.inactive-visemes"
+msgstr "Lip Sync が Viseme BlendShape Face Tracking ではないため、この定義の Viseme 関連の設定は無効です。"
+
+msgid "ftdi.inspector.warning-existing"
+msgstr "Avatar Descriptor に Face Tracking の設定が残っているため、ビルド時にエラーになる可能性があります。"
+
+msgid "ftdi.inspector.save-existing"
+msgstr "現在の設定を JSON に保存して移行する"
+
+msgid "ftdi.inspector.save-disabled"
+msgstr "このコンポーネントには既に定義 JSON が割り当てられています。保存するには別の Face Tracking Data Installer を追加してください。"
+
+msgid "ftdi.inspector.definition"
+msgstr "定義 JSON"
+
+msgid "ftdi.inspector.meshes"
+msgstr "Face Tracking メッシュ"
+
+msgid "ftdi.inspector.status-no-definition"
+msgstr "定義 JSON を割り当ててください。"
+
+msgid "ftdi.inspector.status-failed"
+msgstr "定義 JSON にエラーが {0} 件あります。"
+
+msgid "ftdi.inspector.unspecified"
+msgstr "未指定"
+
+msgid "ftdi.inspector.summary-set-counts"
+msgstr "キー {0} / Viseme {1}"
+
+msgid "ftdi.inspector.summary-external"
+msgstr "(外部参照)"
+
+msgid "ftdi.inspector.save-title"
+msgstr "Face Tracking 設定の保存"
+
+msgid "ftdi.inspector.save-confirm"
+msgstr ""
+"Avatar Descriptor の Face Tracking 設定(メッシュ・BlendShapeSet・ParameterBehavior)を JSON に保存してこのコンポーネントに移し、Avatar Descriptor からは削除します。\n"
+"この操作は元に戻せできますが、保存した JSON ファイルは残ります。"
+
+msgid "ftdi.inspector.save-confirm-ok"
+msgstr "保存して移す"
+
+msgid "ftdi.inspector.save-confirm-cancel"
+msgstr "キャンセル"
+
+msgid "ftdi.inspector.save-message"
+msgstr "定義 JSON の保存先を選択してください。"
+
+msgid "ftdi.inspector.save-invalid"
+msgstr ""
+"Avatar Descriptor の Face Tracking 設定はビルド時に受け付けられない内容を含んでいるため、定義 JSON に保存できません。\n"
+"Avatar Descriptor 側で以下を修正してからやり直してください。\n"
+"\n"
+"{0}"

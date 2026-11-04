@@ -665,3 +665,143 @@ msgstr "Result"
 
 msgid "zaxp.disassembly"
 msgstr "Disassembly"
+
+msgid "ftdi.diagnostic.invalid-json"
+msgstr "Failed to read the JSON: {0}"
+
+msgid "ftdi.diagnostic.root-not-object"
+msgstr "The root value must be an object"
+
+msgid "ftdi.diagnostic.unsupported-version"
+msgstr "Unsupported Version: {0}"
+
+msgid "ftdi.diagnostic.empty-value"
+msgstr "\"{0}\" cannot be empty"
+
+msgid "ftdi.diagnostic.value-too-long"
+msgstr "\"{0}\" must be at most {1} characters"
+
+msgid "ftdi.diagnostic.unknown-tracking-key"
+msgstr "Unknown tracking key \"{0}\""
+
+msgid "ftdi.diagnostic.unknown-viseme"
+msgstr "Unknown viseme \"{0}\""
+
+msgid "ftdi.diagnostic.unknown-input-key"
+msgstr "Unknown input key \"{0}\""
+
+msgid "ftdi.diagnostic.no-inputs"
+msgstr "TrackingKeys needs at least one input"
+
+msgid "ftdi.diagnostic.too-many-inputs"
+msgstr "At most {0} inputs are allowed"
+
+msgid "ftdi.diagnostic.output-conflict"
+msgstr "{0} output \"{1}\" is also used by {2}"
+
+msgid "ftdi.diagnostic.tracking-key-conflict"
+msgstr "Key {1} of BlendShapeSet \"{0}\" conflicts with {2}"
+
+msgid "ftdi.diagnostic.viseme-conflict"
+msgstr "Viseme {1} of BlendShapeSet \"{0}\" conflicts with {2}"
+
+msgid "ftdi.diagnostic.default-weight-conflict"
+msgstr "DefaultWeight of BlendShapeSet \"{0}\" differs from {1}"
+
+msgid "ftdi.diagnostic.use-all-tracking-keys-conflict"
+msgstr "UseAllTrackingKeys differs from {0}"
+
+msgid "ftdi.diagnostic.viseme-dampen-conflict"
+msgstr "VisemeDampen differs from {0}"
+
+msgid "ftdi.diagnostic.unknown-blend-shape-set"
+msgstr "BlendShapeSet \"{0}\" was not found"
+
+msgid "ftdi.diagnostic.non-basic-tracking-key"
+msgstr "Tracking key {0} cannot be used because UseAllTrackingKeys is disabled"
+
+msgid "ftdi.diagnostic.too-many-meshes"
+msgstr "At most {0} Face Tracking meshes are allowed"
+
+msgid "ftdi.diagnostic.too-many-blend-shape-sets"
+msgstr "At most {0} BlendShapeSets are allowed"
+
+msgid "ftdi.diagnostic.too-many-parameter-behaviors"
+msgstr "At most {0} ParameterBehaviors are allowed"
+
+msgid "ftdi.report.existing-configuration"
+msgstr "Face Tracking Data Installer: The Avatar Descriptor already has settings"
+
+msgid "ftdi.report.existing-configuration:description"
+msgstr ""
+"Face Tracking Data Installer cannot be applied because the Avatar Descriptor still has Face Tracking settings.\n"
+"Save the current settings to JSON from the Face Tracking Data Installer inspector."
+
+msgid "ftdi.report.invalid-definition"
+msgstr "Face Tracking Data Installer: Definition error"
+
+msgid "ftdi.report.invalid-definition:description"
+msgstr "{0}"
+
+msgid "ftdi.diagnostic.inactive-gaze-mappings"
+msgstr "Eye Gaze Mode is Bone Rotation, so the EyeLook mappings in this definition have no effect."
+
+msgid "ftdi.diagnostic.inactive-blink-mappings"
+msgstr "Eyelid Type is Bones or Blendshapes, so the EyeClosed mappings in this definition have no effect."
+
+msgid "ftdi.diagnostic.inactive-visemes"
+msgstr "Lip Sync is not Viseme BlendShape Face Tracking, so the viseme settings in this definition have no effect."
+
+msgid "ftdi.inspector.warning-existing"
+msgstr "The Avatar Descriptor still has Face Tracking settings. The build will fail while they remain."
+
+msgid "ftdi.inspector.save-existing"
+msgstr "Save Current Settings to JSON and Move Them Here"
+
+msgid "ftdi.inspector.save-disabled"
+msgstr "This component already has a definition JSON. Add another Face Tracking Data Installer to save the settings."
+
+msgid "ftdi.inspector.definition"
+msgstr "Definition JSON"
+
+msgid "ftdi.inspector.meshes"
+msgstr "Face Tracking Meshes"
+
+msgid "ftdi.inspector.status-no-definition"
+msgstr "Assign a definition JSON."
+
+msgid "ftdi.inspector.status-failed"
+msgstr "The definition JSON has {0} error(s)."
+
+msgid "ftdi.inspector.unspecified"
+msgstr "unspecified"
+
+msgid "ftdi.inspector.summary-set-counts"
+msgstr "{0} keys / {1} visemes"
+
+msgid "ftdi.inspector.summary-external"
+msgstr " (external)"
+
+msgid "ftdi.inspector.save-title"
+msgstr "Save Face Tracking Settings"
+
+msgid "ftdi.inspector.save-confirm"
+msgstr ""
+"The Face Tracking settings of the Avatar Descriptor (meshes, BlendShapeSets and ParameterBehaviors) will be saved to a JSON file, moved to this component, and removed from the Avatar Descriptor.\n"
+"You can undo this, but the saved JSON file will remain."
+
+msgid "ftdi.inspector.save-confirm-ok"
+msgstr "Save and Move"
+
+msgid "ftdi.inspector.save-confirm-cancel"
+msgstr "Cancel"
+
+msgid "ftdi.inspector.save-message"
+msgstr "Choose where to save the definition JSON."
+
+msgid "ftdi.inspector.save-invalid"
+msgstr ""
+"The Face Tracking configuration on the Avatar Descriptor cannot be saved as a definition JSON because it would not be accepted at build time.\n"
+"Fix the following in the Avatar Descriptor and try again.\n"
+"\n"
+"{0}"

@@ -37,6 +37,11 @@
         },
         {
             "name": "com.vrchat.avatars",
+            "expression": "3.10.6",
+            "define": "ZATOOLS_HAS_VRCSDK_FACE_TRACKING"
+        },
+        {
+            "name": "com.vrchat.avatars",
             "expression": "",
             "define": "ZATOOLS_FOUND_ANY_VRCSDK"
         }

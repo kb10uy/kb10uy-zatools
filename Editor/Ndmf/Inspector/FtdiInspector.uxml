@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/org.kb10uy.zatools/Editor/Ndmf/Inspector/InspectorCommon.uss?fileID=7433441132597879392&amp;guid=c87deba29c7e8b643a69a6f5981f99ca&amp;type=3#InspectorCommon" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <nadena.dev.ndmf.ui.LanguageSwitcher style="margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 4px;" />
+        <ui:VisualElement name="SectionExistingConfiguration" style="margin-bottom: 8px;">
+            <ui:HelpBox message-type="Warning" text="ftdi.inspector.warning-existing" class="ndmf-tr" />
+            <ui:Button name="ButtonSaveExisting" text="ftdi.inspector.save-existing" class="ndmf-tr" />
+            <ui:Label name="LabelSaveDisabled" text="ftdi.inspector.save-disabled" class="ndmf-tr ftdi-note" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="ftdi.inspector.meshes" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold;" />
+        <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="Meshes" reorderable="true" virtualization-method="DynamicHeight" name="FieldMeshes" show-border="true" reorder-mode="Animated" style="margin-bottom: 8px;" />
+        <uie:ObjectField label="ftdi.inspector.definition" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Definition" name="FieldDefinition" allow-scene-objects="false" class="ndmf-tr" />
+        <ui:HelpBox name="BoxStatus" message-type="Info" style="margin-top: 4px; margin-bottom: 4px;" />
+        <ui:VisualElement name="ContainerDiagnostics" style="margin-bottom: 4px;" />
+        <ui:VisualElement name="ContainerWarnings" />
+        <ui:VisualElement name="ContainerSummary" style="margin-top: 4px; margin-bottom: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>
