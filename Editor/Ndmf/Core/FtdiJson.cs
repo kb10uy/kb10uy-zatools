@@ -16,6 +16,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
     internal static class FtdiJson
     {
         internal const int CurrentVersion = 1;
+        internal const string SchemaUrl = "https://zatools.kb10uy.dev/schemas/face-tracking-data-installer.schema.json";
 
         private static readonly JsonSerializerSettings ParseSettings = new JsonSerializerSettings
         {
@@ -53,7 +54,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
 
         internal static string Write(Ftdi.Definition definition)
         {
-            var root = new JObject { ["Version"] = CurrentVersion };
+            var root = new JObject { ["$schema"] = SchemaUrl, ["Version"] = CurrentVersion };
             if (definition.UseAllTrackingKeys.HasValue) root["UseAllTrackingKeys"] = definition.UseAllTrackingKeys.Value;
             if (definition.VisemeDampen.HasValue)
             {

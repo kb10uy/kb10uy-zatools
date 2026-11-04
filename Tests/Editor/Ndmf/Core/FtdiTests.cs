@@ -456,6 +456,19 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
+        public void WrittenEmptyDefinitionReferencesSchemaAndParses()
+        {
+            var written = FtdiJson.Write(new Ftdi.Definition());
+            Assert.That(written, Does.Contain($"\"$schema\": \"{FtdiJson.SchemaUrl}\""));
+
+            var diagnostics = new List<FtdiDiagnostic>();
+            var definition = FtdiJson.Parse(written, diagnostics);
+            Assert.That(Codes(diagnostics), Is.Empty);
+            Assert.That(definition.BlendShapeSets, Is.Empty);
+            Assert.That(definition.ParameterBehaviors, Is.Empty);
+        }
+
+        [Test]
         public void ExportedDefinitionRoundTrips()
         {
             var names = new string[Ftdi.TrackingKeyCount];
