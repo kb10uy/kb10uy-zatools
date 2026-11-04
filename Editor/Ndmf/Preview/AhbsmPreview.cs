@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private Mesh _duplicatedMesh = null;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
@@ -68,17 +68,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocBlendShapeMix> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            // Renderer BlendShapes の値の変更など、上流で Mesh が変更されていない場合は現在のノードを再利用する
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

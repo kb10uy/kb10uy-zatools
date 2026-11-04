@@ -81,6 +81,7 @@ namespace KusakaFactory.Zatools.Ndmf
         private ComputeContext _selfContext;
 
         public abstract RenderAspects WhatChanged { get; }
+        protected abstract RenderAspects ReadAspects { get; }
 
         internal async ValueTask InitializeWithDependencies(
             SkinnedMeshRenderer original,
@@ -101,11 +102,6 @@ namespace KusakaFactory.Zatools.Ndmf
             ComputeContext context
         );
 
-        protected virtual ZatoolsRenderFilterNode<TComponent> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        ) => null;
         protected abstract void ZatoolsOnFrame(Renderer original, Renderer proxy);
         protected abstract void ZatoolsDispose();
 
@@ -115,14 +111,13 @@ namespace KusakaFactory.Zatools.Ndmf
             RenderAspects updatedAspects
         )
         {
-            if (_selfContext.IsInvalidated) return Task.FromResult<IRenderFilterNode>(null);
-
-            var refreshed = ZatoolsRefresh(proxyPairs, _selfContext, updatedAspects);
-            if (refreshed == this)
+            if (_selfContext.IsInvalidated || (updatedAspects & ReadAspects) != 0)
             {
-                _selfContext.Invalidates(context);
+                return Task.FromResult<IRenderFilterNode>(null);
             }
-            return Task.FromResult<IRenderFilterNode>(refreshed);
+
+            _selfContext.Invalidates(context);
+            return Task.FromResult<IRenderFilterNode>(this);
         }
 
         void IRenderFilterNode.OnFrame(Renderer original, Renderer proxy)

@@ -27,6 +27,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private Mesh _duplicatedMesh = null;
         private List<Material> _reassignedMaterials = null;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material;
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
         protected internal override ValueTask Initialize(
@@ -62,16 +63,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<EyeholeDepthWrapper> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material)) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

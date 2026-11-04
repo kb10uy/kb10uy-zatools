@@ -23,6 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
     {
         private Mesh _duplicatedMesh = null;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
@@ -67,16 +68,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, duplicatedMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocBlendShapeSplit> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

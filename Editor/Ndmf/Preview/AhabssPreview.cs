@@ -25,6 +25,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private Mesh _synthesizedMesh = null;
         private ImmutableArray<(int Index, float Weight)> _weights = ImmutableArray<(int Index, float Weight)>.Empty;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh;
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Shapes;
 
         protected internal override ValueTask Initialize(
@@ -65,16 +66,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             ObjectRegistry.RegisterReplacedObject(baseMesh, currentMesh);
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedBlendShapeSynthesis> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & RenderAspects.Mesh) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

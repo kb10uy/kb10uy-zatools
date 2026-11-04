@@ -29,6 +29,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private bool _separateMesh = false;
         private SkinnedMeshRenderer _separateSource = null;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
         public override RenderAspects WhatChanged => RenderAspects.Mesh | RenderAspects.Material;
 
         protected internal override ValueTask Initialize(
@@ -72,16 +73,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             }
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<ConvexDepthWrapper> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes)) == 0) return this;
-            return null;
         }
 
         protected override void ZatoolsOnFrame(Renderer original, Renderer proxy)

@@ -26,6 +26,7 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         private List<Material> _materials = null;
         private SkinnedMeshRenderer _source = null;
 
+        protected override RenderAspects ReadAspects => RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes;
         public override RenderAspects WhatChanged => RenderAspects.Mesh;
 
         protected internal override ValueTask Initialize(
@@ -57,16 +58,6 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
             proxyed.sharedMesh = generatedMesh;
 
             return default;
-        }
-
-        protected override ZatoolsRenderFilterNode<AdHocAdvancedMeshDuplication> ZatoolsRefresh(
-            IEnumerable<(Renderer, Renderer)> proxyPairs,
-            ComputeContext context,
-            RenderAspects nonzeroUpdatedAspects
-        )
-        {
-            if ((nonzeroUpdatedAspects & (RenderAspects.Mesh | RenderAspects.Material | RenderAspects.Shapes)) == 0) return this;
-            return null;
         }
 
         private static (int Width, int Height, Hash128 ContentsHash) ObserveTextureContents(Texture2D texture) =>
