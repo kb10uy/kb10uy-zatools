@@ -174,7 +174,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 if (string.IsNullOrEmpty(names[i])) continue;
                 var multiplier = multipliers != null && i < multipliers.Length ? multipliers[i] : 1.0f;
-                yield return new ShapeMapping(i, names[i], multiplier, SourceLocation.None);
+                yield return new ShapeMapping(i, names[i], multiplier);
             }
         }
 
@@ -192,28 +192,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     if (string.IsNullOrEmpty(name) || !InputIndices.TryGetValue(name, out index))
                     {
                         var value = string.IsNullOrEmpty(name) ? keys[i].ToString() : name;
-                        diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, SourceLocation.None, value));
+                        diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.UnknownInputKey, value));
                         continue;
                     }
                 }
-                yield return new BehaviorInput(index, i < inverted.Length && inverted[i], SourceLocation.None);
+                yield return new BehaviorInput(index, i < inverted.Length && inverted[i]);
             }
-        }
-
-        internal readonly struct SourceLocation
-        {
-            internal static readonly SourceLocation None = new SourceLocation(0, 0);
-
-            internal readonly int Line;
-            internal readonly int Column;
-
-            internal SourceLocation(int line, int column)
-            {
-                Line = line;
-                Column = column;
-            }
-
-            internal bool IsKnown => Line > 0;
         }
 
         internal readonly struct VisemeDampen : IEquatable<VisemeDampen>
@@ -237,14 +221,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal readonly int Index;
             internal readonly string Shape;
             internal readonly float Multiplier;
-            internal readonly SourceLocation Location;
 
-            internal ShapeMapping(int index, string shape, float multiplier, SourceLocation location)
+            internal ShapeMapping(int index, string shape, float multiplier)
             {
                 Index = index;
                 Shape = shape;
                 Multiplier = multiplier;
-                Location = location;
             }
         }
 
@@ -252,22 +234,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             internal readonly int Index;
             internal readonly bool Invert;
-            internal readonly SourceLocation Location;
 
-            internal BehaviorInput(int index, bool invert, SourceLocation location)
+            internal BehaviorInput(int index, bool invert)
             {
                 Index = index;
                 Invert = invert;
-                Location = location;
             }
         }
 
         internal sealed class Definition
         {
             internal bool? UseAllTrackingKeys;
-            internal SourceLocation UseAllTrackingKeysLocation;
             internal VisemeDampen? VisemeDampen;
-            internal SourceLocation VisemeDampenLocation;
             internal readonly List<BlendShapeSet> BlendShapeSets = new List<BlendShapeSet>();
             internal readonly List<ParameterBehavior> ParameterBehaviors = new List<ParameterBehavior>();
         }
@@ -276,7 +254,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
         {
             internal string Name;
             internal float? DefaultWeight;
-            internal SourceLocation Location;
             internal readonly List<ShapeMapping> TrackingKeys = new List<ShapeMapping>();
             internal readonly List<ShapeMapping> Visemes = new List<ShapeMapping>();
         }
@@ -288,9 +265,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal string Weight;
             internal CombineMode Combine;
             internal string CustomExpression;
-            internal SourceLocation Location;
-            internal SourceLocation TargetLocation;
-            internal SourceLocation WeightLocation;
             internal readonly List<BehaviorInput> Inputs = new List<BehaviorInput>();
         }
 
@@ -341,7 +315,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     }
                     else if (_useAllTrackingKeys.Value.Value != value)
                     {
-                        Report(FtdiDiagnosticCode.UseAllTrackingKeysConflict, definition.UseAllTrackingKeysLocation, context, ContextName(_useAllTrackingKeys.Value.Context));
+                        Report(FtdiDiagnosticCode.UseAllTrackingKeysConflict, context, ContextName(_useAllTrackingKeys.Value.Context));
                     }
                 }
 
@@ -354,7 +328,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     }
                     else if (!_visemeDampen.Value.Value.Equals(value))
                     {
-                        Report(FtdiDiagnosticCode.VisemeDampenConflict, definition.VisemeDampenLocation, context, ContextName(_visemeDampen.Value.Context));
+                        Report(FtdiDiagnosticCode.VisemeDampenConflict, context, ContextName(_visemeDampen.Value.Context));
                     }
                 }
 
@@ -372,7 +346,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         var key = (behavior.Operation, behavior.Target);
                         if (_outputs.TryGetValue(key, out var first))
                         {
-                            Report(FtdiDiagnosticCode.OutputConflict, behavior.TargetLocation, context, behavior.Operation.ToString(), behavior.Target, ContextName(first));
+                            Report(FtdiDiagnosticCode.OutputConflict, context, behavior.Operation.ToString(), behavior.Target, ContextName(first));
                         }
                         else
                         {
@@ -392,17 +366,17 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     if (behavior.Operation == TargetMode.ApplyBlendSetWeight && !_setsByName.ContainsKey(behavior.Target))
                     {
-                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.TargetLocation, context, behavior.Target);
+                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, context, behavior.Target);
                     }
                     if (behavior.Weight != null && !_setsByName.ContainsKey(behavior.Weight))
                     {
-                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, behavior.WeightLocation, context, behavior.Weight);
+                        Report(FtdiDiagnosticCode.UnknownBlendShapeSet, context, behavior.Weight);
                     }
                 }
 
-                if (_meshes.Count > MaxMeshes) Report(FtdiDiagnosticCode.TooManyMeshes, SourceLocation.None, null, MaxMeshes.ToString());
-                if (_sets.Count > MaxBlendShapeSets) Report(FtdiDiagnosticCode.TooManyBlendShapeSets, SourceLocation.None, null, MaxBlendShapeSets.ToString());
-                if (_behaviors.Count > MaxParameterBehaviors) Report(FtdiDiagnosticCode.TooManyParameterBehaviors, SourceLocation.None, null, MaxParameterBehaviors.ToString());
+                if (_meshes.Count > MaxMeshes) Report(FtdiDiagnosticCode.TooManyMeshes, null, MaxMeshes.ToString());
+                if (_sets.Count > MaxBlendShapeSets) Report(FtdiDiagnosticCode.TooManyBlendShapeSets, null, MaxBlendShapeSets.ToString());
+                if (_behaviors.Count > MaxParameterBehaviors) Report(FtdiDiagnosticCode.TooManyParameterBehaviors, null, MaxParameterBehaviors.ToString());
 
                 return new Configuration
                 {
@@ -432,7 +406,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     }
                     else if (merged.Weight.Value.Value != weight)
                     {
-                        Report(FtdiDiagnosticCode.DefaultWeightConflict, set.Location, context, set.Name, ContextName(merged.Weight.Value.Context));
+                        Report(FtdiDiagnosticCode.DefaultWeightConflict, context, set.Name, ContextName(merged.Weight.Value.Context));
                     }
                 }
 
@@ -440,14 +414,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     if (!merged.TrackingKeys[mapping.Index].TryAssign(mapping, context, out var other))
                     {
-                        Report(FtdiDiagnosticCode.TrackingKeyConflict, mapping.Location, context, set.Name, TrackingKeyNames[mapping.Index], ContextName(other));
+                        Report(FtdiDiagnosticCode.TrackingKeyConflict, context, set.Name, TrackingKeyNames[mapping.Index], ContextName(other));
                     }
                 }
                 foreach (var mapping in set.Visemes)
                 {
                     if (!merged.Visemes[mapping.Index].TryAssign(mapping, context, out var other))
                     {
-                        Report(FtdiDiagnosticCode.VisemeConflict, mapping.Location, context, set.Name, VisemeNames[mapping.Index], ContextName(other));
+                        Report(FtdiDiagnosticCode.VisemeConflict, context, set.Name, VisemeNames[mapping.Index], ContextName(other));
                     }
                 }
             }
@@ -461,7 +435,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         var slot = set.TrackingKeys[i];
                         if (slot.Mapping.HasValue && !IsBasicInput(i))
                         {
-                            Report(FtdiDiagnosticCode.NonBasicTrackingKey, slot.Mapping.Value.Location, slot.Context, TrackingKeyNames[i]);
+                            Report(FtdiDiagnosticCode.NonBasicTrackingKey, slot.Context, TrackingKeyNames[i]);
                         }
                     }
                 }
@@ -469,14 +443,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     foreach (var input in behavior.Inputs.Where((i) => !IsBasicInput(i.Index)))
                     {
-                        Report(FtdiDiagnosticCode.NonBasicTrackingKey, input.Location, context, InputName(input.Index));
+                        Report(FtdiDiagnosticCode.NonBasicTrackingKey, context, InputName(input.Index));
                     }
                 }
             }
 
-            private void Report(FtdiDiagnosticCode code, SourceLocation location, UnityObject context, params string[] arguments)
+            private void Report(FtdiDiagnosticCode code, UnityObject context, params string[] arguments)
             {
-                _diagnostics.Add(new FtdiDiagnostic(code, location, arguments).WithContext(context));
+                _diagnostics.Add(new FtdiDiagnostic(code, arguments).WithContext(context));
             }
 
             private static SdkParameterBehavior ToSdk(ParameterBehavior behavior)
@@ -583,24 +557,22 @@ namespace KusakaFactory.Zatools.Ndmf.Core
     internal readonly struct FtdiDiagnostic
     {
         internal readonly FtdiDiagnosticCode Code;
-        internal readonly Ftdi.SourceLocation Location;
         internal readonly string[] Arguments;
         internal readonly UnityObject Context;
 
-        internal FtdiDiagnostic(FtdiDiagnosticCode code, Ftdi.SourceLocation location, params string[] arguments)
-            : this(code, location, arguments ?? Array.Empty<string>(), null)
+        internal FtdiDiagnostic(FtdiDiagnosticCode code, params string[] arguments)
+            : this(code, arguments ?? Array.Empty<string>(), null)
         {
         }
 
-        private FtdiDiagnostic(FtdiDiagnosticCode code, Ftdi.SourceLocation location, string[] arguments, UnityObject context)
+        private FtdiDiagnostic(FtdiDiagnosticCode code, string[] arguments, UnityObject context)
         {
             Code = code;
-            Location = location;
             Arguments = arguments;
             Context = context;
         }
 
-        internal FtdiDiagnostic WithContext(UnityObject context) => new FtdiDiagnostic(Code, Location, Arguments, context);
+        internal FtdiDiagnostic WithContext(UnityObject context) => new FtdiDiagnostic(Code, Arguments, context);
 
         internal string LocalizationKey
         {

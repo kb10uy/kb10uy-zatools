@@ -799,9 +799,6 @@ msgstr "キー {0} / Viseme {1}"
 msgid "ftdi.inspector.summary-external"
 msgstr "（外部参照）"
 
-msgid "ftdi.inspector.open-location"
-msgstr "クリックするとエディタで該当箇所を開きます"
-
 msgid "ftdi.inspector.save-title"
 msgstr "Face Tracking 設定の保存"
 

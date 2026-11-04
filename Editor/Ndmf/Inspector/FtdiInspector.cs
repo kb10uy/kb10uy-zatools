@@ -120,7 +120,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             if (diagnostics.Count > 0)
             {
                 SetStatus(HelpBoxMessageType.Error, Format("ftdi.inspector.status-failed", diagnostics.Count.ToString()));
-                foreach (var diagnostic in diagnostics) _diagnosticsContainer.Add(DiagnosticLabel(asset, diagnostic));
+                foreach (var diagnostic in diagnostics) _diagnosticsContainer.Add(DiagnosticLabel(diagnostic));
                 SetDisplayed(_summaryContainer, false);
                 return;
             }
@@ -237,17 +237,10 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             return avatarRoot != null ? avatarRoot.GetComponent<VRCAvatarDescriptor>() : null;
         }
 
-        private static Label DiagnosticLabel(TextAsset asset, FtdiDiagnostic diagnostic)
+        private static Label DiagnosticLabel(FtdiDiagnostic diagnostic)
         {
-            var message = diagnostic.Localize();
-            var location = diagnostic.Location;
-            var label = new Label(location.IsKnown ? $"L{location.Line}:{location.Column}  {message}" : message);
+            var label = new Label(diagnostic.Localize());
             label.AddToClassList("ftdi-diagnostic");
-            if (location.IsKnown)
-            {
-                label.tooltip = Localized("ftdi.inspector.open-location");
-                label.RegisterCallback<ClickEvent>((_) => AssetDatabase.OpenAsset(asset, location.Line, location.Column));
-            }
             return label;
         }
 

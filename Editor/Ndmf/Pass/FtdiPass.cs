@@ -75,10 +75,9 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private static void Report(FtdiDiagnostic diagnostic)
         {
-            var location = diagnostic.Context is FtdiComponent component && component.Definition != null ? component.Definition.name : "";
-            if (diagnostic.Location.IsKnown) location += $":{diagnostic.Location.Line}:{diagnostic.Location.Column}";
+            var name = diagnostic.Context is FtdiComponent component && component.Definition != null ? component.Definition.name : "";
             var message = diagnostic.Localize();
-            ErrorReport.ReportError(new ZatoolsNdmfError(diagnostic.Context, ErrorSeverity.Error, "ftdi.report.invalid-definition", location.Length > 0 ? $"{location}: {message}" : message));
+            ErrorReport.ReportError(new ZatoolsNdmfError(diagnostic.Context, ErrorSeverity.Error, "ftdi.report.invalid-definition", name.Length > 0 ? $"{name}: {message}" : message));
         }
     }
 }

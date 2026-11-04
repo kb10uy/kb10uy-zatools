@@ -797,9 +797,6 @@ msgstr "{0} keys / {1} visemes"
 msgid "ftdi.inspector.summary-external"
 msgstr " (external)"
 
-msgid "ftdi.inspector.open-location"
-msgstr "Click to open this location in the editor"
-
 msgid "ftdi.inspector.save-title"
 msgstr "Save Face Tracking Settings"
 

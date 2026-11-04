@@ -36,7 +36,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     var settings = new JsonLoadSettings
                     {
                         CommentHandling = CommentHandling.Ignore,
-                        LineInfoHandling = LineInfoHandling.Load,
+                        LineInfoHandling = LineInfoHandling.Ignore,
                         DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error,
                     };
                     root = JToken.ReadFrom(reader, settings);
@@ -49,13 +49,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             }
             catch (JsonReaderException e)
             {
-                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.SyntaxError, new Ftdi.SourceLocation(e.LineNumber, e.LinePosition), e.Message));
+                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.SyntaxError, e.Message));
                 return null;
             }
 
             if (!(root is JObject rootObject))
             {
-                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.RootNotObject, LocationOf(root)));
+                diagnostics.Add(new FtdiDiagnostic(FtdiDiagnosticCode.RootNotObject));
                 return null;
             }
 
@@ -135,12 +135,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             return written;
         }
 
-        private static Ftdi.SourceLocation LocationOf(JToken token)
-        {
-            if (token is IJsonLineInfo info && info.HasLineInfo()) return new Ftdi.SourceLocation(info.LineNumber, info.LinePosition);
-            return Ftdi.SourceLocation.None;
-        }
-
         private sealed class Parser
         {
             private readonly List<FtdiDiagnostic> _diagnostics;
@@ -157,7 +151,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryRequired(root, "Version", out var versionToken)) return null;
                 if (!(versionToken is JValue versionValue && versionValue.Value is long version && version == CurrentVersion))
                 {
-                    Report(FtdiDiagnosticCode.UnsupportedVersion, versionToken, versionToken.ToString(Formatting.None));
+                    Report(FtdiDiagnosticCode.UnsupportedVersion, versionToken.ToString(Formatting.None));
                     return null;
                 }
 
@@ -165,12 +159,10 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (root.TryGetValue("UseAllTrackingKeys", out var useAllToken) && TryBoolean(useAllToken, "UseAllTrackingKeys", out var useAll))
                 {
                     definition.UseAllTrackingKeys = useAll;
-                    definition.UseAllTrackingKeysLocation = LocationOf(useAllToken);
                 }
                 if (root.TryGetValue("VisemeDampen", out var dampenToken) && TryVisemeDampen(dampenToken, out var dampen))
                 {
                     definition.VisemeDampen = dampen;
-                    definition.VisemeDampenLocation = LocationOf(dampenToken);
                 }
 
                 if (root.TryGetValue("BlendShapeSets", out var setsToken) && TryArray(setsToken, "BlendShapeSets", out var sets))
@@ -182,7 +174,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         if (set == null) continue;
                         if (!names.Add(set.Name))
                         {
-                            Report(FtdiDiagnosticCode.DuplicateBlendShapeSet, setToken, set.Name);
+                            Report(FtdiDiagnosticCode.DuplicateBlendShapeSet, set.Name);
                             continue;
                         }
                         definition.BlendShapeSets.Add(set);
@@ -200,7 +192,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         {
                             _diagnostics.Add(new FtdiDiagnostic(
                                 FtdiDiagnosticCode.DuplicateOutput,
-                                behavior.TargetLocation,
                                 behavior.Operation.ToString(),
                                 behavior.Target));
                         }
@@ -231,7 +222,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryObject(token, "BlendShapeSets", out var obj)) return null;
                 CheckProperties(obj, SetProperties);
 
-                var set = new Ftdi.BlendShapeSet { Location = LocationOf(obj) };
+                var set = new Ftdi.BlendShapeSet();
                 var succeeded = TryRequired(obj, "Name", out var nameToken) && TryName(nameToken, "Name", Ftdi.MaxSetNameLength, out set.Name);
 
                 if (obj.TryGetValue("DefaultWeight", out var weightToken))
@@ -266,14 +257,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 {
                     if (!indices.TryGetValue(property.Name, out var index))
                     {
-                        Report(unknownCode, property, property.Name);
+                        Report(unknownCode, property.Name);
                         succeeded = false;
                         continue;
                     }
 
                     if (TryMapping(property.Value, out var shape, out var multiplier))
                     {
-                        mappings.Add(new Ftdi.ShapeMapping(index, shape, multiplier, LocationOf(property)));
+                        mappings.Add(new Ftdi.ShapeMapping(index, shape, multiplier));
                     }
                     else
                     {
@@ -290,7 +281,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (token.Type == JTokenType.String) return TryName(token, "Shape", int.MaxValue, out shape);
                 if (token.Type != JTokenType.Object)
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, token, "Shape", "string | object");
+                    Report(FtdiDiagnosticCode.TypeMismatch, "Shape", "string | object");
                     return false;
                 }
 
@@ -306,14 +297,13 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryObject(token, "ParameterBehaviors", out var obj)) return null;
                 CheckProperties(obj, BehaviorProperties);
 
-                var behavior = new Ftdi.ParameterBehavior { Location = LocationOf(obj) };
+                var behavior = new Ftdi.ParameterBehavior();
                 var succeeded = TryRequired(obj, "Operation", out var operationToken) && TryEnum(operationToken, "Operation", out behavior.Operation);
 
                 if (TryRequired(obj, "Target", out var targetToken))
                 {
                     var maxLength = succeeded && behavior.Operation == TargetMode.ForwardToAnimator ? Ftdi.MaxParameterNameLength : int.MaxValue;
                     succeeded &= TryName(targetToken, "Target", maxLength, out behavior.Target);
-                    behavior.TargetLocation = LocationOf(targetToken);
                 }
                 else
                 {
@@ -323,7 +313,6 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (obj.TryGetValue("Weight", out var weightToken))
                 {
                     succeeded &= TryName(weightToken, "Weight", Ftdi.MaxSetNameLength, out behavior.Weight);
-                    behavior.WeightLocation = LocationOf(weightToken);
                 }
 
                 succeeded &= TryRequired(obj, "Expression", out var expressionToken) && TryExpression(expressionToken, behavior);
@@ -351,12 +340,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryRequired(obj, "TrackingKeys", out var keysToken) || !TryArray(keysToken, "TrackingKeys", out var keys)) return false;
                 if (keys.Count == 0)
                 {
-                    Report(FtdiDiagnosticCode.NoInputs, keys);
+                    Report(FtdiDiagnosticCode.NoInputs);
                     return false;
                 }
                 if (keys.Count > Ftdi.MaxInputs)
                 {
-                    Report(FtdiDiagnosticCode.TooManyInputs, keys, Ftdi.MaxInputs.ToString());
+                    Report(FtdiDiagnosticCode.TooManyInputs, Ftdi.MaxInputs.ToString());
                     return false;
                 }
 
@@ -387,18 +376,18 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 }
                 else
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, token, "TrackingKeys", "string | object");
+                    Report(FtdiDiagnosticCode.TypeMismatch, "TrackingKeys", "string | object");
                     return false;
                 }
 
                 if (!TryString(keyToken, "Key", out var key)) return false;
                 if (!Ftdi.InputIndices.TryGetValue(key, out var index))
                 {
-                    Report(FtdiDiagnosticCode.UnknownInputKey, keyToken, key);
+                    Report(FtdiDiagnosticCode.UnknownInputKey, key);
                     return false;
                 }
 
-                input = new Ftdi.BehaviorInput(index, invert, LocationOf(keyToken));
+                input = new Ftdi.BehaviorInput(index, invert);
                 return true;
             }
 
@@ -407,14 +396,14 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 foreach (var property in obj.Properties())
                 {
                     if (allowed.Contains(property.Name)) continue;
-                    Report(FtdiDiagnosticCode.UnknownProperty, property, property.Name);
+                    Report(FtdiDiagnosticCode.UnknownProperty, property.Name);
                 }
             }
 
             private bool TryRequired(JObject obj, string name, out JToken token)
             {
                 if (obj.TryGetValue(name, out token)) return true;
-                Report(FtdiDiagnosticCode.MissingProperty, obj, name);
+                Report(FtdiDiagnosticCode.MissingProperty, name);
                 return false;
             }
 
@@ -422,7 +411,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 obj = token as JObject;
                 if (obj != null) return true;
-                Report(FtdiDiagnosticCode.TypeMismatch, token, name, "object");
+                Report(FtdiDiagnosticCode.TypeMismatch, name, "object");
                 return false;
             }
 
@@ -430,7 +419,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 array = token as JArray;
                 if (array != null) return true;
-                Report(FtdiDiagnosticCode.TypeMismatch, token, name, "array");
+                Report(FtdiDiagnosticCode.TypeMismatch, name, "array");
                 return false;
             }
 
@@ -439,7 +428,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 value = null;
                 if (token.Type != JTokenType.String)
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, token, name, "string");
+                    Report(FtdiDiagnosticCode.TypeMismatch, name, "string");
                     return false;
                 }
                 value = token.Value<string>();
@@ -451,12 +440,12 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 if (!TryString(token, name, out value)) return false;
                 if (value.Length == 0)
                 {
-                    Report(FtdiDiagnosticCode.EmptyValue, token, name);
+                    Report(FtdiDiagnosticCode.EmptyValue, name);
                     return false;
                 }
                 if (value.Length > maxLength)
                 {
-                    Report(FtdiDiagnosticCode.ValueTooLong, token, name, maxLength.ToString());
+                    Report(FtdiDiagnosticCode.ValueTooLong, name, maxLength.ToString());
                     return false;
                 }
                 return true;
@@ -467,7 +456,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 value = 0.0f;
                 if (token.Type != JTokenType.Integer && token.Type != JTokenType.Float)
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, token, name, "number");
+                    Report(FtdiDiagnosticCode.TypeMismatch, name, "number");
                     return false;
                 }
                 value = token.Value<float>();
@@ -479,7 +468,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 value = false;
                 if (token.Type != JTokenType.Boolean)
                 {
-                    Report(FtdiDiagnosticCode.TypeMismatch, token, name, "boolean");
+                    Report(FtdiDiagnosticCode.TypeMismatch, name, "boolean");
                     return false;
                 }
                 value = token.Value<bool>();
@@ -494,16 +483,16 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 var names = Enum.GetNames(typeof(T));
                 if (!names.Contains(text, StringComparer.Ordinal))
                 {
-                    Report(FtdiDiagnosticCode.InvalidEnumValue, token, name, text);
+                    Report(FtdiDiagnosticCode.InvalidEnumValue, name, text);
                     return false;
                 }
                 value = (T)Enum.Parse(typeof(T), text);
                 return true;
             }
 
-            private void Report(FtdiDiagnosticCode code, JToken token, params string[] arguments)
+            private void Report(FtdiDiagnosticCode code, params string[] arguments)
             {
-                _diagnostics.Add(new FtdiDiagnostic(code, LocationOf(token), arguments));
+                _diagnostics.Add(new FtdiDiagnostic(code, arguments));
             }
         }
     }

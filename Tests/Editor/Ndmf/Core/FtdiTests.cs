@@ -129,7 +129,7 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void ReportsUnknownKeysWithLocation()
+        public void ReportsUnknownKeys()
         {
             Parse(@"{
                 'Version': 1,
@@ -140,7 +140,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             }", out var diagnostics);
 
             Assert.That(Codes(diagnostics), Is.EqualTo(new[] { FtdiDiagnosticCode.UnknownTrackingKey, FtdiDiagnosticCode.UnknownInputKey }));
-            Assert.That(diagnostics.Select((d) => d.Location.Line), Is.EqualTo(new[] { 3, 5 }));
         }
 
         [Test]
@@ -563,7 +562,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             FtdiJson.Parse(exported, diagnostics);
             Assert.That(Codes(diagnostics), Is.EqualTo(Enumerable.Repeat(FtdiDiagnosticCode.EmptyValue, 3)));
             Assert.That(diagnostics.Select((d) => d.Arguments[0]), Is.EqualTo(new[] { "Name", "Target", "Expression" }));
-            Assert.That(diagnostics.Select((d) => d.Location.IsKnown), Has.All.True);
         }
     }
 }
