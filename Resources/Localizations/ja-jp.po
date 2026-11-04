@@ -739,12 +739,6 @@ msgstr ""
 "Avatar Descriptor に Face Tracking の設定が残っているため、Face Tracking Data Installer を適用できません。\n"
 "Face Tracking Data Installer の Inspector から現在の設定を JSON に保存してください。"
 
-msgid "ftdi.report.missing-definition"
-msgstr "Face Tracking Data Installer: 定義 JSON がありません"
-
-msgid "ftdi.report.missing-definition:description"
-msgstr "定義 JSON が割り当てられていないため、Face Tracking の設定を適用できません。"
-
 msgid "ftdi.report.invalid-definition"
 msgstr "Face Tracking Data Installer: 定義エラー"
 

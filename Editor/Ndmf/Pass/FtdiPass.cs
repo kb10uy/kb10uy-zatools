@@ -1,5 +1,6 @@
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
 using System.Collections.Generic;
+using System.Linq;
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Ndmf.Core;
@@ -33,6 +34,10 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
         {
             var descriptor = context.AvatarRootObject.GetComponent<VRCAvatarDescriptor>();
             if (descriptor == null) return;
+
+            var targets = components.Where((c) => c.Definition != null).ToList();
+            if (targets.Count == 0) return;
+
             if (Ftdi.HasExistingConfiguration(descriptor))
             {
                 ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Error, "ftdi.report.existing-configuration"));
@@ -41,15 +46,8 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             var succeeded = true;
             var sources = new List<Ftdi.Source>();
-            foreach (var component in components)
+            foreach (var component in targets)
             {
-                if (component.Definition == null)
-                {
-                    ErrorReport.ReportError(new ZatoolsNdmfError(component, ErrorSeverity.Error, "ftdi.report.missing-definition"));
-                    succeeded = false;
-                    continue;
-                }
-
                 var diagnostics = new List<FtdiDiagnostic>();
                 var definition = FtdiJson.Parse(component.Definition.text, diagnostics);
                 if (diagnostics.Count > 0)

@@ -737,12 +737,6 @@ msgstr ""
 "Face Tracking Data Installer cannot be applied because the Avatar Descriptor still has Face Tracking settings.\n"
 "Save the current settings to JSON from the Face Tracking Data Installer inspector."
 
-msgid "ftdi.report.missing-definition"
-msgstr "Face Tracking Data Installer: No definition JSON"
-
-msgid "ftdi.report.missing-definition:description"
-msgstr "Face Tracking settings cannot be applied because no definition JSON is assigned."
-
 msgid "ftdi.report.invalid-definition"
 msgstr "Face Tracking Data Installer: Definition error"
 
