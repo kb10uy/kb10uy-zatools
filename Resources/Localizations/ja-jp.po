@@ -790,7 +790,7 @@ msgstr "Face Tracking 設定の保存"
 msgid "ftdi.inspector.save-confirm"
 msgstr ""
 "Avatar Descriptor の Face Tracking 設定(メッシュ・BlendShapeSet・ParameterBehavior)を JSON に保存してこのコンポーネントに移し、Avatar Descriptor からは削除します。\n"
-"この操作は元に戻せできますが、保存した JSON ファイルは残ります。"
+"この操作は元に戻せますが、保存した JSON ファイルは残ります。"
 
 msgid "ftdi.inspector.save-confirm-ok"
 msgstr "保存して移す"
