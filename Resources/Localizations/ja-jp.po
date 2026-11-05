@@ -807,3 +807,18 @@ msgstr ""
 "Avatar Descriptor 側で以下を修正してからやり直してください。\n"
 "\n"
 "{0}"
+
+msgid "reference.report.unresolved"
+msgstr "オブジェクト参照を解決できません"
+
+msgid "reference.report.unresolved:description"
+msgstr "パス \"{0}\" のオブジェクトが見つからないか、必要なコンポーネントが付いていません。アバター内の配置を確認してください。"
+
+msgid "reference.inspector.unresolved"
+msgstr "見つかりません: {0}"
+
+msgid "reference.inspector.legacy-note"
+msgstr "旧形式の参照が設定されています。変換すると、この GameObject を別の prefab にしてもアバター内のパスで参照を解決できます。"
+
+msgid "reference.inspector.convert"
+msgstr "新形式の参照に変換"

@@ -174,3 +174,17 @@
     flex-basis: 32px;
     flex-shrink: 0;
 }
+
+.zatools-object-reference__unresolved {
+    flex-direction: row;
+    align-items: center;
+    margin-left: 3px;
+    margin-right: -2px;
+}
+
+.zatools-object-reference__path {
+    flex-grow: 1;
+    flex-shrink: 1;
+    white-space: normal;
+    color: var(--unity-colors-error-text);
+}

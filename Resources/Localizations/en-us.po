@@ -805,3 +805,18 @@ msgstr ""
 "Fix the following in the Avatar Descriptor and try again.\n"
 "\n"
 "{0}"
+
+msgid "reference.report.unresolved"
+msgstr "Object reference could not be resolved"
+
+msgid "reference.report.unresolved:description"
+msgstr "The object at path \"{0}\" was not found or does not have the required component. Check the placement in the avatar."
+
+msgid "reference.inspector.unresolved"
+msgstr "Not found: {0}"
+
+msgid "reference.inspector.legacy-note"
+msgstr "This uses a legacy reference. After converting, the reference can be resolved by its path in the avatar even if this GameObject is made into a separate prefab."
+
+msgid "reference.inspector.convert"
+msgstr "Convert to New Reference"
