@@ -219,20 +219,6 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
         }
 
         [Test]
-        public void ConvexDepthWrapperStaysSeparateWhenUnresolved()
-        {
-            var obj = CreateObject("Owner", CreateAvatar().transform);
-            var component = obj.AddComponent<ConvexDepthWrapper>();
-
-            var unset = Cdw.FixedParameters.FixFromComponent(Resolve(obj.transform, Reference(null, "")), component);
-            var unresolved = Cdw.FixedParameters.FixFromComponent(Resolve(obj.transform, Reference(null, "Missing")), component);
-
-            Assert.That(unset.SeparateSmr, Is.False);
-            Assert.That(unresolved.SeparateSmr, Is.True);
-            Assert.That(unresolved.SourceMeshRenderer == null);
-        }
-
-        [Test]
         public void FixerUpdatesPathAfterRename()
         {
             var avatar = CreateAvatar().transform;

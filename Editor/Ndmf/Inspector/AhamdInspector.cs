@@ -38,28 +38,15 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             void RefreshWarnings()
             {
                 if (component == null || targetRenderer == null) return;
-                var source = ObjectReferenceResolver.Resolve(component, component.SourceReference, component.Source);
                 SetDisplayed(meshAssignedWarning, targetRenderer.sharedMesh != null);
-                SetDisplayed(missingSourceWarning, source.State != ReferenceState.Resolved);
+                SetDisplayed(missingSourceWarning, component.Source == null);
             }
             RefreshWarnings();
 
-            ZatoolsObjectReferenceField.Attach<SkinnedMeshRenderer>(
-                inspector.Q<ObjectField>("FieldSourceReference"),
-                serializedObject.FindProperty(nameof(AdHocAdvancedMeshDuplication.SourceReference))
-            );
-            ZatoolsObjectReferenceField.AttachLegacy(
-                inspector.Q<VisualElement>("SectionSourceReference"),
-                inspector.Q<VisualElement>("SectionLegacySource"),
-                inspector.Q<Button>("ButtonConvertSource"),
+            missingSourceWarning.TrackPropertyValue(
                 serializedObject.FindProperty(nameof(AdHocAdvancedMeshDuplication.Source)),
-                () =>
-                {
-                    ObjectReferenceResolver.Assign(component, component.SourceReference, component.Source);
-                    component.Source = null;
-                }
+                (_) => RefreshWarnings()
             );
-            missingSourceWarning.TrackSerializedObjectValue(serializedObject, (_) => RefreshWarnings());
 
             var smrSerializedObject = new SerializedObject(targetRenderer);
             var sharedMeshProperty = smrSerializedObject.FindProperty("m_Mesh");

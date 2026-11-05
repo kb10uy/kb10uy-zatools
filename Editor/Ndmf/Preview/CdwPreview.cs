@@ -51,15 +51,14 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         {
             var wrapperMaterial = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperPreviewMaterialGuid));
             // ConvexDepthWrapper has DisallowMultipleComponent, a renderer will have at most one.
-            var source = ObjectReferenceResolver.Observe(context, components[0], (c) => c.SourceReference, (c) => c.SourceMeshRenderer);
-            var observedParameter = context.Observe(components[0], (c) => Cdw.FixedParameters.FixFromComponent(source, c), (op, np) => op == np);
+            var observedParameter = context.Observe(components[0], Cdw.FixedParameters.FixFromComponent, (op, np) => op == np);
 
             _separateMesh = observedParameter.SeparateSmr;
             _separateSource = observedParameter.SourceMeshRenderer;
 
             if (_separateMesh)
             {
-                if (_separateSource == null || proxyed == null || proxyed.sharedMesh != null) return default;
+                if (proxyed == null || proxyed.sharedMesh != null) return default;
 
                 var generatedMesh = new Mesh { name = $"Convex Depth Wrapper for Preview" };
                 Cdw.ProcessSeparate(proxyed, generatedMesh, observedParameter, wrapperMaterial);

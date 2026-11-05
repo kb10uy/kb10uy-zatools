@@ -5,14 +5,7 @@
         <ui:HelpBox message-type="Warning" text="ahamd.inspector.warning-mesh-assigned" name="MeshAssignedWarning" class="ndmf-tr" />
         <ui:HelpBox message-type="Warning" text="ahamd.inspector.warning-missing-source" name="MissingSourceWarning" class="ndmf-tr" />
         <ui:VisualElement class="zatools-section">
-            <ui:VisualElement name="SectionSourceReference">
-                <uie:ObjectField label="ahamd.inspector.source" name="FieldSourceReference" binding-path="SourceReference.Target" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
-            </ui:VisualElement>
-            <ui:VisualElement name="SectionLegacySource">
-                <uie:ObjectField label="ahamd.inspector.source" name="FieldSource" binding-path="Source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
-                <ui:Label text="reference.inspector.legacy-note" class="ndmf-tr zatools-note zatools-note--separated" />
-                <ui:Button name="ButtonConvertSource" text="reference.inspector.convert" class="ndmf-tr zatools-block" />
-            </ui:VisualElement>
+            <uie:ObjectField label="ahamd.inspector.source" name="FieldSource" binding-path="Source" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
         </ui:VisualElement>
         <ui:VisualElement class="zatools-section">
             <ui:Label tabindex="-1" text="ahamd.inspector.preprocess" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr zatools-section__heading" />

@@ -32,15 +32,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
-            var source = ObjectReferenceResolver.Resolve(component, component.SourceReference, component.Source);
-            if (source.State == ReferenceState.Unresolved)
-            {
-                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "reference.report.unresolved", source.Path));
-                UnityObject.DestroyImmediate(component);
-                return;
-            }
-
-            var fixedParameters = Ahamd.FixedParameters.FixFromComponent(source.Target, component);
+            var fixedParameters = Ahamd.FixedParameters.FixFromComponent(component);
             if (fixedParameters.Source == null)
             {
                 ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "ahamd.report.missing-source"));
