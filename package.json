@@ -1,7 +1,7 @@
 {
     "name": "org.kb10uy.zatools",
     "displayName": "Zatools: kb10uy's Various Tools",
-    "version": "7.0.0-beta.1",
+    "version": "7.0.0-beta.2",
     "unity": "2022.3",
     "description": "Various tools developed by kb10uy",
     "documentationUrl": "https://zatools.kb10uy.dev",
@@ -15,7 +15,7 @@
     },
     "vpmDependencies": {
         "nadena.dev.ndmf": ">=1.15.0-beta.4",
-        "nadena.dev.modular-avatar": ">=1.19.0-beta.4"
+        "nadena.dev.modular-avatar": ">=1.19.0-beta.0"
     },
     "dependencies": {
         "com.unity.burst": "1.8.0",
