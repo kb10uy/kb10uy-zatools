@@ -155,15 +155,15 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal SkinnedMeshRenderer SourceMeshRenderer;
             internal ImmutableArray<(string Name, float Value)> Overrides;
 
-            internal static FixedParameters FixFromComponent(ConvexDepthWrapper component)
+            internal static FixedParameters FixFromComponent(ResolvedReference<SkinnedMeshRenderer> source, ConvexDepthWrapper component)
             {
                 var overrides = component.Overrides
                     .Select((o) => (o.Name, o.Value))
                     .ToImmutableArray();
                 return new FixedParameters
                 {
-                    SeparateSmr = component.SourceMeshRenderer != null,
-                    SourceMeshRenderer = component.SourceMeshRenderer,
+                    SeparateSmr = source.State != ReferenceState.Unset,
+                    SourceMeshRenderer = source.Target,
                     Overrides = overrides,
                 };
             }

@@ -9,7 +9,14 @@
         </ui:VisualElement>
         <ui:VisualElement class="zatools-section">
             <ui:Label tabindex="-1" text="ftdi.inspector.meshes" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr zatools-section__heading" />
-            <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="Meshes" reorderable="true" virtualization-method="DynamicHeight" name="FieldMeshes" show-border="true" reorder-mode="Animated" />
+            <ui:VisualElement name="SectionMeshReferences">
+                <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="MeshReferences" reorderable="true" virtualization-method="DynamicHeight" name="FieldMeshReferences" show-border="true" reorder-mode="Animated" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SectionLegacyMeshes">
+                <ui:ListView show-bound-collection-size="false" show-add-remove-footer="true" binding-path="Meshes" reorderable="true" virtualization-method="DynamicHeight" name="FieldMeshes" show-border="true" reorder-mode="Animated" />
+                <ui:Label text="reference.inspector.legacy-note" class="ndmf-tr zatools-note zatools-note--separated" />
+                <ui:Button name="ButtonConvertMeshes" text="reference.inspector.convert" class="ndmf-tr zatools-block" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <uie:ObjectField label="ftdi.inspector.definition" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Definition" name="FieldDefinition" allow-scene-objects="false" class="ndmf-tr" />
         <ui:HelpBox name="BoxStatus" message-type="Info" style="margin-top: 4px; margin-bottom: 4px;" />

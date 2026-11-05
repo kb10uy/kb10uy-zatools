@@ -53,6 +53,14 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             _warningsContainer = inspector.Q<VisualElement>("ContainerWarnings");
             _summaryContainer = inspector.Q<VisualElement>("ContainerSummary");
 
+            ZatoolsObjectReferenceField.AttachLegacy(
+                inspector.Q<VisualElement>("SectionMeshReferences"),
+                inspector.Q<VisualElement>("SectionLegacyMeshes"),
+                inspector.Q<Button>("ButtonConvertMeshes"),
+                serializedObject.FindProperty(nameof(FaceTrackingDataInstaller.Meshes)),
+                ConvertLegacyMeshes
+            );
+
             _saveButton.clicked += SaveExistingConfiguration;
             inspector.TrackSerializedObjectValue(serializedObject, (_) => Refresh(false));
             inspector.RegisterCallback<AttachToPanelEvent>((_) =>
@@ -238,10 +246,7 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
             Undo.RecordObject(descriptor, title);
 
             _component.Definition = asset;
-            foreach (var mesh in descriptor.faceTrackingMeshes.Where((m) => m != null))
-            {
-                if (!_component.Meshes.Contains(mesh)) _component.Meshes.Add(mesh);
-            }
+            foreach (var mesh in descriptor.faceTrackingMeshes.Where((m) => m != null)) AddMeshReference(mesh);
             descriptor.faceTrackingMeshes = new List<SkinnedMeshRenderer>();
             descriptor.faceTrackingBlendshapesSetList = new List<VRCAvatarDescriptor.FaceTrackingBlendshapesSet>();
             descriptor.faceTrackingParameterBehaviors = new List<VRCAvatarDescriptor.FaceTrackingParameterBehavior>();
@@ -252,6 +257,21 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             serializedObject.Update();
             Refresh(true);
+        }
+
+        private void ConvertLegacyMeshes()
+        {
+            foreach (var mesh in _component.Meshes.Where((m) => m != null)) AddMeshReference(mesh);
+            _component.Meshes.Clear();
+        }
+
+        private void AddMeshReference(SkinnedMeshRenderer mesh)
+        {
+            if (_component.MeshReferences.Any((r) => r.Target == mesh)) return;
+
+            var reference = new SkinnedMeshRendererReference();
+            ObjectReferenceResolver.Assign(_component, reference, mesh);
+            _component.MeshReferences.Add(reference);
         }
 
         private VRCAvatarDescriptor FindDescriptor()

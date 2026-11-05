@@ -4,6 +4,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using KusakaFactory.Zatools.Localization;
+using KusakaFactory.Zatools.Ndmf.Core;
 using KusakaFactory.Zatools.Runtime;
 
 namespace KusakaFactory.Zatools.Ndmf.Inspector
@@ -26,16 +27,28 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
 
             var component = target as ConvexDepthWrapper;
             var targetRenderer = component.GetComponent<SkinnedMeshRenderer>();
-            var sourceMeshRendererField = inspector.Q<ObjectField>("FieldSourceMeshRenderer");
+            var sourceSection = inspector.Q<VisualElement>("SectionSource");
             var meshAssignedWarning = inspector.Q<HelpBox>("MeshAssignedWarning");
             var missingSourceMeshWarning = inspector.Q<HelpBox>("MissingSourceMeshWarning");
-            void RefreshSourceState() => UpdateSourceState(component, targetRenderer, sourceMeshRendererField, meshAssignedWarning, missingSourceMeshWarning);
+            void RefreshSourceState() => UpdateSourceState(component, targetRenderer, sourceSection, meshAssignedWarning, missingSourceMeshWarning);
             RefreshSourceState();
 
-            meshAssignedWarning.TrackPropertyValue(
-                serializedObject.FindProperty(nameof(ConvexDepthWrapper.SourceMeshRenderer)),
-                (_) => RefreshSourceState()
+            ZatoolsObjectReferenceField.Attach<SkinnedMeshRenderer>(
+                inspector.Q<ObjectField>("FieldSourceReference"),
+                serializedObject.FindProperty(nameof(ConvexDepthWrapper.SourceReference))
             );
+            ZatoolsObjectReferenceField.AttachLegacy(
+                inspector.Q<VisualElement>("SectionSourceReference"),
+                inspector.Q<VisualElement>("SectionLegacySource"),
+                inspector.Q<Button>("ButtonConvertSource"),
+                serializedObject.FindProperty(nameof(ConvexDepthWrapper.SourceMeshRenderer)),
+                () =>
+                {
+                    ObjectReferenceResolver.Assign(component, component.SourceReference, component.SourceMeshRenderer);
+                    component.SourceMeshRenderer = null;
+                }
+            );
+            meshAssignedWarning.TrackSerializedObjectValue(serializedObject, (_) => RefreshSourceState());
 
             var smrSerializedObject = new SerializedObject(targetRenderer);
             var sharedMeshProperty = smrSerializedObject.FindProperty("m_Mesh");
@@ -51,7 +64,8 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         {
             var component = target as Runtime.ConvexDepthWrapper;
             var targetSkinnedMesh = component.GetComponent<SkinnedMeshRenderer>();
-            var sharedMesh = component.SourceMeshRenderer != null ? component.SourceMeshRenderer.sharedMesh : targetSkinnedMesh.sharedMesh;
+            var source = ObjectReferenceResolver.Resolve(component, component.SourceReference, component.SourceMeshRenderer).Target;
+            var sharedMesh = source != null ? source.sharedMesh : targetSkinnedMesh.sharedMesh;
             return ZatoolsBlendShapeSelector.FetchBlendShapeNames(sharedMesh);
         }
 
@@ -68,18 +82,20 @@ namespace KusakaFactory.Zatools.Ndmf.Inspector
         private static void UpdateSourceState(
             ConvexDepthWrapper component,
             SkinnedMeshRenderer targetRenderer,
-            ObjectField sourceMeshRendererField,
+            VisualElement sourceSection,
             HelpBox meshAssignedWarning,
             HelpBox missingSourceMeshWarning)
         {
             if (component == null || targetRenderer == null) return;
 
             var meshAssigned = targetRenderer.sharedMesh != null;
-            var source = component.SourceMeshRenderer;
+            var resolved = ObjectReferenceResolver.Resolve(component, component.SourceReference, component.SourceMeshRenderer);
+            var separate = resolved.State != ReferenceState.Unset;
+            var source = resolved.Target;
             var sourceMeshGeneratedOnBuild = source != null && source.TryGetComponent<AdHocAdvancedMeshDuplication>(out _);
 
-            SetDisplayed(sourceMeshRendererField, !meshAssigned || source != null);
-            SetDisplayed(meshAssignedWarning, meshAssigned && source != null);
+            SetDisplayed(sourceSection, !meshAssigned || separate);
+            SetDisplayed(meshAssignedWarning, meshAssigned && separate);
             SetDisplayed(missingSourceMeshWarning, !meshAssigned && source != null && source.sharedMesh == null && !sourceMeshGeneratedOnBuild);
         }
     }

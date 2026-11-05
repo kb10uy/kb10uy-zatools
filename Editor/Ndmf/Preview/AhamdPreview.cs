@@ -36,7 +36,8 @@ namespace KusakaFactory.Zatools.Ndmf.Preview
         )
         {
             // AdHocAdvancedMeshDuplication has DisallowMultipleComponent, a renderer will have at most one.
-            var observedParameter = context.Observe(components[0], Ahamd.FixedParameters.FixFromComponent, (op, np) => op == np);
+            var source = ObjectReferenceResolver.Observe(context, components[0], (c) => c.SourceReference, (c) => c.Source);
+            var observedParameter = context.Observe(components[0], (c) => Ahamd.FixedParameters.FixFromComponent(source.Target, c), (op, np) => op == np);
             _source = observedParameter.Source;
             if (_source != null) context.Observe(_source, (s) => s.sharedMesh);
             if (observedParameter.SelectionTexture != null) context.Observe(observedParameter.SelectionTexture, ObserveTextureContents);

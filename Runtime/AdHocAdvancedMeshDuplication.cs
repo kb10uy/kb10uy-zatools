@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace KusakaFactory.Zatools.Runtime
@@ -7,9 +8,10 @@ namespace KusakaFactory.Zatools.Runtime
     [HelpURL("https://zatools.kb10uy.dev/ndmf-plugin/adhoc-advanced-mesh-duplication/")]
     [RequireComponent(typeof(SkinnedMeshRenderer))]
     [DisallowMultipleComponent]
-    public sealed class AdHocAdvancedMeshDuplication : ZatoolsMeshEditingComponent
+    public sealed class AdHocAdvancedMeshDuplication : ZatoolsMeshEditingComponent, IZatoolsObjectReferenceHolder
     {
         public SkinnedMeshRenderer Source;
+        public SkinnedMeshRendererReference SourceReference = new SkinnedMeshRendererReference();
 
         // Preprocess
         public Texture2D SelectionTexture = null;
@@ -23,6 +25,9 @@ namespace KusakaFactory.Zatools.Runtime
         // Postprocess
         public bool RecalculateNormals = false;
         public bool RecalculateTangents = false;
+
+        IEnumerable<ZatoolsObjectReference> IZatoolsObjectReferenceHolder.GetObjectReferences() =>
+            new ZatoolsObjectReference[] { SourceReference };
     }
 
     [Serializable]

@@ -4,8 +4,15 @@
         <nadena.dev.ndmf.ui.LanguageSwitcher class="zatools-language-switcher" />
         <ui:HelpBox message-type="Warning" text="cdw.inspector.warning-mesh-assigned" name="MeshAssignedWarning" class="ndmf-tr" />
         <ui:HelpBox message-type="Warning" text="cdw.inspector.warning-missing-source-mesh" name="MissingSourceMeshWarning" class="ndmf-tr" />
-        <ui:VisualElement class="zatools-section">
-            <uie:ObjectField label="cdw.inspector.source" name="FieldSourceMeshRenderer" binding-path="SourceMeshRenderer" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
+        <ui:VisualElement name="SectionSource" class="zatools-section">
+            <ui:VisualElement name="SectionSourceReference">
+                <uie:ObjectField label="cdw.inspector.source" name="FieldSourceReference" binding-path="SourceReference.Target" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SectionLegacySource">
+                <uie:ObjectField label="cdw.inspector.source" name="FieldSourceMeshRenderer" binding-path="SourceMeshRenderer" type="UnityEngine.SkinnedMeshRenderer, UnityEngine.CoreModule" class="ndmf-tr" />
+                <ui:Label text="reference.inspector.legacy-note" class="ndmf-tr zatools-note zatools-note--separated" />
+                <ui:Button name="ButtonConvertSource" text="reference.inspector.convert" class="ndmf-tr zatools-block" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Foldout text="cdw.inspector.advanced" value="false" class="ndmf-tr zatools-foldout--flush zatools-section">
             <ui:VisualElement class="zatools-section">

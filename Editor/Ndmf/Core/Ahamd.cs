@@ -769,11 +769,11 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal bool RecalculateNormals;
             internal bool RecalculateTangents;
 
-            internal static FixedParameters FixFromComponent(AdHocAdvancedMeshDuplication component)
+            internal static FixedParameters FixFromComponent(SkinnedMeshRenderer source, AdHocAdvancedMeshDuplication component)
             {
                 return new FixedParameters()
                 {
-                    Source = component.Source,
+                    Source = source,
                     SelectionTexture = component.SelectionTexture,
                     SelectionTextureUv = component.SelectionTextureUv,
                     SelectionExpression = component.SelectionExpression,

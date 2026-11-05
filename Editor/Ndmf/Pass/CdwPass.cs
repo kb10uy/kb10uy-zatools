@@ -25,7 +25,15 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
         private void ProcessFor(CdwComponent component, SkinnedMeshRenderer skinnedMeshRenderer, Transform avatarRoot)
         {
-            var fixedParameters = Cdw.FixedParameters.FixFromComponent(component);
+            var source = ObjectReferenceResolver.Resolve(component, component.SourceReference, component.SourceMeshRenderer);
+            if (source.State == ReferenceState.Unresolved)
+            {
+                ErrorReport.ReportError(new ZatoolsNdmfError(component.gameObject, ErrorSeverity.NonFatal, "reference.report.unresolved", source.Path));
+                UnityObject.DestroyImmediate(component);
+                return;
+            }
+
+            var fixedParameters = Cdw.FixedParameters.FixFromComponent(source, component);
             var assigningMaterial = component.MaterialOverride != null ?
                 component.MaterialOverride :
                 AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(WrapperMaterialGuid));

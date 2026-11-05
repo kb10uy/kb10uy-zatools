@@ -18,7 +18,11 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Resolving)
                 .Run(new VsvcResolving())
                 .Then.Run(new AsvResolving())
-                .Then.Run(new EepiResolving());
+                .Then.Run(new EepiResolving())
+#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
+                .Then.Run(new FtdiResolving())
+#endif
+                ;
 
             // Generating before APS
             InPhase(BuildPhase.Generating)

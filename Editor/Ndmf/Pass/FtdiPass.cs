@@ -1,6 +1,7 @@
 #if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using nadena.dev.ndmf;
 using KusakaFactory.Zatools.Ndmf.Core;
@@ -9,6 +10,30 @@ using FtdiComponent = KusakaFactory.Zatools.Runtime.FaceTrackingDataInstaller;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
+    internal sealed class FtdiState
+    {
+        internal readonly Dictionary<FtdiComponent, List<ResolvedReference<SkinnedMeshRenderer>>> Meshes =
+            new Dictionary<FtdiComponent, List<ResolvedReference<SkinnedMeshRenderer>>>();
+
+        internal static FtdiState Initializer(BuildContext context) => new FtdiState();
+    }
+
+    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
+    internal sealed class FtdiResolving : ZatoolsPass<FtdiResolving>
+    {
+        protected override string ZatoolsPassName => nameof(FtdiResolving);
+        protected override string ZatoolsPassDescription => "Resolve face tracking mesh references";
+
+        protected override void Execute(BuildContext context)
+        {
+            var state = context.GetState(FtdiState.Initializer);
+            foreach (var component in context.AvatarRootObject.GetComponentsInChildren<FtdiComponent>())
+            {
+                state.Meshes[component] = ObjectReferenceResolver.ResolveAll(component, component.MeshReferences, component.Meshes);
+            }
+        }
+    }
+
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class FtdiTransforming : ZatoolsPass<FtdiTransforming>
     {
@@ -44,10 +69,18 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                 return;
             }
 
+            var state = context.GetState(FtdiState.Initializer);
             var succeeded = true;
             var sources = new List<Ftdi.Source>();
             foreach (var component in targets)
             {
+                var meshes = state.Meshes[component];
+                foreach (var mesh in meshes.Where((m) => m.State == ReferenceState.Unresolved))
+                {
+                    ErrorReport.ReportError(new ZatoolsNdmfError(component, ErrorSeverity.Error, "reference.report.unresolved", mesh.Path));
+                    succeeded = false;
+                }
+
                 var diagnostics = new List<FtdiDiagnostic>();
                 var definition = FtdiJson.Parse(component.Definition.text, diagnostics);
                 if (diagnostics.Count > 0)
@@ -56,7 +89,12 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
                     succeeded = false;
                     continue;
                 }
-                sources.Add(new Ftdi.Source { Context = component, Definition = definition, Meshes = component.Meshes });
+                sources.Add(new Ftdi.Source
+                {
+                    Context = component,
+                    Definition = definition,
+                    Meshes = meshes.Where((m) => m.State == ReferenceState.Resolved).Select((m) => m.Target).ToList(),
+                });
             }
             if (!succeeded) return;
 
