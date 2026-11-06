@@ -140,6 +140,29 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 diagnostics);
         }
 
+        internal static Source ExistingSource(VRCAvatarDescriptor descriptor, List<FtdiDiagnostic> diagnostics)
+        {
+            return ExistingSource(
+                descriptor,
+                descriptor.faceTrackingBlendshapesSetList ?? new List<SdkBlendShapeSet>(),
+                descriptor.faceTrackingParameterBehaviors ?? new List<SdkParameterBehavior>(),
+                descriptor.faceTrackingMeshes,
+                diagnostics);
+        }
+
+        internal static Source ExistingSource(
+            UnityObject context,
+            IEnumerable<SdkBlendShapeSet> sets,
+            IEnumerable<SdkParameterBehavior> behaviors,
+            IReadOnlyList<SkinnedMeshRenderer> meshes,
+            List<FtdiDiagnostic> diagnostics)
+        {
+            var definition = Export(sets, behaviors, false, default, diagnostics);
+            definition.UseAllTrackingKeys = null;
+            definition.VisemeDampen = null;
+            return new Source { Context = context, Definition = definition, Meshes = meshes, Existing = true };
+        }
+
         internal static Definition Export(
             IEnumerable<SdkBlendShapeSet> sets,
             IEnumerable<SdkParameterBehavior> behaviors,
@@ -312,6 +335,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             internal UnityObject Context;
             internal Definition Definition;
             internal IReadOnlyList<SkinnedMeshRenderer> Meshes;
+            internal bool Existing;
         }
 
         internal sealed class Configuration
@@ -334,6 +358,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             private readonly Dictionary<(TargetMode, string), UnityObject> _outputs = new Dictionary<(TargetMode, string), UnityObject>();
             private (bool Value, UnityObject Context)? _useAllTrackingKeys;
             private (VisemeDampen Value, UnityObject Context)? _visemeDampen;
+            private UnityObject _existing;
 
             internal Merger(List<FtdiDiagnostic> diagnostics)
             {
@@ -344,6 +369,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
             {
                 var context = source.Context;
                 var definition = source.Definition;
+                if (source.Existing) _existing = context;
 
                 if (definition.UseAllTrackingKeys.HasValue)
                 {
@@ -385,7 +411,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                         var key = (behavior.Operation, behavior.Target);
                         if (_outputs.TryGetValue(key, out var first))
                         {
-                            Report(FtdiDiagnosticCode.OutputConflict, context, behavior.Operation.ToString(), behavior.Target, ContextName(first));
+                            if (!source.Existing) Report(FtdiDiagnosticCode.OutputConflict, context, behavior.Operation.ToString(), behavior.Target, ContextName(first));
                         }
                         else
                         {
@@ -401,7 +427,7 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                 var useAllTrackingKeys = _useAllTrackingKeys?.Value ?? fallbackUseAllTrackingKeys;
                 if (!useAllTrackingKeys) CheckNonBasicKeys();
 
-                foreach (var (context, behavior) in _behaviors)
+                foreach (var (context, behavior) in _behaviors.Where((b) => !IsExisting(b.Context)))
                 {
                     if (behavior.Operation == TargetMode.ApplyBlendSetWeight && !_setsByName.ContainsKey(behavior.Target))
                     {
@@ -472,19 +498,24 @@ namespace KusakaFactory.Zatools.Ndmf.Core
                     for (var i = 0; i < TrackingKeyCount; ++i)
                     {
                         var slot = set.TrackingKeys[i];
-                        if (slot.Mapping.HasValue && !IsBasicInput(i))
+                        if (slot.Mapping.HasValue && !IsBasicInput(i) && !IsExisting(slot.Context))
                         {
                             Report(FtdiDiagnosticCode.NonBasicTrackingKey, slot.Context, TrackingKeyNames[i]);
                         }
                     }
                 }
-                foreach (var (context, behavior) in _behaviors)
+                foreach (var (context, behavior) in _behaviors.Where((b) => !IsExisting(b.Context)))
                 {
                     foreach (var input in behavior.Inputs.Where((i) => !IsBasicInput(i.Index)))
                     {
                         Report(FtdiDiagnosticCode.NonBasicTrackingKey, context, InputName(input.Index));
                     }
                 }
+            }
+
+            private bool IsExisting(UnityObject context)
+            {
+                return _existing != null && context == _existing;
             }
 
             private void Report(FtdiDiagnosticCode code, UnityObject context, params string[] arguments)

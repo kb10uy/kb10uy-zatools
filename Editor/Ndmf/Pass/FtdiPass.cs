@@ -10,30 +10,6 @@ using FtdiComponent = KusakaFactory.Zatools.Runtime.FaceTrackingDataInstaller;
 
 namespace KusakaFactory.Zatools.Ndmf.Pass
 {
-    internal sealed class FtdiState
-    {
-        internal readonly Dictionary<FtdiComponent, List<ResolvedReference<SkinnedMeshRenderer>>> Meshes =
-            new Dictionary<FtdiComponent, List<ResolvedReference<SkinnedMeshRenderer>>>();
-
-        internal static FtdiState Initializer(BuildContext context) => new FtdiState();
-    }
-
-    [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
-    internal sealed class FtdiResolving : ZatoolsPass<FtdiResolving>
-    {
-        protected override string ZatoolsPassName => nameof(FtdiResolving);
-        protected override string ZatoolsPassDescription => "Resolve face tracking mesh references";
-
-        protected override void Execute(BuildContext context)
-        {
-            var state = context.GetState(FtdiState.Initializer);
-            foreach (var component in context.AvatarRootObject.GetComponentsInChildren<FtdiComponent>())
-            {
-                state.Meshes[component] = ObjectReferenceResolver.ResolveAll(component, component.MeshReferences, component.Meshes);
-            }
-        }
-    }
-
     [RunsOnPlatforms(WellKnownPlatforms.VRChatAvatar30)]
     internal sealed class FtdiTransforming : ZatoolsPass<FtdiTransforming>
     {
@@ -47,7 +23,7 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
 
             try
             {
-                Install(context, components);
+                Install(context.AvatarRootObject, components);
             }
             finally
             {
@@ -55,26 +31,20 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
         }
 
-        private static void Install(BuildContext context, FtdiComponent[] components)
+        private static void Install(GameObject avatarRoot, FtdiComponent[] components)
         {
-            var descriptor = context.AvatarRootObject.GetComponent<VRCAvatarDescriptor>();
+            var descriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
             if (descriptor == null) return;
 
             var targets = components.Where((c) => c.Definition != null).ToList();
             if (targets.Count == 0) return;
 
-            if (Ftdi.HasExistingConfiguration(descriptor))
-            {
-                ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Error, "ftdi.report.existing-configuration"));
-                return;
-            }
-
-            var state = context.GetState(FtdiState.Initializer);
             var succeeded = true;
-            var sources = new List<Ftdi.Source>();
+            var mergeDiagnostics = new List<FtdiDiagnostic>();
+            var sources = new List<Ftdi.Source> { Ftdi.ExistingSource(descriptor, mergeDiagnostics) };
             foreach (var component in targets)
             {
-                var meshes = state.Meshes[component];
+                var meshes = ObjectReferenceResolver.ResolveAll(component, component.MeshReferences, component.Meshes);
                 foreach (var mesh in meshes.Where((m) => m.State == ReferenceState.Unresolved))
                 {
                     ErrorReport.ReportError(new ZatoolsNdmfError(component, ErrorSeverity.Error, "reference.report.unresolved", mesh.Path));
@@ -98,7 +68,6 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
             if (!succeeded) return;
 
-            var mergeDiagnostics = new List<FtdiDiagnostic>();
             var configuration = Ftdi.Merge(sources, descriptor.useAllTrackingKeys, mergeDiagnostics);
             if (mergeDiagnostics.Count > 0)
             {

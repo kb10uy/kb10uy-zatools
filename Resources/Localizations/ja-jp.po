@@ -731,14 +731,6 @@ msgstr "BlendShapeSet は {0} 個までです"
 msgid "ftdi.diagnostic.too-many-parameter-behaviors"
 msgstr "ParameterBehavior は {0} 個までです"
 
-msgid "ftdi.report.existing-configuration"
-msgstr "Face Tracking Data Installer: Avatar Descriptor に既存の設定があります"
-
-msgid "ftdi.report.existing-configuration:description"
-msgstr ""
-"Avatar Descriptor に Face Tracking の設定が残っているため、Face Tracking Data Installer を適用できません。\n"
-"Face Tracking Data Installer の Inspector から現在の設定を JSON に保存してください。"
-
 msgid "ftdi.report.invalid-definition"
 msgstr "Face Tracking Data Installer: 定義エラー"
 
@@ -755,7 +747,7 @@ msgid "ftdi.diagnostic.inactive-visemes"
 msgstr "Lip Sync が Viseme BlendShape Face Tracking ではないため、この定義の Viseme 関連の設定は無効です。"
 
 msgid "ftdi.inspector.warning-existing"
-msgstr "Avatar Descriptor に Face Tracking の設定が残っているため、ビルド時にエラーになる可能性があります。"
+msgstr "Avatar Descriptor に Face Tracking の設定があります。ビルド時にこの定義と統合され、競合する場合はエラーになります。"
 
 msgid "ftdi.inspector.save-existing"
 msgstr "現在の設定を JSON に保存して移行する"
