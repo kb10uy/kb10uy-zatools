@@ -18,11 +18,7 @@ namespace KusakaFactory.Zatools.Ndmf
             InPhase(BuildPhase.Resolving)
                 .Run(new VsvcResolving())
                 .Then.Run(new AsvResolving())
-                .Then.Run(new EepiResolving())
-#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
-                .Then.Run(new FtdiResolving())
-#endif
-                ;
+                .Then.Run(new EepiResolving());
 
             // Generating before APS
             InPhase(BuildPhase.Generating)
@@ -46,7 +42,11 @@ namespace KusakaFactory.Zatools.Ndmf
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .Run(new BariTransforming())
                 .Then.Run(new AhnbTransforming()).PreviewingWith(new AhnbRenderFilter())
-                .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter());
+                .Then.Run(new AhbsmTransforming()).PreviewingWith(new AhbsmRenderFilter())
+#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
+                .Then.Run(new FtdiTransforming())
+#endif
+                ;
 
             // Transforming before MA with VirtualControllerContext
             InPhase(BuildPhase.Transforming)
@@ -60,11 +60,7 @@ namespace KusakaFactory.Zatools.Ndmf
             // Transforming after MA (only)
             InPhase(BuildPhase.Transforming)
                 .AfterPlugin("nadena.dev.modular-avatar")
-                .Run(new PbitTransforming())
-#if ZATOOLS_HAS_VRCSDK_FACE_TRACKING
-                .Then.Run(new FtdiTransforming())
-#endif
-                ;
+                .Run(new PbitTransforming());
 
             // Transforming after MA, APS
             InPhase(BuildPhase.Transforming)
