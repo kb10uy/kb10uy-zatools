@@ -39,14 +39,9 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             var targets = components.Where((c) => c.Definition != null).ToList();
             if (targets.Count == 0) return;
 
-            if (Ftdi.HasExistingConfiguration(descriptor))
-            {
-                ErrorReport.ReportError(new ZatoolsNdmfError(descriptor, ErrorSeverity.Error, "ftdi.report.existing-configuration"));
-                return;
-            }
-
             var succeeded = true;
-            var sources = new List<Ftdi.Source>();
+            var mergeDiagnostics = new List<FtdiDiagnostic>();
+            var sources = new List<Ftdi.Source> { Ftdi.ExistingSource(descriptor, mergeDiagnostics) };
             foreach (var component in targets)
             {
                 var meshes = ObjectReferenceResolver.ResolveAll(component, component.MeshReferences, component.Meshes);
@@ -73,7 +68,6 @@ namespace KusakaFactory.Zatools.Ndmf.Pass
             }
             if (!succeeded) return;
 
-            var mergeDiagnostics = new List<FtdiDiagnostic>();
             var configuration = Ftdi.Merge(sources, descriptor.useAllTrackingKeys, mergeDiagnostics);
             if (mergeDiagnostics.Count > 0)
             {

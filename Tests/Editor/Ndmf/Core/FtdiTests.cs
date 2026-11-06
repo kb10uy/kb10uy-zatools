@@ -421,6 +421,105 @@ namespace KusakaFactory.Zatools.Tests.Ndmf.Core
             Assert.That(Codes(tooMany), Is.EqualTo(new[] { FtdiDiagnosticCode.TooManyMeshes }));
         }
 
+        private Ftdi.Source Existing(SdkBlendShapeSet[] sets, SdkParameterBehavior[] behaviors, params SkinnedMeshRenderer[] meshes)
+        {
+            var context = new GameObject("FtdiTestsDescriptor");
+            _createdObjects.Add(context);
+            var diagnostics = new List<FtdiDiagnostic>();
+            var source = Ftdi.ExistingSource(context, sets, behaviors, meshes, diagnostics);
+            Assert.That(Codes(diagnostics), Is.Empty);
+            return source;
+        }
+
+        private static SdkBlendShapeSet ExistingSet(string name, int key, string shape)
+        {
+            var names = new string[Ftdi.TrackingKeyCount];
+            names[key] = shape;
+            return new SdkBlendShapeSet { setName = name, setWeight = 1.0f, faceTrackingBlendshapeNames = names };
+        }
+
+        private static SdkParameterBehavior ExistingForward(string parameter)
+        {
+            return new SdkParameterBehavior
+            {
+                targetMode = TargetMode.ForwardToAnimator,
+                outputParameterName = parameter,
+                combineMode = CombineMode.Custom,
+                customExpression = "Voice",
+            };
+        }
+
+        [Test]
+        public void MergesExistingDataBeforeDefinitions()
+        {
+            var shared = CreateRenderer();
+            var existingMesh = CreateRenderer();
+            var configuration = Merge(
+                out var diagnostics,
+                Existing(
+                    new[] { ExistingSet("Face", (int)FaceTrackingKey.JawOpen, "jaw") },
+                    new[] { ExistingForward("A") },
+                    existingMesh,
+                    shared),
+                Source(@"{
+                    'Version': 1,
+                    'UseAllTrackingKeys': true,
+                    'BlendShapeSets': [{ 'Name': 'Face', 'TrackingKeys': { 'EyeClosedLeft': 'blink' } }],
+                    'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'B', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['Voice'] } }]
+                }", shared));
+
+            Assert.That(Codes(diagnostics), Is.Empty);
+            Assert.That(configuration.Meshes, Is.EqualTo(new[] { existingMesh, shared }));
+            var set = configuration.BlendShapeSets.Single();
+            Assert.That(set.faceTrackingBlendshapeNames[(int)FaceTrackingKey.JawOpen], Is.EqualTo("jaw"));
+            Assert.That(set.faceTrackingBlendshapeNames[(int)FaceTrackingKey.EyeClosedLeft], Is.EqualTo("blink"));
+            Assert.That(configuration.ParameterBehaviors.Select((b) => b.outputParameterName), Is.EqualTo(new[] { "A", "B" }));
+        }
+
+        [Test]
+        public void ExistingDataHasNoOpinionOnGlobalSettings()
+        {
+            var existing = Existing(new SdkBlendShapeSet[0], new SdkParameterBehavior[0]);
+            var configuration = Merge(out var diagnostics, existing, Source("{ 'Version': 1, 'UseAllTrackingKeys': true }"));
+            Assert.That(Codes(diagnostics), Is.Empty);
+            Assert.That(configuration.UseAllTrackingKeys, Is.True);
+            Assert.That(configuration.VisemeDampen, Is.Null);
+        }
+
+        [Test]
+        public void ReportsConflictsBetweenExistingDataAndDefinitions()
+        {
+            Merge(
+                out var diagnostics,
+                Existing(
+                    new[] { ExistingSet("Face", (int)FaceTrackingKey.JawOpen, "jaw") },
+                    new[] { ExistingForward("A") }),
+                Source(@"{
+                    'Version': 1,
+                    'BlendShapeSets': [{ 'Name': 'Face', 'TrackingKeys': { 'JawOpen': 'other' } }],
+                    'ParameterBehaviors': [{ 'Operation': 'ForwardToAnimator', 'Target': 'A', 'Expression': { 'Type': 'Max', 'TrackingKeys': ['Voice'] } }]
+                }"));
+
+            Assert.That(Codes(diagnostics), Is.EquivalentTo(new[] { FtdiDiagnosticCode.TrackingKeyConflict, FtdiDiagnosticCode.OutputConflict }));
+        }
+
+        [Test]
+        public void DoesNotValidateExistingDataOnItsOwn()
+        {
+            var nonBasic = Enumerable.Range(0, Ftdi.TrackingKeyCount).First((i) => !Ftdi.IsBasicInput(i));
+            var dangling = ExistingForward("A");
+            dangling.weightBlendSetName = "Missing";
+            var configuration = Merge(
+                out var diagnostics,
+                Existing(
+                    new[] { ExistingSet("Face", nonBasic, "shape") },
+                    new[] { dangling, ExistingForward("A") }),
+                Source("{ 'Version': 1 }"));
+
+            Assert.That(Codes(diagnostics), Is.Empty);
+            Assert.That(configuration.ParameterBehaviors.Length, Is.EqualTo(2));
+        }
+
         [Test]
         public void ConvertsBehaviorsToSdkFields()
         {
