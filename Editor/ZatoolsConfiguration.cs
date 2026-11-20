@@ -10,6 +10,7 @@ namespace KusakaFactory.Zatools
         internal sealed class ConfigurationObject
         {
             public bool EnableAsvScanUnmergedArmature = false;
+            public bool ClearUndoOnExitingPlayMode = false;
         }
 
         [MenuItem(MENU_PREFIX_ASV + "Scan suspicious unmerged armature")]
@@ -25,6 +26,43 @@ namespace KusakaFactory.Zatools
         {
             Menu.SetChecked(MENU_PREFIX_ASV + "Scan suspicious unmerged armature", Current.EnableAsvScanUnmergedArmature);
             return true;
+        }
+
+        [MenuItem(MENU_PREFIX_ADVANCED + "Clear undo history on exiting play mode")]
+        internal static void ToggleClearUndoOnExitingPlayMode()
+        {
+            if (!Current.ClearUndoOnExitingPlayMode)
+            {
+                var accepted = EditorUtility.DisplayDialog(
+                    "Zatools",
+                    "When enabled, the entire undo history is cleared every time you exit play mode. Changes made before entering play mode can no longer be undone.\n\nEnable this option?",
+                    "Enable",
+                    "Cancel"
+                );
+                if (!accepted) return;
+            }
+
+            Current.ClearUndoOnExitingPlayMode = !Current.ClearUndoOnExitingPlayMode;
+            Menu.SetChecked(MENU_PREFIX_ADVANCED + "Clear undo history on exiting play mode", Current.ClearUndoOnExitingPlayMode);
+            Save();
+        }
+
+        [MenuItem(MENU_PREFIX_ADVANCED + "Clear undo history on exiting play mode", validate = true)]
+        private static bool InitializeClearUndoOnExitingPlayMode()
+        {
+            Menu.SetChecked(MENU_PREFIX_ADVANCED + "Clear undo history on exiting play mode", Current.ClearUndoOnExitingPlayMode);
+            return true;
+        }
+
+        [InitializeOnLoadMethod]
+        private static void RegisterPlayModeUndoCleaner()
+        {
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+
+        private static void OnPlayModeStateChanged(PlayModeStateChange change)
+        {
+            if (change == PlayModeStateChange.ExitingPlayMode && Current.ClearUndoOnExitingPlayMode) Undo.ClearAll();
         }
 
 #if UNITY_EDITOR_WIN
@@ -44,6 +82,7 @@ namespace KusakaFactory.Zatools
         private const string EDITOR_USER_SETTINGS_KEY = "ZatoolsConfigurationJson";
         private const string MENU_PREFIX = "Tools/Zatools: kb10uy's Various Tools/";
         private const string MENU_PREFIX_ASV = MENU_PREFIX + "Avatar Status Validator/";
+        private const string MENU_PREFIX_ADVANCED = MENU_PREFIX + "Advanced/";
         private static ConfigurationObject _current = null;
         internal static ConfigurationObject Current
         {
